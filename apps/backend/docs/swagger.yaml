@@ -1,0 +1,1098 @@
+basePath: /api/v1/{tenant_id}
+definitions:
+  github_com_aralvesandrade_cafeos_internal_domain_entity.Harvest:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      estimated_production:
+        type: number
+      id:
+        type: string
+      status:
+        $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.HarvestStatus'
+      tenant_id:
+        type: string
+      updated_at:
+        type: string
+      year:
+        type: integer
+    type: object
+  github_com_aralvesandrade_cafeos_internal_domain_entity.HarvestStatus:
+    enum:
+    - planejada
+    - em_andamento
+    - finalizada
+    type: string
+    x-enum-varnames:
+    - HarvestPlanejada
+    - HarvestEmAndamento
+    - HarvestFinalizada
+  github_com_aralvesandrade_cafeos_internal_domain_entity.Indicator:
+    properties:
+      calculated_at:
+        type: string
+      harvest_id:
+        type: string
+      id:
+        type: string
+      plot_id:
+        type: string
+      tenant_id:
+        type: string
+      type:
+        $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.IndicatorType'
+      value:
+        type: number
+    type: object
+  github_com_aralvesandrade_cafeos_internal_domain_entity.IndicatorType:
+    enum:
+    - sacas_por_hectare
+    - custo_por_saca
+    - rentabilidade
+    - bienalidade
+    - producao_total
+    - custo_total
+    type: string
+    x-enum-varnames:
+    - IndSacasHA
+    - IndCustoSaca
+    - IndRentabilidade
+    - IndBienalidade
+    - IndProducaoTotal
+    - IndCustoTotal
+  github_com_aralvesandrade_cafeos_internal_domain_entity.Operation:
+    properties:
+      cost:
+        type: number
+      created_at:
+        type: string
+      date:
+        type: string
+      id:
+        type: string
+      notes:
+        type: string
+      plot_id:
+        type: string
+      product_used:
+        type: string
+      quantity:
+        type: number
+      responsible:
+        type: string
+      tenant_id:
+        type: string
+      type:
+        $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.OperationType'
+    type: object
+  github_com_aralvesandrade_cafeos_internal_domain_entity.OperationType:
+    enum:
+    - adubacao
+    - pulverizacao
+    - irrigacao
+    - poda
+    - colheita
+    type: string
+    x-enum-varnames:
+    - OpAdubacao
+    - OpPulverizacao
+    - OpIrrigacao
+    - OpPoda
+    - OpColheita
+  internal_api_handler.DashboardResponse:
+    properties:
+      cost_per_saca:
+        type: number
+      harvests:
+        items:
+          $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.Harvest'
+        type: array
+      indicators:
+        items:
+          $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.Indicator'
+        type: array
+      recent_operations:
+        items:
+          $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.Operation'
+        type: array
+      sacas_per_ha:
+        type: number
+      total_cost:
+        type: number
+      total_production:
+        type: number
+    type: object
+  internal_api_handler.SwaggerFarm:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      planted_area_ha:
+        type: number
+      tenant_id:
+        type: string
+      total_area_ha:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  internal_api_handler.SwaggerHarvest:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      estimated_production:
+        type: number
+      id:
+        type: string
+      status:
+        $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.HarvestStatus'
+      tenant_id:
+        type: string
+      updated_at:
+        type: string
+      year:
+        type: integer
+    type: object
+  internal_api_handler.SwaggerHarvestProduction:
+    properties:
+      harvest_id:
+        type: string
+      id:
+        type: string
+      notes:
+        type: string
+      plot_id:
+        type: string
+      quantity:
+        type: number
+      recorded_at:
+        type: string
+      tenant_id:
+        type: string
+    type: object
+  internal_api_handler.SwaggerOperation:
+    properties:
+      cost:
+        type: number
+      created_at:
+        type: string
+      date:
+        type: string
+      id:
+        type: string
+      notes:
+        type: string
+      plot_id:
+        type: string
+      product_used:
+        type: string
+      quantity:
+        type: number
+      responsible:
+        type: string
+      tenant_id:
+        type: string
+      type:
+        $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.OperationType'
+    type: object
+  internal_api_handler.SwaggerPlot:
+    properties:
+      altitude:
+        type: integer
+      area_ha:
+        type: number
+      created_at:
+        type: string
+      cultivar:
+        type: string
+      farm_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      planting_year:
+        type: integer
+      soil_type:
+        type: string
+      tenant_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  internal_api_handler.createFarmRequest:
+    properties:
+      location:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      planted_area_ha:
+        type: number
+      total_area_ha:
+        type: number
+    type: object
+  internal_api_handler.createHarvestRequest:
+    properties:
+      description:
+        type: string
+      estimated_production:
+        type: number
+      year:
+        type: integer
+    type: object
+  internal_api_handler.createOperationRequest:
+    properties:
+      cost:
+        type: number
+      date:
+        type: string
+      notes:
+        type: string
+      plot_id:
+        type: string
+      product_used:
+        type: string
+      quantity:
+        type: number
+      responsible:
+        type: string
+      type:
+        type: string
+    type: object
+  internal_api_handler.createPlotRequest:
+    properties:
+      altitude:
+        type: integer
+      area_ha:
+        type: number
+      cultivar:
+        type: string
+      farm_id:
+        type: string
+      name:
+        type: string
+      planting_year:
+        type: integer
+      soil_type:
+        type: string
+    type: object
+  internal_api_handler.recordProductionRequest:
+    properties:
+      notes:
+        type: string
+      plot_id:
+        type: string
+      quantity:
+        type: number
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Plataforma SaaS especializada em cafeicultura para gestão operacional,
+    produtiva, financeira e analítica de propriedades cafeeiras.
+  license:
+    name: Proprietary
+  title: CafeOS API
+  version: 0.1.0
+paths:
+  /api/v1/{tenant_id}/dashboard:
+    get:
+      description: Returns consolidated production, costs, indicators and recent operations
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_api_handler.DashboardResponse'
+      security:
+      - BearerAuth: []
+      summary: Get dashboard
+      tags:
+      - dashboard
+  /api/v1/{tenant_id}/farms:
+    get:
+      description: List all farms belonging to the tenant
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_api_handler.SwaggerFarm'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List farms
+      tags:
+      - farms
+    post:
+      consumes:
+      - application/json
+      description: Register a new farm in the tenant
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Farm data
+        in: body
+        name: farm
+        required: true
+        schema:
+          $ref: '#/definitions/internal_api_handler.createFarmRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_api_handler.SwaggerFarm'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a farm
+      tags:
+      - farms
+  /api/v1/{tenant_id}/farms/{farm_id}/plots:
+    get:
+      description: List all plots (talhões) belonging to a farm
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Farm ID
+        in: path
+        name: farm_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_api_handler.SwaggerPlot'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List plots by farm
+      tags:
+      - plots
+  /api/v1/{tenant_id}/farms/{id}:
+    delete:
+      description: Delete a farm by ID
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Farm ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a farm
+      tags:
+      - farms
+    get:
+      description: Returns a single farm
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Farm ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_api_handler.SwaggerFarm'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get farm by ID
+      tags:
+      - farms
+    put:
+      consumes:
+      - application/json
+      description: Update farm data by ID
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Farm ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated farm data
+        in: body
+        name: farm
+        required: true
+        schema:
+          $ref: '#/definitions/internal_api_handler.SwaggerFarm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_api_handler.SwaggerFarm'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a farm
+      tags:
+      - farms
+  /api/v1/{tenant_id}/harvests:
+    get:
+      description: List all harvests (safras) for the tenant
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_api_handler.SwaggerHarvest'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List harvests
+      tags:
+      - harvests
+    post:
+      consumes:
+      - application/json
+      description: Register a new harvest (safra) for a year
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Harvest data
+        in: body
+        name: harvest
+        required: true
+        schema:
+          $ref: '#/definitions/internal_api_handler.createHarvestRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_api_handler.SwaggerHarvest'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a harvest
+      tags:
+      - harvests
+  /api/v1/{tenant_id}/harvests/{id}:
+    get:
+      description: Returns a single harvest (safra)
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Harvest ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_api_handler.SwaggerHarvest'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get harvest by ID
+      tags:
+      - harvests
+  /api/v1/{tenant_id}/harvests/{id}/finalize:
+    put:
+      description: Finalize a harvest (safra), calculating all indicators (sacas/ha,
+        custo/saca, etc.)
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Harvest ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Finalize a harvest
+      tags:
+      - harvests
+  /api/v1/{tenant_id}/harvests/{id}/production:
+    get:
+      description: Get all production records for a given harvest
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Harvest ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_api_handler.SwaggerHarvestProduction'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get harvest production
+      tags:
+      - harvests
+    post:
+      consumes:
+      - application/json
+      description: Record production quantity for a specific plot in a harvest
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Harvest ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Production data
+        in: body
+        name: production
+        required: true
+        schema:
+          $ref: '#/definitions/internal_api_handler.recordProductionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_api_handler.SwaggerHarvestProduction'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Record harvest production
+      tags:
+      - harvests
+  /api/v1/{tenant_id}/operations:
+    get:
+      description: List all operations across all plots in the tenant
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_api_handler.SwaggerOperation'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List all operations
+      tags:
+      - operations
+    post:
+      consumes:
+      - application/json
+      description: Register an agricultural operation (adubação, pulverização, irrigação,
+        poda, colheita)
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Operation data
+        in: body
+        name: operation
+        required: true
+        schema:
+          $ref: '#/definitions/internal_api_handler.createOperationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_api_handler.SwaggerOperation'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Register an operation
+      tags:
+      - operations
+  /api/v1/{tenant_id}/operations/{id}:
+    delete:
+      description: Delete an operation by ID
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Operation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete an operation
+      tags:
+      - operations
+    get:
+      description: Returns a single operation
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Operation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_api_handler.SwaggerOperation'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get operation by ID
+      tags:
+      - operations
+  /api/v1/{tenant_id}/operations/recent:
+    get:
+      description: List the most recent operations, limited by query param
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Max results (default 10)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_api_handler.SwaggerOperation'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List recent operations
+      tags:
+      - operations
+  /api/v1/{tenant_id}/plots:
+    get:
+      description: List all plots across all farms in the tenant
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_api_handler.SwaggerPlot'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List all plots
+      tags:
+      - plots
+    post:
+      consumes:
+      - application/json
+      description: Register a new plot (talhão) in a farm
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Plot data
+        in: body
+        name: plot
+        required: true
+        schema:
+          $ref: '#/definitions/internal_api_handler.createPlotRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_api_handler.SwaggerPlot'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a plot
+      tags:
+      - plots
+  /api/v1/{tenant_id}/plots/{id}:
+    delete:
+      description: Delete a plot by ID
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Plot ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a plot
+      tags:
+      - plots
+    get:
+      description: Returns a single plot (talhão)
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Plot ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_api_handler.SwaggerPlot'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get plot by ID
+      tags:
+      - plots
+    put:
+      consumes:
+      - application/json
+      description: Update plot data by ID
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Plot ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated plot data
+        in: body
+        name: plot
+        required: true
+        schema:
+          $ref: '#/definitions/internal_api_handler.SwaggerPlot'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_api_handler.SwaggerPlot'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a plot
+      tags:
+      - plots
+  /api/v1/{tenant_id}/plots/{plot_id}/operations:
+    get:
+      description: List all operations for a specific plot (talhão)
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Plot ID
+        in: path
+        name: plot_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_api_handler.SwaggerOperation'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List operations by plot
+      tags:
+      - operations
+  /health:
+    get:
+      description: Returns API health status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - system
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    description: 'JWT token. Use: Bearer {token}'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
