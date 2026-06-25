@@ -247,6 +247,35 @@ transactor.RunInTx(func(repos repository.TransactionProvider) error {
 })
 ```
 
+## Mobile — `apps/mobile/`
+
+App React Native (Expo) offline-first para operações de campo:
+
+```
+src/
+├── api/            # Cliente HTTP (JWT)
+├── db/             # SQLite local + migrações
+├── sync/           # Engine de sincronização (lote 50)
+├── hooks/          # Network status, operações offline
+├── screens/        # Login, Operations, PendingSync
+└── navigation/     # Bottom tabs
+```
+
+```bash
+cd apps/mobile
+npm install
+npx expo start
+```
+
+## Worker — `cmd/worker`
+
+Processo separado que consome filas RabbitMQ e persiste no PostgreSQL:
+
+```bash
+# Requer RabbitMQ rodando
+cd apps/backend && go run ./cmd/worker/main.go
+```
+
 ## Desenvolvimento Local
 
 ### Pré-requisitos
@@ -254,6 +283,15 @@ transactor.RunInTx(func(repos repository.TransactionProvider) error {
 - Go 1.22+
 - Node.js 20+
 - Docker & Docker Compose
+
+### Serviços
+
+| Serviço    | Porta | Acesso                     |
+|-----------|-------|----------------------------|
+| PostgreSQL | 5432  | `cafeos:cafeos@localhost`  |
+| Redis      | 6379  | `redis://localhost`        |
+| RabbitMQ   | 5672  | `amqp://cafeos:cafeos@localhost` |
+| RabbitMQ UI| 15672 | `http://localhost:15672`   |
 
 ### Comandos
 
@@ -318,12 +356,12 @@ cd apps/admin && npm run dev
 - [x] Frota (veículos, manutenções preventivas/corretivas)
 - [x] Mão de Obra (equipes, trabalhadores, apontamento de horas)
 
-### Fase 3 ✅ (em desenvolvimento)
+### Fase 3 ✅ (MVP)
 - [x] Mobile offline (React Native + SQLite + sync engine)
 - [x] RabbitMQ para fila de sincronização
-- [x] Worker para processar registros offline
-- [ ] Cooperativas e consultorias
-- [ ] Integrações externas
+- [x] Worker para processar registros offline (cmd/worker)
+- [ ] Cooperativas e consultorias (pendente)
+- [ ] Integrações externas (pendente)
 
 ### Fase 4
 - [ ] IoT (sensores, estações meteorológicas)

@@ -1981,6 +1981,9 @@ const docTemplate = `{
                 "plot_id": {
                     "type": "string"
                 },
+                "plot_name": {
+                    "type": "string"
+                },
                 "product_used": {
                     "type": "string"
                 },
