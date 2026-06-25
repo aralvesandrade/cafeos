@@ -20,6 +20,7 @@ import (
 	"github.com/aralvesandrade/cafeos/internal/event"
 	"github.com/aralvesandrade/cafeos/internal/infra/config"
 	"github.com/aralvesandrade/cafeos/internal/infra/db/postgres"
+	"github.com/aralvesandrade/cafeos/internal/infra/messaging"
 )
 
 func main() {
@@ -39,7 +40,25 @@ func main() {
 	eventBus := event.NewInMemoryBus()
 	event.SetupHandlers(eventBus)
 
-	router := api.NewRouter(db, eventBus, cfg.JWTSecret)
+	var pub *messaging.Publisher
+	if cfg.RabbitMQURL != "" {
+		conn, err := messaging.NewConnection(cfg.RabbitMQURL)
+		if err != nil {
+			log.Printf("[RABBITMQ] connection failed (sync disabled): %v", err)
+		} else {
+			defer conn.Close()
+			pub = messaging.NewPublisher(conn.Channel())
+			queues := []string{"sync.operations", "sync.stock", "sync.harvest", "sync.financial", "sync.labor"}
+			for _, q := range queues {
+				if err := pub.DeclareQueue(q); err != nil {
+					log.Printf("[RABBITMQ] queue declare failed: %v", err)
+				}
+			}
+			log.Println("[RABBITMQ] connected, sync enabled")
+		}
+	}
+
+	router := api.NewRouter(db, eventBus, pub, cfg.JWTSecret)
 
 	port := cfg.ServerPort
 	if p := os.Getenv("PORT"); p != "" {

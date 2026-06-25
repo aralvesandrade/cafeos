@@ -200,6 +200,7 @@ Rotas multi-tenant sob `/api/v1/{tenant_id}`:
 | POST   | `/labor/shifts`                | Registrar apontamento         |
 | GET    | `/labor/shifts`                | Listar apontamentos           |
 | DELETE | `/labor/shifts/{id}`           | Remover apontamento           |
+| POST   | `/sync`                        | Sincronizar lote offline      |
 
 Rotas admin (`platform_owner` apenas, prefixo `/api/v1/admin`):
 
@@ -317,8 +318,10 @@ cd apps/admin && npm run dev
 - [x] Frota (veículos, manutenções preventivas/corretivas)
 - [x] Mão de Obra (equipes, trabalhadores, apontamento de horas)
 
-### Fase 3
-- [ ] Mobile offline (React Native)
+### Fase 3 ✅ (em desenvolvimento)
+- [x] Mobile offline (React Native + SQLite + sync engine)
+- [x] RabbitMQ para fila de sincronização
+- [x] Worker para processar registros offline
 - [ ] Cooperativas e consultorias
 - [ ] Integrações externas
 

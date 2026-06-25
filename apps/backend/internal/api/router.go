@@ -10,13 +10,14 @@ import (
 	"github.com/aralvesandrade/cafeos/internal/event"
 	infraRepo "github.com/aralvesandrade/cafeos/internal/infra/db/repository"
 	"github.com/aralvesandrade/cafeos/internal/infra/db/postgres"
+	"github.com/aralvesandrade/cafeos/internal/infra/messaging"
 	"gorm.io/gorm"
 
 	_ "github.com/aralvesandrade/cafeos/docs"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
-func NewRouter(db *gorm.DB, eventBus event.Bus, jwtSecret string) http.Handler {
+func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, jwtSecret string) http.Handler {
 	mux := http.NewServeMux()
 
 	farmRepo := infraRepo.NewFarmRepository(db)
@@ -174,6 +175,12 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, jwtSecret string) http.Handler {
 	mux.Handle("POST /api/v1/admin/users", adminChain(userH.Create))
 	mux.Handle("PUT /api/v1/admin/users/{id}", adminChain(userH.Update))
 	mux.Handle("DELETE /api/v1/admin/users/{id}", adminChain(userH.Delete))
+
+	// Sync — offline mobile (requires RabbitMQ publisher)
+	if publisher != nil {
+		syncH := handler.NewSyncHandler(publisher)
+		mux.Handle("POST /api/v1/{tenant_id}/sync", chain(syncH.Sync))
+	}
 
 	return corsMw(mux)
 }
