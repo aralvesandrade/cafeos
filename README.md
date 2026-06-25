@@ -368,6 +368,10 @@ cd apps/admin && npm run dev
 - [ ] IA (previsão de safra, recomendação, detecção de doenças)
 - [ ] Analytics avançado
 
+## Desenvolvimento com IA
+
+O arquivo `AGENTS.md` na raiz do projeto contém o resumo técnico para agentes de IA (stack, rotas, convenções, credenciais de seed).
+
 ## Licença
 
 Proprietária — todos os direitos reservados.
