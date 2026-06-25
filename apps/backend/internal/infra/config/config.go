@@ -12,7 +12,7 @@ type Config struct {
 
 func Load() *Config {
 	return &Config{
-		ServerPort:  getEnv("SERVER_PORT", "8080"),
+		ServerPort:  getEnv("SERVER_PORT", "5001"),
 		DatabaseURL: getEnv("DATABASE_URL", "postgres://cafeos:cafeos@localhost:5432/cafeos?sslmode=disable"),
 		RedisURL:    getEnv("REDIS_URL", "redis://localhost:6379"),
 		RabbitMQURL: getEnv("RABBITMQ_URL", "amqp://cafeos:cafeos@localhost:5672/"),

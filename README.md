@@ -137,7 +137,7 @@ npm run build    # Build produção
 
 ### Swagger
 
-Documentação interativa disponível em `http://localhost:8080/swagger/index.html` (com backend rodando).
+Documentação interativa disponível em `http://localhost:5001/swagger/index.html` (com backend rodando).
 
 ### API REST
 
@@ -330,7 +330,7 @@ cd apps/admin && npm run dev
 
 | Variável       | Default                                      |
 | -------------- | -------------------------------------------- |
-| `SERVER_PORT`  | `8080`                                       |
+| `SERVER_PORT`  | `5001`                                       |
 | `DATABASE_URL` | `postgres://cafeos:cafeos@localhost:5432/cafeos?sslmode=disable` |
 | `REDIS_URL`    | `redis://localhost:6379`                     |
 | `JWT_SECRET`   | `dev-secret-change-in-production`            |

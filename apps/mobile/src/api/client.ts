@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store'
 
-const API_BASE = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:8080'
+const API_BASE = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:5001'
 
 export interface RequestOptions {
   method?: string

@@ -1,7 +1,7 @@
 // @title CafeOS API
 // @version 0.1.0
 // @description Plataforma SaaS especializada em cafeicultura para gestão operacional, produtiva, financeira e analítica de propriedades cafeeiras.
-// @host localhost:8080
+// @host localhost:5001
 // @BasePath /api/v1/{tenant_id}
 // @schemes http
 // @license.name Proprietary

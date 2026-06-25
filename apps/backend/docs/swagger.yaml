@@ -414,7 +414,7 @@ definitions:
       role:
         type: string
     type: object
-host: localhost:8080
+host: localhost:5001
 info:
   contact: {}
   description: Plataforma SaaS especializada em cafeicultura para gestão operacional,

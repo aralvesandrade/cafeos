@@ -2260,7 +2260,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "0.1.0",
-	Host:             "localhost:8080",
+	Host:             "localhost:5001",
 	BasePath:         "/api/v1/{tenant_id}",
 	Schemes:          []string{"http"},
 	Title:            "CafeOS API",

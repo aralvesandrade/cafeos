@@ -12,7 +12,7 @@
         },
         "version": "0.1.0"
     },
-    "host": "localhost:8080",
+    "host": "localhost:5001",
     "basePath": "/api/v1/{tenant_id}",
     "paths": {
         "/api/v1/admin/tenants": {
