@@ -16,6 +16,7 @@ type Operation struct {
 	ID          string        `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	TenantID    string        `json:"tenant_id" gorm:"type:uuid;not null;index"`
 	PlotID      string        `json:"plot_id" gorm:"type:uuid;not null;index"`
+	PlotName    string        `json:"plot_name" gorm:"->;-:migration"`
 	Type        OperationType `json:"type" gorm:"not null"`
 	Date        time.Time     `json:"date" gorm:"not null;index"`
 	Responsible string        `json:"responsible" gorm:"default:''"`

@@ -9,11 +9,13 @@ interface Operation {
   id: string
   type: string
   date: string
+  plot_id: string
   plot_name: string
   responsible: string
   product_used: string
   quantity: number
   cost: number
+  notes: string
 }
 
 const typeColors: Record<string, 'info' | 'warning' | 'success' | 'default' | 'danger'> = {
@@ -44,9 +46,9 @@ export function Operations() {
 
   const filtered = operations.filter(
     (op) =>
-      op.plot_name.toLowerCase().includes(search.toLowerCase()) ||
-      op.type.toLowerCase().includes(search.toLowerCase()) ||
-      op.responsible.toLowerCase().includes(search.toLowerCase())
+      (op.plot_name || op.plot_id || '').toLowerCase().includes(search.toLowerCase()) ||
+      (op.type || '').toLowerCase().includes(search.toLowerCase()) ||
+      (op.responsible || '').toLowerCase().includes(search.toLowerCase())
   )
 
   if (loading) return <div className="flex items-center justify-center h-64 text-coffee-text-light">Carregando...</div>
@@ -83,14 +85,14 @@ export function Operations() {
         <TableBody>
           {filtered.map((op) => (
             <TableRow key={op.id}>
-              <TableCell>{op.date}</TableCell>
+              <TableCell>{new Date(op.date).toLocaleDateString()}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
                   <Tractor className="h-4 w-4 text-coffee-green" />
                   <Badge variant={typeColors[op.type] || 'default'}>{op.type}</Badge>
                 </div>
               </TableCell>
-              <TableCell>{op.plot_name}</TableCell>
+              <TableCell>{op.plot_name || op.plot_id.slice(0, 8)}</TableCell>
               <TableCell>{op.responsible}</TableCell>
               <TableCell>{op.product_used}</TableCell>
               <TableCell>{op.quantity}</TableCell>

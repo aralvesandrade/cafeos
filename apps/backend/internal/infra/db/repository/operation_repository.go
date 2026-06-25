@@ -23,26 +23,38 @@ func (r *OperationRepository) Create(op *entity.Operation) error {
 
 func (r *OperationRepository) GetByID(id string) (*entity.Operation, error) {
 	var op entity.Operation
-	err := r.db.First(&op, "id = ?", id).Error
+	err := r.db.Preload("Plot").First(&op, "id = ?", id).Error
+	if err == nil {
+		op.PlotName = op.Plot.Name
+	}
 	return &op, err
 }
 
 func (r *OperationRepository) ListByPlot(plotID string) ([]*entity.Operation, error) {
 	var ops []*entity.Operation
-	err := r.db.Where("plot_id = ?", plotID).Order("date DESC").Find(&ops).Error
+	err := r.db.Preload("Plot").Where("plot_id = ?", plotID).Order("date DESC").Find(&ops).Error
+	for _, op := range ops {
+		op.PlotName = op.Plot.Name
+	}
 	return ops, err
 }
 
 func (r *OperationRepository) ListByTenant(tenantID string) ([]*entity.Operation, error) {
 	var ops []*entity.Operation
-	err := r.db.Where("tenant_id = ?", tenantID).Order("date DESC").Find(&ops).Error
+	err := r.db.Preload("Plot").Where("tenant_id = ?", tenantID).Order("date DESC").Find(&ops).Error
+	for _, op := range ops {
+		op.PlotName = op.Plot.Name
+	}
 	return ops, err
 }
 
 func (r *OperationRepository) ListByTenantAndPeriod(tenantID string, start, end string) ([]*entity.Operation, error) {
 	var ops []*entity.Operation
-	err := r.db.Where("tenant_id = ? AND date >= ? AND date <= ?", tenantID, start, end).
+	err := r.db.Preload("Plot").Where("tenant_id = ? AND date >= ? AND date <= ?", tenantID, start, end).
 		Order("date DESC").Find(&ops).Error
+	for _, op := range ops {
+		op.PlotName = op.Plot.Name
+	}
 	return ops, err
 }
 
