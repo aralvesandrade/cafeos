@@ -8,7 +8,7 @@ import {
   Calendar,
   Building2,
   Users,
-  Coffee,
+  Sprout,
   X,
   DollarSign,
   Package,
@@ -62,7 +62,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       >
         <div className="flex items-center justify-between px-4 h-16 border-b border-white/10">
           <NavLink to="/" className="flex items-center gap-2 font-bold text-lg">
-            <Coffee className="h-6 w-6" />
+            <Sprout className="h-6 w-6" />
             CafeOS
           </NavLink>
           <button onClick={onClose} className="lg:hidden text-white/60 hover:text-white">

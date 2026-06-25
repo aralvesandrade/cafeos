@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Coffee, LogIn, UserCircle } from 'lucide-react'
+import { Sprout, LogIn, UserCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/lib/auth'
@@ -49,7 +49,7 @@ export function Login() {
     <div className="w-full max-w-sm">
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-coffee-green/10 mb-4">
-          <Coffee className="h-8 w-8 text-coffee-green" />
+          <Sprout className="h-8 w-8 text-coffee-green" />
         </div>
         <h1 className="text-2xl font-bold text-coffee-green-dark">CafeOS</h1>
         <p className="text-sm text-coffee-text-light mt-1">
