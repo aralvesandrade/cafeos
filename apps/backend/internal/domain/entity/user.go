@@ -18,13 +18,14 @@ const (
 )
 
 type User struct {
-	ID           string    `json:"id" db:"id"`
-	TenantID     string    `json:"tenant_id" db:"tenant_id"`
-	Name         string    `json:"name" db:"name"`
-	Email        string    `json:"email" db:"email"`
-	PasswordHash string    `json:"-" db:"password_hash"`
-	Role         UserRole  `json:"role" db:"role"`
-	IsActive     bool      `json:"is_active" db:"is_active"`
-	CreatedAt    time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at" db:"updated_at"`
+	ID           string    `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	TenantID     string    `json:"tenant_id" gorm:"type:uuid;not null;uniqueIndex:idx_tenant_email"`
+	Name         string    `json:"name" gorm:"not null"`
+	Email        string    `json:"email" gorm:"not null;uniqueIndex:idx_tenant_email"`
+	PasswordHash string    `json:"-" gorm:"not null"`
+	Role         UserRole  `json:"role" gorm:"default:'operador_campo'"`
+	IsActive     bool      `json:"is_active" gorm:"default:true"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	Tenant       Tenant    `json:"-" gorm:"foreignKey:TenantID"`
 }

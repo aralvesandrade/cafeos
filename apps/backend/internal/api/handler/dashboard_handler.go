@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/aralvesandrade/cafeos/internal/api/middleware"
 	"github.com/aralvesandrade/cafeos/internal/domain/entity"
 	"github.com/aralvesandrade/cafeos/internal/domain/repository"
 )
@@ -13,6 +14,7 @@ type DashboardHandler struct {
 	indicatorRepo  repository.IndicatorRepository
 	operationRepo  repository.OperationRepository
 	plotRepo       repository.PlotRepository
+	farmRepo       repository.FarmRepository
 }
 
 func NewDashboardHandler(
@@ -20,23 +22,43 @@ func NewDashboardHandler(
 	indicatorRepo repository.IndicatorRepository,
 	operationRepo repository.OperationRepository,
 	plotRepo repository.PlotRepository,
+	farmRepo repository.FarmRepository,
 ) *DashboardHandler {
 	return &DashboardHandler{
 		harvestRepo:   harvestRepo,
 		indicatorRepo: indicatorRepo,
 		operationRepo: operationRepo,
 		plotRepo:      plotRepo,
+		farmRepo:      farmRepo,
 	}
 }
 
+type ProductionByHarvest struct {
+	Year       string  `json:"year"`
+	Production float64 `json:"production"`
+}
+
+type CostPerBag struct {
+	Year string  `json:"year"`
+	Cost float64 `json:"cost"`
+}
+
+type RecentOperationItem struct {
+	ID       string  `json:"id"`
+	Type     string  `json:"type"`
+	Date     string  `json:"date"`
+	PlotName string  `json:"plot_name"`
+	Cost     float64 `json:"cost"`
+}
+
 type DashboardResponse struct {
-	TotalProduction  float64             `json:"total_production"`
-	TotalCost        float64             `json:"total_cost"`
-	SacasPerHA       float64             `json:"sacas_per_ha"`
-	CostPerSaca      float64             `json:"cost_per_saca"`
-	Harvests         []*entity.Harvest   `json:"harvests"`
-	RecentOperations []*entity.Operation `json:"recent_operations"`
-	Indicators       []*entity.Indicator `json:"indicators"`
+	TotalFarms        int                   `json:"total_farms"`
+	TotalPlots        int                   `json:"total_plots"`
+	TotalProduction   float64               `json:"total_production"`
+	TotalCost         float64               `json:"total_cost"`
+	ProductionByHarvest []ProductionByHarvest `json:"production_by_harvest"`
+	CostPerBag        []CostPerBag          `json:"cost_per_bag"`
+	RecentOperations  []RecentOperationItem `json:"recent_operations"`
 }
 
 // GetDashboard returns consolidated dashboard data
@@ -49,18 +71,19 @@ type DashboardResponse struct {
 // @Security BearerAuth
 // @Router /api/v1/{tenant_id}/dashboard [get]
 func (h *DashboardHandler) GetDashboard(w http.ResponseWriter, r *http.Request) {
-	tenantID := r.PathValue("tenant_id")
+	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
 	if tenantID == "" {
-		tenantID = r.URL.Query().Get("tenant_id")
+		writeError(w, "tenant not found", http.StatusUnauthorized)
+		return
 	}
 
 	harvests, _ := h.harvestRepo.ListByTenant(tenantID)
 	indicators, _ := h.indicatorRepo.ListByTenant(tenantID)
 	operations, _ := h.operationRepo.ListByTenant(tenantID)
 	plots, _ := h.plotRepo.ListByTenant(tenantID)
+	farms, _ := h.farmRepo.ListByTenant(tenantID)
 
 	var totalProduction, totalCost float64
-	var latestIndicators []*entity.Indicator
 
 	for _, ind := range indicators {
 		switch ind.Type {
@@ -71,29 +94,25 @@ func (h *DashboardHandler) GetDashboard(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	var totalPlantedArea float64
+	productionByHarvest := make([]ProductionByHarvest, 0, len(harvests))
+	for _, h := range harvests {
+		productionByHarvest = append(productionByHarvest, ProductionByHarvest{
+			Year:       h.Description,
+			Production: h.EstimatedProduction,
+		})
+	}
+
+	plotMap := make(map[string]string)
 	for _, p := range plots {
-		totalPlantedArea += p.AreaHA
+		plotMap[p.ID] = p.Name
 	}
 
-	sacasPerHA := 0.0
-	if totalPlantedArea > 0 {
-		sacasPerHA = totalProduction / totalPlantedArea
-	}
-
-	costPerSaca := 0.0
-	if totalProduction > 0 {
-		costPerSaca = totalCost / totalProduction
-	}
-
-	if len(indicators) > 0 {
-		seen := make(map[string]bool)
-		for _, ind := range indicators {
-			if !seen[string(ind.Type)] {
-				latestIndicators = append(latestIndicators, ind)
-				seen[string(ind.Type)] = true
-			}
-		}
+	costPerBag := make([]CostPerBag, 0, len(harvests))
+	for _, h := range harvests {
+		costPerBag = append(costPerBag, CostPerBag{
+			Year: h.Description,
+			Cost: 0,
+		})
 	}
 
 	recentLimit := 10
@@ -101,14 +120,25 @@ func (h *DashboardHandler) GetDashboard(w http.ResponseWriter, r *http.Request) 
 		operations = operations[:recentLimit]
 	}
 
+	recentOps := make([]RecentOperationItem, 0, len(operations))
+	for _, op := range operations {
+		recentOps = append(recentOps, RecentOperationItem{
+			ID:       op.ID,
+			Type:     string(op.Type),
+			Date:     op.Date.Format("2006-01-02"),
+			PlotName: plotMap[op.PlotID],
+			Cost:     op.Cost,
+		})
+	}
+
 	dashboard := DashboardResponse{
-		TotalProduction:  totalProduction,
-		TotalCost:        totalCost,
-		SacasPerHA:       sacasPerHA,
-		CostPerSaca:      costPerSaca,
-		Harvests:         harvests,
-		RecentOperations: operations,
-		Indicators:       latestIndicators,
+		TotalFarms:          len(farms),
+		TotalPlots:          len(plots),
+		TotalProduction:     totalProduction,
+		TotalCost:           totalCost,
+		ProductionByHarvest: productionByHarvest,
+		CostPerBag:          costPerBag,
+		RecentOperations:    recentOps,
 	}
 
 	writeJSON(w, dashboard, http.StatusOK)

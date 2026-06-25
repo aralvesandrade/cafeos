@@ -29,7 +29,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
-	defer db.Close()
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatalf("failed to get sql.DB: %v", err)
+	}
+	defer sqlDB.Close()
 
 	eventBus := event.NewInMemoryBus()
 	event.SetupHandlers(eventBus)

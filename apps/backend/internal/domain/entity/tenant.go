@@ -3,14 +3,14 @@ package entity
 import "time"
 
 type Tenant struct {
-	ID          string    `json:"id" db:"id"`
-	Name        string    `json:"name" db:"name"`
-	Slug        string    `json:"slug" db:"slug"`
-	BrandName   string    `json:"brand_name" db:"brand_name"`
-	LogoURL     string    `json:"logo_url" db:"logo_url"`
-	PrimaryColor string   `json:"primary_color" db:"primary_color"`
-	Plan        string    `json:"plan" db:"plan"`
-	Domain      string    `json:"domain" db:"domain"`
-	CreatedAt   time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
+	ID           string    `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	Name         string    `json:"name" gorm:"not null"`
+	Slug         string    `json:"slug" gorm:"uniqueIndex;not null"`
+	BrandName    string    `json:"brand_name" gorm:"default:''"`
+	LogoURL      string    `json:"logo_url" gorm:"default:''"`
+	PrimaryColor string    `json:"primary_color" gorm:"default:'#2E7D32'"`
+	Plan         string    `json:"plan" gorm:"default:'free'"`
+	Domain       string    `json:"domain" gorm:"default:''"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }

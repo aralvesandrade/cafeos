@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { apiRequest } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Calendar } from 'lucide-react'
+import { Plus, Calendar, ExternalLink } from 'lucide-react'
 
 interface Harvest {
   id: string
@@ -90,10 +91,10 @@ export function Harvests() {
           {harvests.map((h) => (
             <TableRow key={h.id}>
               <TableCell className="font-medium">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-coffee-green" />
+                <Link to={`/harvests/${h.id}`} className="flex items-center gap-2 text-coffee-green hover:underline">
+                  <Calendar className="h-4 w-4" />
                   {h.year}
-                </div>
+                </Link>
               </TableCell>
               <TableCell>{h.estimated_production}</TableCell>
               <TableCell>
@@ -103,11 +104,18 @@ export function Harvests() {
               </TableCell>
               <TableCell>{h.created_at}</TableCell>
               <TableCell className="text-right">
-                {h.status !== 'finalized' && (
-                  <Button variant="outline" size="sm" onClick={() => handleFinalize(h.id)}>
-                    Finalizar
+                <div className="flex justify-end gap-1">
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to={`/harvests/${h.id}`}>
+                      <ExternalLink className="h-4 w-4" />
+                    </Link>
                   </Button>
-                )}
+                  {h.status !== 'finalized' && (
+                    <Button variant="outline" size="sm" onClick={() => handleFinalize(h.id)}>
+                      Finalizar
+                    </Button>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           ))}

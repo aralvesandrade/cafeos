@@ -1,18 +1,18 @@
 import { useEffect, useState, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { apiRequest } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, ExternalLink } from 'lucide-react'
 
 interface Plot {
   id: string
   name: string
   farm_id: string
-  farm_name: string
-  area: number
+  area_ha: number
   cultivar: string
   soil_type: string
   altitude: number
@@ -90,7 +90,7 @@ export function Plots() {
   const openEdit = (plot: Plot) => {
     setEditing(plot)
     setForm({
-      name: plot.name, farm_id: plot.farm_id, area: String(plot.area),
+      name: plot.name, farm_id: plot.farm_id, area: String(plot.area_ha),
       cultivar: plot.cultivar, soil_type: plot.soil_type,
       altitude: String(plot.altitude), planting_year: String(plot.planting_year),
     })
@@ -131,15 +131,24 @@ export function Plots() {
         <TableBody>
           {plots.map((plot) => (
             <TableRow key={plot.id}>
-              <TableCell className="font-medium">{plot.name}</TableCell>
-              <TableCell>{plot.farm_name}</TableCell>
-              <TableCell>{plot.area} ha</TableCell>
+              <TableCell className="font-medium">
+                <Link to={`/plots/${plot.id}`} className="text-coffee-green hover:underline">
+                  {plot.name}
+                </Link>
+              </TableCell>
+              <TableCell>{farms.find((f) => f.id === plot.farm_id)?.name || plot.farm_id}</TableCell>
+              <TableCell>{plot.area_ha} ha</TableCell>
               <TableCell>{plot.cultivar}</TableCell>
               <TableCell>{plot.soil_type}</TableCell>
               <TableCell>{plot.altitude} m</TableCell>
               <TableCell>{plot.planting_year}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-1">
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to={`/plots/${plot.id}`}>
+                      <ExternalLink className="h-4 w-4" />
+                    </Link>
+                  </Button>
                   <Button variant="ghost" size="sm" onClick={() => openEdit(plot)}><Pencil className="h-4 w-4" /></Button>
                   <Button variant="ghost" size="sm" onClick={() => handleDelete(plot.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
                 </div>

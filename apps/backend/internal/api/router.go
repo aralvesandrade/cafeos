@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"net/http"
 
 	"github.com/aralvesandrade/cafeos/internal/api/handler"
@@ -9,12 +8,14 @@ import (
 	domainSvc "github.com/aralvesandrade/cafeos/internal/domain/service"
 	"github.com/aralvesandrade/cafeos/internal/event"
 	infraRepo "github.com/aralvesandrade/cafeos/internal/infra/db/repository"
+	"github.com/aralvesandrade/cafeos/internal/infra/db/postgres"
+	"gorm.io/gorm"
 
 	_ "github.com/aralvesandrade/cafeos/docs"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
-func NewRouter(db *sql.DB, eventBus event.Bus, jwtSecret string) http.Handler {
+func NewRouter(db *gorm.DB, eventBus event.Bus, jwtSecret string) http.Handler {
 	mux := http.NewServeMux()
 
 	farmRepo := infraRepo.NewFarmRepository(db)
@@ -23,21 +24,27 @@ func NewRouter(db *sql.DB, eventBus event.Bus, jwtSecret string) http.Handler {
 	harvestRepo := infraRepo.NewHarvestRepository(db)
 	hpRepo := infraRepo.NewHarvestProductionRepository(db)
 	indicatorRepo := infraRepo.NewIndicatorRepository(db)
+	tenantRepo := infraRepo.NewTenantRepository(db)
+	userRepo := infraRepo.NewUserRepository(db)
+	transactor := postgres.NewTransactor(db)
 
 	farmSvc := domainSvc.NewFarmService(farmRepo)
 	plotSvc := domainSvc.NewPlotService(plotRepo)
 	opSvc := domainSvc.NewOperationService(opRepo, eventBus)
-	harvestSvc := domainSvc.NewHarvestService(harvestRepo, hpRepo, indicatorRepo, plotRepo, opRepo, eventBus)
+	harvestSvc := domainSvc.NewHarvestService(harvestRepo, hpRepo, indicatorRepo, plotRepo, opRepo, transactor, eventBus)
 
 	farmH := handler.NewFarmHandler(farmSvc)
 	plotH := handler.NewPlotHandler(plotSvc)
 	opH := handler.NewOperationHandler(opSvc)
 	harvestH := handler.NewHarvestHandler(harvestSvc)
-	dashboardH := handler.NewDashboardHandler(harvestRepo, indicatorRepo, opRepo, plotRepo)
+	dashboardH := handler.NewDashboardHandler(harvestRepo, indicatorRepo, opRepo, plotRepo, farmRepo)
+	authH := handler.NewAuthHandler(userRepo, tenantRepo, jwtSecret)
 
 	authMw := middleware.Auth(jwtSecret)
 	corsMw := middleware.CORS
-	tenantMw := middleware.Tenant()
+
+	// Auth (public)
+	mux.HandleFunc("POST /auth/login", authH.Login)
 
 	// Health
 	mux.HandleFunc("GET /health", handler.HealthCheck)
@@ -49,7 +56,7 @@ func NewRouter(db *sql.DB, eventBus event.Bus, jwtSecret string) http.Handler {
 
 	// API v1 routes
 	chain := func(h http.HandlerFunc) http.Handler {
-		return corsMw(authMw(tenantMw(http.HandlerFunc(h))))
+		return authMw(http.HandlerFunc(h))
 	}
 
 	// Farms
@@ -86,5 +93,5 @@ func NewRouter(db *sql.DB, eventBus event.Bus, jwtSecret string) http.Handler {
 	// Dashboard
 	mux.Handle("GET /api/v1/{tenant_id}/dashboard", chain(dashboardH.GetDashboard))
 
-	return mux
+	return corsMw(mux)
 }

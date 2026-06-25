@@ -12,10 +12,11 @@ const (
 )
 
 type AgriculturalProduct struct {
-	ID        string      `json:"id" db:"id"`
-	TenantID  string      `json:"tenant_id" db:"tenant_id"`
-	Name      string      `json:"name" db:"name"`
-	Type      ProductType `json:"type" db:"type"`
-	Unit      string      `json:"unit" db:"unit"`
-	CreatedAt time.Time   `json:"created_at" db:"created_at"`
+	ID        string      `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	TenantID  string      `json:"tenant_id" gorm:"type:uuid;not null;index"`
+	Name      string      `json:"name" gorm:"not null"`
+	Type      ProductType `json:"type" gorm:"default:'outro'"`
+	Unit      string      `json:"unit" gorm:"default:''"`
+	CreatedAt time.Time   `json:"created_at"`
+	Tenant    Tenant      `json:"-" gorm:"foreignKey:TenantID"`
 }

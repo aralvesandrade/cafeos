@@ -3,13 +3,15 @@ package entity
 import "time"
 
 type Farm struct {
-	ID           string    `json:"id" db:"id"`
-	TenantID     string    `json:"tenant_id" db:"tenant_id"`
-	Name         string    `json:"name" db:"name"`
-	Owner        string    `json:"owner" db:"owner"`
-	Location     string    `json:"location" db:"location"`
-	TotalAreaHA  float64   `json:"total_area_ha" db:"total_area_ha"`
-	PlantedAreaHA float64  `json:"planted_area_ha" db:"planted_area_ha"`
-	CreatedAt    time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at" db:"updated_at"`
+	ID           string    `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	TenantID     string    `json:"tenant_id" gorm:"type:uuid;not null;index"`
+	Name         string    `json:"name" gorm:"not null"`
+	Owner        string    `json:"owner" gorm:"default:''"`
+	Location     string    `json:"location" gorm:"default:''"`
+	TotalAreaHA  float64   `json:"total_area_ha" gorm:"type:numeric(12,2);default:0"`
+	PlantedAreaHA float64  `json:"planted_area_ha" gorm:"type:numeric(12,2);default:0"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	Tenant       Tenant    `json:"-" gorm:"foreignKey:TenantID"`
+	Plots        []Plot    `json:"plots,omitempty" gorm:"foreignKey:FarmID"`
 }

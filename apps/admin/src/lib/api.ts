@@ -18,7 +18,14 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   const token = getToken()
   const tenantId = getTenantId()
 
-  let url = `${API_BASE}/api/v1${tenantId ? `/${tenantId}` : ''}${path}`
+  const isPublic = path.startsWith('/auth/') || path.startsWith('/health')
+
+  let url: string
+  if (isPublic) {
+    url = `${API_BASE}${path}`
+  } else {
+    url = `${API_BASE}/api/v1${tenantId ? `/${tenantId}` : ''}${path}`
+  }
 
   if (options.params) {
     const searchParams = new URLSearchParams(options.params)

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { apiRequest } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
@@ -10,8 +11,8 @@ interface Farm {
   id: string
   name: string
   owner: string
-  total_area: number
-  planted_area: number
+  total_area_ha: number
+  planted_area_ha: number
   location: string
 }
 
@@ -44,8 +45,8 @@ export function Farms() {
         name: formData.name,
         owner: formData.owner,
         location: formData.location,
-        total_area: parseFloat(formData.total_area),
-        planted_area: parseFloat(formData.planted_area),
+        total_area_ha: parseFloat(formData.total_area),
+        planted_area_ha: parseFloat(formData.planted_area),
       }
 
       if (editingFarm) {
@@ -113,8 +114,8 @@ export function Farms() {
             name: editingFarm.name,
             owner: editingFarm.owner,
             location: editingFarm.location,
-            total_area: String(editingFarm.total_area),
-            planted_area: String(editingFarm.planted_area),
+            total_area: String(editingFarm.total_area_ha),
+            planted_area: String(editingFarm.planted_area_ha),
           } : undefined}
           onSave={handleSave}
           onCancel={() => { setDialogOpen(false); setEditingFarm(null) }}

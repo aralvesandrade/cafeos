@@ -28,13 +28,18 @@ case "${1:-help}" in
     docker compose -f infra/dev/docker-compose.yml exec -T postgres psql -U cafeos -d cafeos -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
     docker compose -f infra/dev/docker-compose.yml exec -T postgres psql -U cafeos -d cafeos -f /docker-entrypoint-initdb.d/001_initial_schema.sql
     ;;
+  db:seed)
+    echo "Running seed..."
+    cd apps/backend
+    go run ./cmd/seed
+    ;;
   test)
     echo "Running tests..."
     cd apps/backend
     go test ./... -v
     ;;
   *)
-    echo "Usage: $0 {up|down|db:migrate|db:reset|test}"
+    echo "Usage: $0 {up|down|db:migrate|db:reset|db:seed|test}"
     echo ""
     echo "  up          Start infrastructure and API server"
     echo "  down        Stop infrastructure"

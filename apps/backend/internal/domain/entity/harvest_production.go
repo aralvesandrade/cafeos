@@ -3,11 +3,14 @@ package entity
 import "time"
 
 type HarvestProduction struct {
-	ID         string    `json:"id" db:"id"`
-	TenantID   string    `json:"tenant_id" db:"tenant_id"`
-	HarvestID  string    `json:"harvest_id" db:"harvest_id"`
-	PlotID     string    `json:"plot_id" db:"plot_id"`
-	Quantity   float64   `json:"quantity" db:"quantity"`
-	RecordedAt time.Time `json:"recorded_at" db:"recorded_at"`
-	Notes      string    `json:"notes" db:"notes"`
+	ID         string    `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	TenantID   string    `json:"tenant_id" gorm:"type:uuid;not null;index"`
+	HarvestID  string    `json:"harvest_id" gorm:"type:uuid;not null;index"`
+	PlotID     string    `json:"plot_id" gorm:"type:uuid;not null;index"`
+	Quantity   float64   `json:"quantity" gorm:"type:numeric(12,2);default:0"`
+	RecordedAt time.Time `json:"recorded_at"`
+	Notes      string    `json:"notes" gorm:"default:''"`
+	Tenant     Tenant   `json:"-" gorm:"foreignKey:TenantID"`
+	Harvest    Harvest   `json:"-" gorm:"foreignKey:HarvestID"`
+	Plot       Plot      `json:"-" gorm:"foreignKey:PlotID"`
 }

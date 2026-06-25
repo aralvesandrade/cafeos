@@ -12,7 +12,7 @@ Plataforma SaaS multi-tenant para gestão operacional, produtiva, financeira e a
 | Frontend  | React + Vite + Tailwind CSS v4 (landing page)           |
 | Admin     | React + Vite + Tailwind CSS v4 + Recharts               |
 | Mobile    | React Native _(futuro)_                                 |
-| Banco     | PostgreSQL + Redis                                      |
+| Banco     | PostgreSQL + Redis (GORM ORM)                            |
 | Mensageria| RabbitMQ / Kafka _(futuro)_                             |
 | Infra     | Docker, Kubernetes, ArgoCD, Grafana, Prometheus         |
 
@@ -41,8 +41,8 @@ cafeos/
 ```
 internal/
 ├── domain/
-│   ├── entity/           # Entidades de domínio (Farm, Plot, Operation, Harvest, etc.)
-│   ├── repository/       # Interfaces de repositório
+│   ├── entity/           # Entidades de domínio (Farm, Plot, Operation, Harvest, etc.) com tags GORM
+│   ├── repository/       # Interfaces de repositório + Transactor
 │   └── service/          # Serviços de domínio + Rule Engine
 ├── api/
 │   ├── handler/          # Handlers HTTP (REST)
@@ -52,9 +52,9 @@ internal/
 └── infra/
     ├── config/           # Configuração via environment variables
     ├── db/
-    │   ├── postgres/     # Conexão PostgreSQL
-    │   ├── repository/   # Implementações dos repositórios
-    │   └── migration/    # Migrations SQL
+    │   ├── postgres/     # Conexão GORM + AutoMigrate + Transactor
+    │   ├── repository/   # Implementações dos repositórios (GORM + WithTx)
+    │   └── migration/    # Migrations SQL (legado)
     └── messaging/        # Integração RabbitMQ (futuro)
 ```
 
@@ -189,6 +189,18 @@ Sistema orientado a eventos (in-memory, preparado para fila):
 | `IndicatorUpdated`        | Ao recalcular indicadores         |
 | `AlertGenerated`          | Quando regra é acionada           |
 
+### Transações
+
+O HarvestService utiliza o `Transactor` para garantir atomicidade na finalização de safras (atualização + cálculo de indicadores). Demais services operam com repositories individuais. Uso:
+
+```go
+transactor.RunInTx(func(repos repository.TransactionProvider) error {
+    repos.Harvest().Update(harvest)
+    repos.Indicator().Create(indicator)
+    return nil
+})
+```
+
 ## Desenvolvimento Local
 
 ### Pré-requisitos
@@ -219,6 +231,9 @@ Sistema orientado a eventos (in-memory, preparado para fila):
 ./scripts/dev.sh test
 # ou diretamente:
 cd apps/backend && go test ./... -v
+
+# Seed do banco (cria tenant + admin padrão)
+./scripts/dev.sh db:seed
 
 # Frontend (outro terminal)
 cd apps/frontend && npm run dev

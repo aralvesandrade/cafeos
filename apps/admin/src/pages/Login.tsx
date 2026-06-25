@@ -7,8 +7,8 @@ import { useAuth } from '@/lib/auth'
 import { apiRequest } from '@/lib/api'
 
 export function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('admin@cafeos.com.br')
+  const [password, setPassword] = useState('admin123')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()

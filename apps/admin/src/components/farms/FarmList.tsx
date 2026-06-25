@@ -1,13 +1,14 @@
+import { Link } from 'react-router-dom'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Trash2, ExternalLink } from 'lucide-react'
 
 interface Farm {
   id: string
   name: string
   owner: string
-  total_area: number
-  planted_area: number
+  total_area_ha: number
+  planted_area_ha: number
   location: string
 }
 
@@ -33,13 +34,22 @@ export function FarmList({ farms, onEdit, onDelete }: FarmListProps) {
       <TableBody>
         {farms.map((farm) => (
           <TableRow key={farm.id}>
-            <TableCell className="font-medium">{farm.name}</TableCell>
+            <TableCell className="font-medium">
+              <Link to={`/farms/${farm.id}`} className="text-coffee-green hover:underline">
+                {farm.name}
+              </Link>
+            </TableCell>
             <TableCell>{farm.owner}</TableCell>
-            <TableCell>{farm.total_area} ha</TableCell>
-            <TableCell>{farm.planted_area} ha</TableCell>
+            <TableCell>{farm.total_area_ha} ha</TableCell>
+            <TableCell>{farm.planted_area_ha} ha</TableCell>
             <TableCell>{farm.location}</TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end gap-1">
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to={`/farms/${farm.id}`}>
+                    <ExternalLink className="h-4 w-4" />
+                  </Link>
+                </Button>
                 <Button variant="ghost" size="sm" onClick={() => onEdit(farm)}>
                   <Pencil className="h-4 w-4" />
                 </Button>

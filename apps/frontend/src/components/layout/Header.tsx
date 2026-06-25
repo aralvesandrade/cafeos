@@ -34,7 +34,9 @@ export function Header() {
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
-            <Button variant="ghost" size="sm">Entrar</Button>
+            <a href="http://localhost:5174" target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="sm">Entrar</Button>
+            </a>
             <Button variant="primary" size="sm">Começar Grátis</Button>
           </div>
 
@@ -60,7 +62,9 @@ export function Header() {
               </a>
             ))}
             <div className="flex gap-3 pt-2">
-              <Button variant="ghost" size="sm">Entrar</Button>
+              <a href="http://localhost:5174" target="_blank" rel="noopener noreferrer">
+                <Button variant="ghost" size="sm">Entrar</Button>
+              </a>
               <Button variant="primary" size="sm">Começar Grátis</Button>
             </div>
           </div>

@@ -16,6 +16,7 @@ type HarvestService struct {
 	indicatorRepo         repository.IndicatorRepository
 	plotRepo              repository.PlotRepository
 	operationRepo         repository.OperationRepository
+	transactor            repository.Transactor
 	eventBus              event.Bus
 }
 
@@ -25,6 +26,7 @@ func NewHarvestService(
 	indicatorRepo repository.IndicatorRepository,
 	plotRepo repository.PlotRepository,
 	operationRepo repository.OperationRepository,
+	transactor repository.Transactor,
 	eventBus event.Bus,
 ) *HarvestService {
 	return &HarvestService{
@@ -33,6 +35,7 @@ func NewHarvestService(
 		indicatorRepo:  indicatorRepo,
 		plotRepo:       plotRepo,
 		operationRepo:  operationRepo,
+		transactor:     transactor,
 		eventBus:       eventBus,
 	}
 }
@@ -79,11 +82,13 @@ func (s *HarvestService) Finalize(harvestID string) error {
 	harvest.Status = entity.HarvestFinalizada
 	harvest.UpdatedAt = time.Now()
 
-	if err := s.harvestRepo.Update(harvest); err != nil {
-		return err
-	}
-
-	if err := s.calculateIndicators(harvest); err != nil {
+	err = s.transactor.RunInTx(func(repos repository.TransactionProvider) error {
+		if err := repos.Harvest().Update(harvest); err != nil {
+			return err
+		}
+		return s.calculateIndicatorsWithRepos(harvest, repos)
+	})
+	if err != nil {
 		return err
 	}
 
@@ -153,6 +158,60 @@ func (s *HarvestService) calculateIndicators(harvest *entity.Harvest) error {
 		totalCost += op.Cost
 	}
 
+	indicators := s.buildIndicators(harvest, totalProduction, totalPlantedArea, totalCost)
+
+	for _, ind := range indicators {
+		if err := s.indicatorRepo.Create(ind); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *HarvestService) calculateIndicatorsWithRepos(harvest *entity.Harvest, repos repository.TransactionProvider) error {
+	productions, err := repos.HarvestProduction().ListByHarvest(harvest.ID)
+	if err != nil {
+		return err
+	}
+
+	var totalProduction float64
+	for _, p := range productions {
+		totalProduction += p.Quantity
+	}
+
+	plots, err := repos.Plot().ListByTenant(harvest.TenantID)
+	if err != nil {
+		return err
+	}
+
+	var totalPlantedArea float64
+	for _, p := range plots {
+		totalPlantedArea += p.AreaHA
+	}
+
+	operations, err := repos.Operation().ListByTenant(harvest.TenantID)
+	if err != nil {
+		return err
+	}
+
+	var totalCost float64
+	for _, op := range operations {
+		totalCost += op.Cost
+	}
+
+	indicators := s.buildIndicators(harvest, totalProduction, totalPlantedArea, totalCost)
+
+	for _, ind := range indicators {
+		if err := repos.Indicator().Create(ind); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *HarvestService) buildIndicators(harvest *entity.Harvest, totalProduction, totalPlantedArea, totalCost float64) []*entity.Indicator {
 	indicators := []*entity.Indicator{
 		{
 			ID:           uuid.New().String(),
@@ -194,18 +253,5 @@ func (s *HarvestService) calculateIndicators(harvest *entity.Harvest) error {
 		})
 	}
 
-	for _, ind := range indicators {
-		if err := s.indicatorRepo.Create(ind); err != nil {
-			return err
-		}
-		s.eventBus.Publish(event.IndicatorUpdated{
-			TenantID:    harvest.TenantID,
-			HarvestID:   harvest.ID,
-			IndicatorID: ind.ID,
-			Type:        string(ind.Type),
-			Value:       ind.Value,
-		})
-	}
-
-	return nil
+	return indicators
 }
