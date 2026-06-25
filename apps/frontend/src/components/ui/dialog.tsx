@@ -24,12 +24,13 @@ export function Dialog({ open, onClose, title, children }: DialogProps) {
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 bg-black/50 p-4 overflow-y-auto"
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose()
       }}
     >
-      <div className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
+      <div className="min-h-full flex items-center justify-center">
+        <div className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-lg my-8">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
@@ -38,6 +39,7 @@ export function Dialog({ open, onClose, title, children }: DialogProps) {
         </button>
         <h2 className="text-lg font-semibold text-coffee-green-dark mb-4">{title}</h2>
         {children}
+      </div>
       </div>
     </div>
   )

@@ -104,7 +104,7 @@ export function LeadModal({ open, onClose, mode, plan }: LeadModalProps) {
           </div>
 
           <Button type="submit" variant="primary" className="w-full gap-2" disabled={sending}>
-            {sending ? 'Enviando...' : 'Assinar Grátis'}
+            {sending ? 'Enviando...' : 'Assinar'}
             <Send className="h-4 w-4" />
           </Button>
         </form>
