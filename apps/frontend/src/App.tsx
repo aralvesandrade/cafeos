@@ -6,8 +6,6 @@ import { Features } from '@/components/sections/Features'
 import { CoffeeCycle } from '@/components/sections/CoffeeCycle'
 import { Indicators } from '@/components/sections/Indicators'
 import { Plans } from '@/components/sections/Plans'
-import { TechStack } from '@/components/sections/TechStack'
-import { Roadmap } from '@/components/sections/Roadmap'
 import { CtaSection } from '@/components/sections/CtaSection'
 
 function App() {
@@ -22,8 +20,6 @@ function App() {
         <CoffeeCycle />
         <Indicators />
         <Plans />
-        <TechStack />
-        <Roadmap />
         <CtaSection />
       </main>
 

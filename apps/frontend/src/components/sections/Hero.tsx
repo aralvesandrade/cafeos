@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Coffee, Leaf, BarChart3 } from 'lucide-react'
+import { ArrowRight, Sprout, Leaf, BarChart3 } from 'lucide-react'
 
 export function Hero() {
   return (
@@ -13,7 +13,7 @@ export function Hero() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-coffee-green/10 text-coffee-green text-sm font-medium mb-6">
-              <Coffee className="h-4 w-4" />
+              <Sprout className="h-4 w-4" />
               Plataforma especialista em cafeicultura
             </div>
 
@@ -53,7 +53,7 @@ export function Hero() {
           <div className="hidden lg:flex items-center justify-center">
             <div className="relative">
               <div className="w-96 h-96 rounded-full bg-gradient-to-br from-coffee-green/20 to-coffee-brown/20 flex items-center justify-center">
-                <Coffee className="h-48 w-48 text-coffee-green/30" />
+                <Sprout className="h-48 w-48 text-coffee-green/30" />
               </div>
               <div className="absolute -top-4 -right-4 bg-white rounded-xl shadow-lg p-4">
                 <BarChart3 className="h-8 w-8 text-coffee-green" />

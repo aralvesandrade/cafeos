@@ -1,4 +1,4 @@
-import { Coffee, Mail, Globe, ExternalLink } from 'lucide-react'
+import { Sprout, Mail, Globe, ExternalLink } from 'lucide-react'
 
 export function Footer() {
   return (
@@ -7,7 +7,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <Coffee className="h-6 w-6" />
+              <Sprout className="h-6 w-6" />
               <span className="text-lg font-bold">CafeOS</span>
             </div>
             <p className="text-coffee-beige text-sm max-w-md">
@@ -21,7 +21,6 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-coffee-beige">
               <li><a href="#features" className="hover:text-white transition-colors">Funcionalidades</a></li>
               <li><a href="#plans" className="hover:text-white transition-colors">Planos</a></li>
-              <li><a href="#roadmap" className="hover:text-white transition-colors">Roadmap</a></li>
             </ul>
           </div>
 

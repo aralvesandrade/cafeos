@@ -1,12 +1,10 @@
 import { Button } from '@/components/ui/button'
-import { Coffee, Menu, X } from 'lucide-react'
+import { Sprout, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 
 const navLinks = [
   { label: 'Funcionalidades', href: '#features' },
   { label: 'Planos', href: '#plans' },
-  { label: 'Tecnologia', href: '#tech' },
-  { label: 'Roadmap', href: '#roadmap' },
 ]
 
 export function Header() {
@@ -17,7 +15,7 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <a href="#" className="flex items-center gap-2">
-            <Coffee className="h-8 w-8 text-coffee-green" />
+            <Sprout className="h-8 w-8 text-coffee-green" />
             <span className="text-xl font-bold text-coffee-green-dark">CafeOS</span>
           </a>
 
