@@ -18,7 +18,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/tenants": {
+        "/api/v1/admin/tenants": {
             "get": {
                 "security": [
                     {
@@ -92,7 +92,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/tenants/{id}": {
+        "/api/v1/admin/tenants/{id}": {
             "get": {
                 "security": [
                     {
@@ -214,7 +214,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/users": {
+        "/api/v1/admin/users": {
             "get": {
                 "security": [
                     {
@@ -288,7 +288,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/users/{id}": {
+        "/api/v1/admin/users/{id}": {
             "put": {
                 "security": [
                     {

@@ -39,7 +39,7 @@ type updateTenantRequest struct {
 // @Produce json
 // @Success 200 {array} entity.Tenant
 // @Security BearerAuth
-// @Router /api/v1/tenants [get]
+// @Router /api/v1/admin/tenants [get]
 func (h *TenantHandler) List(w http.ResponseWriter, r *http.Request) {
 	tenants, err := h.repo.List()
 	if err != nil {
@@ -59,7 +59,7 @@ func (h *TenantHandler) List(w http.ResponseWriter, r *http.Request) {
 // @Success 201 {object} entity.Tenant
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/tenants [post]
+// @Router /api/v1/admin/tenants [post]
 func (h *TenantHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var req createTenantRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -103,7 +103,7 @@ func (h *TenantHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} entity.Tenant
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/tenants/{id} [get]
+// @Router /api/v1/admin/tenants/{id} [get]
 func (h *TenantHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	tenant, err := h.repo.GetByID(id)
@@ -125,7 +125,7 @@ func (h *TenantHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} entity.Tenant
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/tenants/{id} [put]
+// @Router /api/v1/admin/tenants/{id} [put]
 func (h *TenantHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
@@ -170,7 +170,7 @@ func (h *TenantHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Param id path string true "Tenant ID"
 // @Success 204 "No Content"
 // @Security BearerAuth
-// @Router /api/v1/tenants/{id} [delete]
+// @Router /api/v1/admin/tenants/{id} [delete]
 func (h *TenantHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.repo.Delete(id); err != nil {

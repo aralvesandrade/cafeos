@@ -170,19 +170,19 @@ Rotas multi-tenant sob `/api/v1/{tenant_id}`:
 | GET    | `/harvests/{id}/production`    | Produção da safra            |
 | GET    | `/dashboard`                   | Dashboard consolidado        |
 
-Rotas admin (`platform_owner` apenas, sem `{tenant_id}`):
+Rotas admin (`platform_owner` apenas, prefixo `/api/v1/admin`):
 
-| Método | Rota                   | Descrição              |
-| ------ | ---------------------- | ---------------------- |
-| GET    | `/api/v1/tenants`      | Listar tenants         |
-| POST   | `/api/v1/tenants`      | Criar tenant           |
-| GET    | `/api/v1/tenants/{id}` | Detalhe do tenant      |
-| PUT    | `/api/v1/tenants/{id}` | Atualizar tenant       |
-| DELETE | `/api/v1/tenants/{id}` | Remover tenant         |
-| GET    | `/api/v1/users`        | Listar usuários        |
-| POST   | `/api/v1/users`        | Criar usuário          |
-| PUT    | `/api/v1/users/{id}`   | Atualizar usuário      |
-| DELETE | `/api/v1/users/{id}`   | Remover usuário        |
+| Método | Rota                          | Descrição              |
+| ------ | ----------------------------- | ---------------------- |
+| GET    | `/api/v1/admin/tenants`       | Listar tenants         |
+| POST   | `/api/v1/admin/tenants`       | Criar tenant           |
+| GET    | `/api/v1/admin/tenants/{id}`  | Detalhe do tenant      |
+| PUT    | `/api/v1/admin/tenants/{id}`  | Atualizar tenant       |
+| DELETE | `/api/v1/admin/tenants/{id}`  | Remover tenant         |
+| GET    | `/api/v1/admin/users`         | Listar usuários        |
+| POST   | `/api/v1/admin/users`         | Criar usuário          |
+| PUT    | `/api/v1/admin/users/{id}`    | Atualizar usuário      |
+| DELETE | `/api/v1/admin/users/{id}`    | Remover usuário        |
 
 ### Engine de Regras
 

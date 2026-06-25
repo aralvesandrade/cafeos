@@ -102,17 +102,17 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, jwtSecret string) http.Handler {
 		return authMw(adminMw(http.HandlerFunc(h)))
 	}
 
-	mux.Handle("GET /api/v1/tenants", adminChain(tenantH.List))
-	mux.Handle("POST /api/v1/tenants", adminChain(tenantH.Create))
-	mux.Handle("GET /api/v1/tenants/{id}", adminChain(tenantH.GetByID))
-	mux.Handle("PUT /api/v1/tenants/{id}", adminChain(tenantH.Update))
-	mux.Handle("DELETE /api/v1/tenants/{id}", adminChain(tenantH.Delete))
+	mux.Handle("GET /api/v1/admin/tenants", adminChain(tenantH.List))
+	mux.Handle("POST /api/v1/admin/tenants", adminChain(tenantH.Create))
+	mux.Handle("GET /api/v1/admin/tenants/{id}", adminChain(tenantH.GetByID))
+	mux.Handle("PUT /api/v1/admin/tenants/{id}", adminChain(tenantH.Update))
+	mux.Handle("DELETE /api/v1/admin/tenants/{id}", adminChain(tenantH.Delete))
 
 	// Admin — User management (platform_owner only)
-	mux.Handle("GET /api/v1/users", adminChain(userH.List))
-	mux.Handle("POST /api/v1/users", adminChain(userH.Create))
-	mux.Handle("PUT /api/v1/users/{id}", adminChain(userH.Update))
-	mux.Handle("DELETE /api/v1/users/{id}", adminChain(userH.Delete))
+	mux.Handle("GET /api/v1/admin/users", adminChain(userH.List))
+	mux.Handle("POST /api/v1/admin/users", adminChain(userH.Create))
+	mux.Handle("PUT /api/v1/admin/users/{id}", adminChain(userH.Update))
+	mux.Handle("DELETE /api/v1/admin/users/{id}", adminChain(userH.Delete))
 
 	return corsMw(mux)
 }

@@ -27,7 +27,7 @@ export function Tenants() {
 
   const load = useCallback(async () => {
     try {
-      const data = await apiRequest<Tenant[]>('/tenants', { admin: true })
+      const data = await apiRequest<Tenant[]>('/admin/tenants', { admin: true })
       setTenants(data)
     } catch (err) {
       console.error(err)
@@ -42,9 +42,9 @@ export function Tenants() {
     setSaving(true)
     try {
       if (editing) {
-        await apiRequest(`/tenants/${editing.id}`, { method: 'PUT', body: form, admin: true })
+        await apiRequest(`/admin/tenants/${editing.id}`, { method: 'PUT', body: form, admin: true })
       } else {
-        await apiRequest('/tenants', { method: 'POST', body: form, admin: true })
+        await apiRequest('/admin/tenants', { method: 'POST', body: form, admin: true })
       }
       setDialogOpen(false); setEditing(null)
       await load()

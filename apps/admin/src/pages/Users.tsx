@@ -46,8 +46,8 @@ export function Users() {
   const load = useCallback(async () => {
     try {
       const [userData, tenantData] = await Promise.all([
-        apiRequest<AppUser[]>('/users', { admin: true }),
-        apiRequest<Tenant[]>('/tenants', { admin: true }),
+        apiRequest<AppUser[]>('/admin/users', { admin: true }),
+        apiRequest<Tenant[]>('/admin/tenants', { admin: true }),
       ])
       setUsers(userData)
       setTenants(tenantData)
@@ -64,9 +64,9 @@ export function Users() {
     setSaving(true)
     try {
       if (editing) {
-        await apiRequest(`/users/${editing.id}`, { method: 'PUT', body: { name: form.name, email: form.email, role: form.role }, admin: true })
+        await apiRequest(`/admin/users/${editing.id}`, { method: 'PUT', body: { name: form.name, email: form.email, role: form.role }, admin: true })
       } else {
-        await apiRequest('/users', { method: 'POST', body: { name: form.name, email: form.email, password: form.password, role: form.role, tenant_id: form.tenant_id }, admin: true })
+        await apiRequest('/admin/users', { method: 'POST', body: { name: form.name, email: form.email, password: form.password, role: form.role, tenant_id: form.tenant_id }, admin: true })
       }
       setDialogOpen(false); setEditing(null)
       await load()
@@ -80,7 +80,7 @@ export function Users() {
   const handleDelete = async (id: string) => {
     if (!confirm('Remover usuário?')) return
     try {
-      await apiRequest(`/users/${id}`, { method: 'DELETE', admin: true })
+      await apiRequest(`/admin/users/${id}`, { method: 'DELETE', admin: true })
       await load()
     } catch (err) { console.error(err) }
   }

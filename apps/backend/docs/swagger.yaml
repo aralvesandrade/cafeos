@@ -1188,7 +1188,7 @@ paths:
       summary: List operations by plot
       tags:
       - operations
-  /api/v1/tenants:
+  /api/v1/admin/tenants:
     get:
       description: List all tenants (platform_owner only)
       produces:
@@ -1234,7 +1234,7 @@ paths:
       summary: Create a tenant
       tags:
       - tenants
-  /api/v1/tenants/{id}:
+  /api/v1/admin/tenants/{id}:
     delete:
       description: Delete a tenant by ID (platform_owner only)
       parameters:
@@ -1311,7 +1311,7 @@ paths:
       summary: Update a tenant
       tags:
       - tenants
-  /api/v1/users:
+  /api/v1/admin/users:
     get:
       description: List all users (platform_owner only)
       produces:
@@ -1357,7 +1357,7 @@ paths:
       summary: Create a user
       tags:
       - users
-  /api/v1/users/{id}:
+  /api/v1/admin/users/{id}:
     delete:
       description: Delete a user by ID (platform_owner only)
       parameters:

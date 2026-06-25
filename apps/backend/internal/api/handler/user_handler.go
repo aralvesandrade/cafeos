@@ -40,7 +40,7 @@ type updateUserRequest struct {
 // @Produce json
 // @Success 200 {array} entity.User
 // @Security BearerAuth
-// @Router /api/v1/users [get]
+// @Router /api/v1/admin/users [get]
 func (h *UserHandler) List(w http.ResponseWriter, r *http.Request) {
 	users, err := h.repo.List()
 	if err != nil {
@@ -86,7 +86,7 @@ func (h *UserHandler) List(w http.ResponseWriter, r *http.Request) {
 // @Success 201 {object} entity.User
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/users [post]
+// @Router /api/v1/admin/users [post]
 func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var req createUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -141,7 +141,7 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} entity.User
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/users/{id} [put]
+// @Router /api/v1/admin/users/{id} [put]
 func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
@@ -183,7 +183,7 @@ func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Param id path string true "User ID"
 // @Success 204 "No Content"
 // @Security BearerAuth
-// @Router /api/v1/users/{id} [delete]
+// @Router /api/v1/admin/users/{id} [delete]
 func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.repo.Delete(id); err != nil {
