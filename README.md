@@ -9,7 +9,8 @@ Plataforma SaaS multi-tenant para gestão operacional, produtiva, financeira e a
 | Camada    | Tecnologia                                              |
 | --------- | ------------------------------------------------------- |
 | Backend   | Go (REST API, workers, engine de regras)                |
-| Frontend  | React + Vite + Tailwind CSS v4                          |
+| Frontend  | React + Vite + Tailwind CSS v4 (landing page)           |
+| Admin     | React + Vite + Tailwind CSS v4 + Recharts               |
 | Mobile    | React Native _(futuro)_                                 |
 | Banco     | PostgreSQL + Redis                                      |
 | Mensageria| RabbitMQ / Kafka _(futuro)_                             |
@@ -22,6 +23,7 @@ cafeos/
 ├── apps/
 │   ├── backend/          # Go API (MVP atual)
 │   ├── frontend/         # React + Vite (landing page)
+│   ├── admin/            # React + Vite (painel administrativo)
 │   └── mobile/           # React Native (futuro)
 ├── packages/
 │   └── shared/           # Tipos e utilitários compartilhados
@@ -102,6 +104,34 @@ src/
 ```bash
 cd apps/frontend
 npm run dev      # Desenvolvimento
+npm run build    # Build produção
+```
+
+## Admin Panel — `apps/admin/`
+
+Painel administrativo com autenticação JWT, dashboard com gráficos e CRUD completo:
+
+```
+src/
+├── components/
+│   ├── layout/       # Sidebar, Header, AdminLayout, AuthLayout
+│   ├── ui/           # Button, Badge, Card, Table, Dialog, Input, Select
+│   ├── dashboard/    # StatsCards, ProductionChart, CostChart, RecentOperations
+│   └── farms/        # FarmList, FarmForm
+├── lib/
+│   ├── utils.ts      # cn() utility
+│   ├── api.ts        # Cliente HTTP com JWT
+│   └── auth.tsx      # AuthContext + hook
+├── pages/            # Login, Dashboard, Farms, Plots, Operations, Harvests, Tenants, Users, NotFound
+├── router.tsx        # React Router DOM v7 (nested layouts, lazy routes)
+├── App.tsx
+├── main.tsx
+└── index.css         # Tailwind v4 @theme
+```
+
+```bash
+cd apps/admin
+npm run dev      # Desenvolvimento (http://localhost:5174)
 npm run build    # Build produção
 ```
 
@@ -192,6 +222,9 @@ cd apps/backend && go test ./... -v
 
 # Frontend (outro terminal)
 cd apps/frontend && npm run dev
+
+# Admin Panel (outro terminal)
+cd apps/admin && npm run dev
 ```
 
 ### Variáveis de Ambiente
