@@ -141,7 +141,7 @@ Documentação interativa disponível em `http://localhost:8080/swagger/index.ht
 
 ### API REST
 
-Todas as rotas sob `/api/v1/{tenant_id}`:
+Rotas multi-tenant sob `/api/v1/{tenant_id}`:
 
 | Método | Rota                           | Descrição                    |
 | ------ | ------------------------------ | ---------------------------- |
@@ -169,6 +169,20 @@ Todas as rotas sob `/api/v1/{tenant_id}`:
 | POST   | `/harvests/{id}/production`    | Registrar produção           |
 | GET    | `/harvests/{id}/production`    | Produção da safra            |
 | GET    | `/dashboard`                   | Dashboard consolidado        |
+
+Rotas admin (`platform_owner` apenas, sem `{tenant_id}`):
+
+| Método | Rota                   | Descrição              |
+| ------ | ---------------------- | ---------------------- |
+| GET    | `/api/v1/tenants`      | Listar tenants         |
+| POST   | `/api/v1/tenants`      | Criar tenant           |
+| GET    | `/api/v1/tenants/{id}` | Detalhe do tenant      |
+| PUT    | `/api/v1/tenants/{id}` | Atualizar tenant       |
+| DELETE | `/api/v1/tenants/{id}` | Remover tenant         |
+| GET    | `/api/v1/users`        | Listar usuários        |
+| POST   | `/api/v1/users`        | Criar usuário          |
+| PUT    | `/api/v1/users/{id}`   | Atualizar usuário      |
+| DELETE | `/api/v1/users/{id}`   | Remover usuário        |
 
 ### Engine de Regras
 
@@ -262,6 +276,9 @@ cd apps/admin && npm run dev
 - [x] Engine de regras
 - [x] API REST multi-tenant
 - [x] Event system
+- [x] RBAC com 10 perfis + autorização por rota
+- [x] Gestão de tenants e usuários (platform_owner)
+- [x] Login com acesso rápido por perfil (dev)
 
 ### Fase 2
 - [ ] Financeiro (contas, fluxo de caixa, planejamento)

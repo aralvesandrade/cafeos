@@ -1,32 +1,51 @@
-# React + TypeScript + Vite
+# CafeOS — Admin Panel
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Painel administrativo do CafeOS, plataforma SaaS multi-tenant para cafeicultura.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Vite** + **React** + **TypeScript**
+- **Tailwind CSS v4** com paleta personalizada (coffee-green, coffee-brown, coffee-beige)
+- **React Router DOM v7** (nested layouts)
+- **Recharts** (gráficos)
+- **Lucide React** (ícones)
+- **shadcn/ui** (Button, Badge, Card, Table, Dialog, Input)
 
-## React Compiler
+## Estrutura
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```
+src/
+├── components/
+│   ├── layout/       # Sidebar, Header, AdminLayout, AuthLayout
+│   ├── ui/           # Button, Badge, Card, Table, Dialog, Input, Select
+│   ├── dashboard/    # StatsCards, ProductionChart, CostChart, RecentOperations
+│   └── farms/        # FarmList, FarmForm
+├── lib/
+│   ├── utils.ts      # cn() utility (class-variance-authority + tailwind-merge)
+│   ├── api.ts        # Cliente HTTP com JWT + suporte a rotas admin
+│   └── auth.tsx      # AuthContext + hook
+├── pages/            # Login, Dashboard, Farms, Plots, Operations, Harvests, Tenants, Users, NotFound
+├── router.tsx        # React Router DOM v7 (nested layouts, role-based guards)
+├── App.tsx
+├── main.tsx
+└── index.css         # Tailwind v4 @theme
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Perfis RBAC
+
+| Perfil | Visibilidade |
+|--------|-------------|
+| `platform_owner` | Dashboard + CRUD fazendas/talhões/operações/safras + Administração (Tenants, Usuários) |
+| Demais perfis | Dashboard + dados do próprio tenant apenas |
+
+## Comandos
+
+```bash
+npm run dev      # Servidor de desenvolvimento (Vite, http://localhost:5174)
+npm run build    # Build de produção
+npm run preview  # Preview do build
+```
+
+## Login Rápido (dev)
+
+Botões de acesso rápido na tela de login preenchem email/senha automaticamente para cada perfil RBAC.
