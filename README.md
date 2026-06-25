@@ -9,7 +9,7 @@ Plataforma SaaS multi-tenant para gestão operacional, produtiva, financeira e a
 | Camada    | Tecnologia                                              |
 | --------- | ------------------------------------------------------- |
 | Backend   | Go (REST API, workers, engine de regras)                |
-| Frontend  | React + Vite _(em desenvolvimento)_                     |
+| Frontend  | React + Vite + Tailwind CSS v4                          |
 | Mobile    | React Native _(futuro)_                                 |
 | Banco     | PostgreSQL + Redis                                      |
 | Mensageria| RabbitMQ / Kafka _(futuro)_                             |
@@ -21,7 +21,7 @@ Plataforma SaaS multi-tenant para gestão operacional, produtiva, financeira e a
 cafeos/
 ├── apps/
 │   ├── backend/          # Go API (MVP atual)
-│   ├── frontend/         # React (em breve)
+│   ├── frontend/         # React + Vite (landing page)
 │   └── mobile/           # React Native (futuro)
 ├── packages/
 │   └── shared/           # Tipos e utilitários compartilhados
@@ -83,6 +83,32 @@ internal/
 - `consultor_externo` — Leitura autorizada
 - `auditor` — Compliance e rastreabilidade
 
+## Frontend — `apps/frontend/`
+
+Landing page responsiva com paleta de cores cafeicultura:
+
+```
+src/
+├── components/
+│   ├── layout/       # Header, Footer
+│   ├── sections/     # Hero, About, Features, CoffeeCycle, Indicators, Plans, TechStack, Roadmap, CTA
+│   └── ui/           # Button, Badge (shadcn/ui)
+├── lib/utils.ts      # cn() utility
+├── App.tsx           # Página principal
+├── main.tsx          # Entry point
+└── index.css         # Tailwind v4 @theme
+```
+
+```bash
+cd apps/frontend
+npm run dev      # Desenvolvimento
+npm run build    # Build produção
+```
+
+### Swagger
+
+Documentação interativa disponível em `http://localhost:8080/swagger/index.html` (com backend rodando).
+
 ### API REST
 
 Todas as rotas sob `/api/v1/{tenant_id}`:
@@ -138,6 +164,7 @@ Sistema orientado a eventos (in-memory, preparado para fila):
 ### Pré-requisitos
 
 - Go 1.22+
+- Node.js 20+
 - Docker & Docker Compose
 
 ### Comandos
@@ -158,10 +185,13 @@ Sistema orientado a eventos (in-memory, preparado para fila):
 # Resetar banco
 ./scripts/dev.sh db:reset
 
-# Rodar testes
+# Rodar testes backend
 ./scripts/dev.sh test
 # ou diretamente:
 cd apps/backend && go test ./... -v
+
+# Frontend (outro terminal)
+cd apps/frontend && npm run dev
 ```
 
 ### Variáveis de Ambiente
