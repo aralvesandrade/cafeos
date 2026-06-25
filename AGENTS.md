@@ -1,5 +1,13 @@
 # CafeOS — Agent Guide
 
+## Agent Rules
+
+- Commits and push NEVER automatic. Ask user before each commit/push.
+- Plans must be saved in `/plans/` folder at project root, not in `.opencode/` or elsewhere.
+- When user says "commitar" or "push", confirm and execute.
+- When planning features, create a markdown file in `/plans/` first and present to user for approval before implementing.
+- Any destructive operation (delete, reset, migration) must be confirmed by user first.
+
 ## Stack
 
 - Backend: Go 1.26 + GORM + PostgreSQL + Redis + RabbitMQ
