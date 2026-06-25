@@ -169,6 +169,36 @@ Rotas multi-tenant sob `/api/v1/{tenant_id}`:
 | POST   | `/harvests/{id}/production`    | Registrar produção           |
 | GET    | `/harvests/{id}/production`    | Produção da safra            |
 | GET    | `/dashboard`                   | Dashboard consolidado        |
+| POST   | `/financial`                   | Criar transação financeira    |
+| GET    | `/financial`                   | Listar transações             |
+| GET    | `/financial/{id}`              | Detalhe da transação          |
+| PUT    | `/financial/{id}`              | Atualizar transação           |
+| DELETE | `/financial/{id}`              | Remover transação             |
+| GET    | `/agricultural-products`       | Listar produtos agrícolas     |
+| POST   | `/stock/items`                 | Criar item de estoque         |
+| GET    | `/stock/items`                 | Listar itens                  |
+| PUT    | `/stock/items/{id}`            | Atualizar item                |
+| DELETE | `/stock/items/{id}`            | Remover item                  |
+| POST   | `/stock/movements`             | Registrar movimentação        |
+| GET    | `/stock/movements`             | Listar movimentações          |
+| POST   | `/fleet/vehicles`              | Criar veículo                 |
+| GET    | `/fleet/vehicles`              | Listar veículos               |
+| PUT    | `/fleet/vehicles/{id}`         | Atualizar veículo             |
+| DELETE | `/fleet/vehicles/{id}`         | Remover veículo               |
+| POST   | `/fleet/maintenance`           | Registrar manutenção          |
+| GET    | `/fleet/maintenance`           | Listar manutenções            |
+| DELETE | `/fleet/maintenance/{id}`      | Remover manutenção            |
+| POST   | `/labor/teams`                 | Criar equipe                  |
+| GET    | `/labor/teams`                 | Listar equipes                |
+| PUT    | `/labor/teams/{id}`            | Atualizar equipe              |
+| DELETE | `/labor/teams/{id}`            | Remover equipe                 |
+| POST   | `/labor/workers`               | Criar trabalhador             |
+| GET    | `/labor/workers`               | Listar trabalhadores          |
+| PUT    | `/labor/workers/{id}`          | Atualizar trabalhador         |
+| DELETE | `/labor/workers/{id}`          | Remover trabalhador           |
+| POST   | `/labor/shifts`                | Registrar apontamento         |
+| GET    | `/labor/shifts`                | Listar apontamentos           |
+| DELETE | `/labor/shifts/{id}`           | Remover apontamento           |
 
 Rotas admin (`platform_owner` apenas, prefixo `/api/v1/admin`):
 
@@ -280,10 +310,11 @@ cd apps/admin && npm run dev
 - [x] Gestão de tenants e usuários (platform_owner)
 - [x] Login com acesso rápido por perfil (dev)
 
-### Fase 2
-- [ ] Financeiro (contas, fluxo de caixa, planejamento)
-- [ ] Estoque (insumos, validade, consumo)
-- [ ] Frota e equipes
+### Fase 2 ✅ (implementado)
+- [x] Financeiro (contas a pagar/receber, categorias)
+- [x] Estoque (insumos, validade, movimentações)
+- [x] Frota (veículos, manutenções preventivas/corretivas)
+- [x] Mão de Obra (equipes, trabalhadores, apontamento de horas)
 
 ### Fase 3
 - [ ] Mobile offline (React Native)

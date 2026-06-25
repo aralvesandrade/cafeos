@@ -37,6 +37,14 @@ func NewConnection(databaseURL string) (*gorm.DB, error) {
 		&entity.HarvestProduction{},
 		&entity.Indicator{},
 		&entity.AgriculturalProduct{},
+		&entity.FinancialTransaction{},
+		&entity.StockItem{},
+		&entity.StockMovement{},
+		&entity.Vehicle{},
+		&entity.Maintenance{},
+		&entity.Team{},
+		&entity.Worker{},
+		&entity.WorkShift{},
 	); err != nil {
 		return nil, fmt.Errorf("auto migrate: %w", err)
 	}

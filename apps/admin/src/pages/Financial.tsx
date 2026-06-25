@@ -1,0 +1,107 @@
+import { useEffect, useState, useCallback } from 'react'
+import { apiRequest } from '@/lib/api'
+import { Button } from '@/components/ui/button'
+import { Dialog } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Plus, Pencil, Trash2, DollarSign } from 'lucide-react'
+
+interface Transaction {
+  id: string
+  type: string
+  category: string
+  description: string
+  amount: number
+  date: string
+  due_date: string
+  status: string
+  notes: string
+}
+
+const typeLabels: Record<string, string> = { receita: 'Receita', despesa: 'Despesa' }
+const typeVariants: Record<string, 'success' | 'danger'> = { receita: 'success', despesa: 'danger' }
+const statusLabels: Record<string, string> = { pending: 'Pendente', paid: 'Pago', cancelled: 'Cancelado' }
+
+export function Financial() {
+  const [items, setItems] = useState<Transaction[]>([])
+  const [loading, setLoading] = useState(true)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [editing, setEditing] = useState<Transaction | null>(null)
+  const [form, setForm] = useState({ type: 'despesa', category: '', description: '', amount: '', date: '', due_date: '', notes: '' })
+  const [saving, setSaving] = useState(false)
+
+  const load = useCallback(async () => {
+    try { const data = await apiRequest<Transaction[]>('/financial'); setItems(data) }
+    catch (err) { console.error(err) }
+    finally { setLoading(false) }
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const body = { ...form, amount: parseFloat(form.amount) }
+      if (editing) await apiRequest(`/financial/${editing.id}`, { method: 'PUT', body })
+      else await apiRequest('/financial', { method: 'POST', body })
+      setDialogOpen(false); setEditing(null); await load()
+    } catch (err) { console.error(err) }
+    finally { setSaving(false) }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Remover transação?')) return
+    try { await apiRequest(`/financial/${id}`, { method: 'DELETE' }); await load() }
+    catch (err) { console.error(err) }
+  }
+
+  if (loading) return <div className="flex items-center justify-center h-64 text-coffee-text-light">Carregando...</div>
+
+  return (<div className="space-y-6">
+    <div className="flex items-center justify-between">
+      <div><h1 className="text-2xl font-bold text-coffee-green-dark">Financeiro</h1><p className="text-sm text-coffee-text-light">Contas a pagar e receber</p></div>
+      <Button onClick={() => { setEditing(null); setForm({ type: 'despesa', category: '', description: '', amount: '', date: '', due_date: '', notes: '' }); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Nova Transação</Button>
+    </div>
+    <Table>
+      <TableHead><TableRow><TableHeader>Tipo</TableHeader><TableHeader>Descrição</TableHeader><TableHeader>Categoria</TableHeader><TableHeader>Valor</TableHeader><TableHeader>Data</TableHeader><TableHeader>Status</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
+      <TableBody>{items.map((t) => (<TableRow key={t.id}>
+        <TableCell><Badge variant={typeVariants[t.type]}>{typeLabels[t.type] || t.type}</Badge></TableCell>
+        <TableCell className="font-medium"><div className="flex items-center gap-2"><DollarSign className="h-4 w-4 text-coffee-green" />{t.description}</div></TableCell>
+        <TableCell className="text-coffee-text-light text-sm">{t.category}</TableCell>
+        <TableCell>R$ {t.amount.toFixed(2)}</TableCell>
+        <TableCell>{t.date}</TableCell>
+        <TableCell><Badge variant={t.status === 'paid' ? 'success' : t.status === 'cancelled' ? 'danger' : 'default'}>{statusLabels[t.status] || t.status}</Badge></TableCell>
+        <TableCell className="text-right"><div className="flex justify-end gap-1">
+          <Button variant="ghost" size="sm" onClick={() => { setEditing(t); setForm({ type: t.type, category: t.category, description: t.description, amount: String(t.amount), date: t.date, due_date: t.due_date, notes: t.notes }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="sm" onClick={() => handleDelete(t.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
+        </div></TableCell>
+      </TableRow>))}
+      {items.length === 0 && <TableRow><TableCell colSpan={7} className="text-center text-coffee-text-light py-8">Nenhuma transação cadastrada.</TableCell></TableRow>}
+      </TableBody>
+    </Table>
+    <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Transação' : 'Nova Transação'}>
+      <div className="space-y-4">
+        <div><label className="block text-sm font-medium text-coffee-text mb-1">Tipo</label>
+          <select className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-coffee-text" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
+            <option value="despesa">Despesa</option><option value="receita">Receita</option>
+          </select></div>
+        <div><label className="block text-sm font-medium text-coffee-text mb-1">Descrição</label><Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required /></div>
+        <div><label className="block text-sm font-medium text-coffee-text mb-1">Categoria</label>
+          <select className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-coffee-text" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+            <option value="">Selecione</option><option value="insumos">Insumos</option><option value="servicos">Serviços</option><option value="mao_de_obra">Mão de Obra</option><option value="comercializacao">Comercialização</option><option value="outros">Outros</option>
+          </select></div>
+        <div><label className="block text-sm font-medium text-coffee-text mb-1">Valor (R$)</label><Input type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} required /></div>
+        <div><label className="block text-sm font-medium text-coffee-text mb-1">Data</label><Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></div>
+        {editing && <div><label className="block text-sm font-medium text-coffee-text mb-1">Status</label>
+          <select className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-coffee-text" value={form.type === 'status' ? '' : ''} onChange={(e) => {/* handled separately in update */}}>
+            <option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option>
+          </select></div>}
+        <div className="flex justify-end gap-3 pt-2">
+          <Button variant="outline" onClick={() => { setDialogOpen(false); setEditing(null) }}>Cancelar</Button>
+          <Button onClick={handleSave} disabled={saving}>{saving ? 'Salvando...' : 'Salvar'}</Button>
+        </div>
+      </div>
+    </Dialog>
+  </div>)
+}

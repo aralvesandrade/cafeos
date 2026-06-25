@@ -12,6 +12,10 @@ import { Harvests } from '@/pages/Harvests'
 import { HarvestDetail } from '@/pages/HarvestDetail'
 import { Tenants } from '@/pages/Tenants'
 import { Users } from '@/pages/Users'
+import { Financial } from '@/pages/Financial'
+import { Stock } from '@/pages/Stock'
+import { Fleet } from '@/pages/Fleet'
+import { Labor } from '@/pages/Labor'
 import { NotFound } from '@/pages/NotFound'
 
 export const router = createBrowserRouter([
@@ -32,6 +36,10 @@ export const router = createBrowserRouter([
       { path: 'operations', element: <Operations /> },
       { path: 'harvests', element: <Harvests /> },
       { path: 'harvests/:harvestId', element: <HarvestDetail /> },
+      { path: 'financial', element: <Financial /> },
+      { path: 'stock', element: <Stock /> },
+      { path: 'fleet', element: <Fleet /> },
+      { path: 'labor', element: <Labor /> },
       { path: 'tenants', element: <Tenants /> },
       { path: 'users', element: <Users /> },
       { path: '404', element: <NotFound /> },

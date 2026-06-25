@@ -10,6 +10,10 @@ import {
   Users,
   Coffee,
   X,
+  DollarSign,
+  Package,
+  Truck,
+  UserCog,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 
@@ -19,6 +23,13 @@ const navItems = [
   { to: '/plots', icon: Grid3X3, label: 'Talhões' },
   { to: '/operations', icon: Tractor, label: 'Operações' },
   { to: '/harvests', icon: Calendar, label: 'Safras' },
+]
+
+const phase2Items = [
+  { to: '/financial', icon: DollarSign, label: 'Financeiro' },
+  { to: '/stock', icon: Package, label: 'Estoque' },
+  { to: '/fleet', icon: Truck, label: 'Frota' },
+  { to: '/labor', icon: UserCog, label: 'Equipes' },
 ]
 
 const adminItems = [
@@ -79,6 +90,30 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               {item.label}
             </NavLink>
           ))}
+
+          <div className="pt-4 mt-4 border-t border-white/10">
+            <p className="px-3 text-xs font-medium text-white/40 uppercase tracking-wider mb-2">
+              Gestão
+            </p>
+            {phase2Items.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={onClose}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
+                    isActive
+                      ? 'bg-white/20 text-white font-medium'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  )
+                }
+              >
+                <item.icon className="h-5 w-5" />
+                {item.label}
+              </NavLink>
+            ))}
+          </div>
 
           {isAdmin && (
             <div className="pt-4 mt-4 border-t border-white/10">
