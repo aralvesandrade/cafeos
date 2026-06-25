@@ -145,7 +145,7 @@ export function Plans() {
                 className="w-full"
                 onClick={() => setShowSignup(true)}
               >
-                {plan.name === 'Grátis' ? 'Começar Grátis' : 'Assinar'}
+                {plan.name === 'Grátis' ? 'Assinar Grátis' : 'Assinar'}
               </Button>
             </div>
           ))}

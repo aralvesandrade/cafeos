@@ -104,7 +104,7 @@ export function LeadModal({ open, onClose, mode }: LeadModalProps) {
         )}
 
         <Button type="submit" variant="primary" className="w-full gap-2" disabled={sending}>
-          {sending ? 'Enviando...' : isSignup ? 'Criar Conta Grátis' : 'Enviar Mensagem'}
+          {sending ? 'Enviando...' : isSignup ? 'Assinar Grátis' : 'Enviar Mensagem'}
           <Send className="h-4 w-4" />
         </Button>
       </form>

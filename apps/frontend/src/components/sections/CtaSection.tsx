@@ -25,7 +25,7 @@ export function CtaSection() {
             className="gap-2"
             onClick={() => setShowSignup(true)}
           >
-            Começar Grátis
+            Assinar Grátis
             <ArrowRight className="h-5 w-5" />
           </Button>
           <Button
