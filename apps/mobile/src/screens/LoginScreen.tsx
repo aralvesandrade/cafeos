@@ -7,8 +7,8 @@ interface Props {
 }
 
 export function LoginScreen({ onLogin }: Props) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('joao@cafeos.com.br')
+  const [password, setPassword] = useState('123456')
   const [loading, setLoading] = useState(false)
 
   const handleLogin = async () => {

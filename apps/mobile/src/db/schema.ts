@@ -1,16 +1,27 @@
-import * as SQLite from 'expo-sqlite'
+import { Platform } from 'react-native'
 
-let db: SQLite.SQLiteDatabase | null = null
+const isWeb = Platform.OS === 'web'
 
-export async function getDb(): Promise<SQLite.SQLiteDatabase> {
+let db: any = null
+
+export async function getDb(): Promise<any> {
   if (db) return db
-  db = await SQLite.openDatabaseAsync('cafeos_offline.db')
-  await migrate(db)
+
+  if (isWeb) {
+    const webDb = await import('./schema.web')
+    db = await webDb.getDb()
+    return db
+  }
+
+  const SQLite = await import('expo-sqlite')
+  const sqliteDb = await SQLite.openDatabaseAsync('cafeos_offline.db')
+  await migrate(sqliteDb)
+  db = sqliteDb
   return db
 }
 
-async function migrate(db: SQLite.SQLiteDatabase): Promise<void> {
-  await db.execAsync(`
+async function migrate(database: any): Promise<void> {
+  await database.execAsync(`
     CREATE TABLE IF NOT EXISTS sync_queue (
       id TEXT PRIMARY KEY,
       event_type TEXT NOT NULL,

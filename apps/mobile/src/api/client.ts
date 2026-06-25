@@ -1,6 +1,8 @@
-import * as SecureStore from 'expo-secure-store'
+import { Platform } from 'react-native'
+import { storage } from './storage'
 
-const API_BASE = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:5001'
+const defaultHost = Platform.OS === 'android' ? '10.0.2.2' : 'localhost'
+const API_BASE = process.env.EXPO_PUBLIC_API_URL || `http://${defaultHost}:5001`
 
 export interface RequestOptions {
   method?: string
@@ -9,23 +11,23 @@ export interface RequestOptions {
 }
 
 export async function getToken(): Promise<string | null> {
-  return SecureStore.getItemAsync('cafeos_token')
+  return storage.getItem('cafeos_token')
 }
 
 export async function setToken(token: string): Promise<void> {
-  await SecureStore.setItemAsync('cafeos_token', token)
+  await storage.setItem('cafeos_token', token)
 }
 
 export async function clearToken(): Promise<void> {
-  await SecureStore.deleteItemAsync('cafeos_token')
+  await storage.removeItem('cafeos_token')
 }
 
 export async function getTenantId(): Promise<string | null> {
-  return SecureStore.getItemAsync('cafeos_tenant_id')
+  return storage.getItem('cafeos_tenant_id')
 }
 
 export async function setTenantId(id: string): Promise<void> {
-  await SecureStore.setItemAsync('cafeos_tenant_id', id)
+  await storage.setItem('cafeos_tenant_id', id)
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {

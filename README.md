@@ -296,34 +296,23 @@ cd apps/backend && go run ./cmd/worker/main.go
 ### Comandos
 
 ```bash
-# Subir ambiente + API
+# Subir infra + API (background)
 ./scripts/dev.sh up
 
-# Apenas infraestrutura (PostgreSQL + Redis)
-./scripts/dev.sh up        # depois rode o backend separadamente
-
-# Parar ambiente
+# Parar todos containers
 ./scripts/dev.sh down
 
-# Rodar migrations
-./scripts/dev.sh db:migrate
+# Serviços individuais (cada um em terminal separado):
+./scripts/dev.sh api       # API Go na :5001
+./scripts/dev.sh worker    # Worker RabbitMQ
+./scripts/dev.sh admin     # Admin panel na :5174
+./scripts/dev.sh mobile    # App mobile na :8081
 
-# Resetar banco
-./scripts/dev.sh db:reset
-
-# Rodar testes backend
-./scripts/dev.sh test
-# ou diretamente:
-cd apps/backend && go test ./... -v
-
-# Seed do banco (cria tenant + admin padrão)
-./scripts/dev.sh db:seed
-
-# Frontend (outro terminal)
-cd apps/frontend && npm run dev
-
-# Admin Panel (outro terminal)
-cd apps/admin && npm run dev
+# Utilitários
+./scripts/dev.sh db:migrate  # Rodar migrations
+./scripts/dev.sh db:reset    # Resetar banco
+./scripts/dev.sh db:seed     # Seed dados iniciais
+./scripts/dev.sh test        # Testes backend
 ```
 
 ### Variáveis de Ambiente
@@ -334,6 +323,7 @@ cd apps/admin && npm run dev
 | `DATABASE_URL` | `postgres://cafeos:cafeos@localhost:5432/cafeos?sslmode=disable` |
 | `REDIS_URL`    | `redis://localhost:6379`                     |
 | `JWT_SECRET`   | `dev-secret-change-in-production`            |
+| `RABBITMQ_URL` | `amqp://cafeos:cafeos@localhost:5672/`       |
 
 ## Roadmap
 
