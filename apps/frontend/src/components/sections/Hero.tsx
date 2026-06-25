@@ -1,7 +1,11 @@
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Sprout, Leaf, BarChart3 } from 'lucide-react'
+import { LeadModal } from '@/components/ui/LeadModal'
 
 export function Hero() {
+  const [showSignup, setShowSignup] = useState(false)
+
   return (
     <section className="relative min-h-screen flex items-center bg-gradient-to-b from-coffee-beige to-white pt-16">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -29,13 +33,15 @@ export function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="primary" size="lg">
+              <Button variant="primary" size="lg" onClick={() => setShowSignup(true)}>
                 Começar Grátis
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button variant="outline" size="lg">
-                Ver Funcionalidades
-              </Button>
+              <a href="#features">
+                <Button variant="outline" size="lg">
+                  Ver Funcionalidades
+                </Button>
+              </a>
             </div>
 
             <div className="flex items-center gap-6 mt-10 text-sm text-coffee-text-light">
@@ -65,6 +71,8 @@ export function Hero() {
           </div>
         </div>
       </div>
+
+      <LeadModal open={showSignup} onClose={() => setShowSignup(false)} mode="signup" />
     </section>
   )
 }

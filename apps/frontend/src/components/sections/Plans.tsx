@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Check, X } from 'lucide-react'
+import { LeadModal } from '@/components/ui/LeadModal'
 
 const plans = [
   {
@@ -78,6 +80,8 @@ const plans = [
 ]
 
 export function Plans() {
+  const [showSignup, setShowSignup] = useState(false)
+
   return (
     <section className="py-20 bg-coffee-beige" id="plans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -139,6 +143,7 @@ export function Plans() {
               <Button
                 variant={plan.featured ? 'secondary' : 'outline'}
                 className="w-full"
+                onClick={() => setShowSignup(true)}
               >
                 {plan.name === 'Grátis' ? 'Começar Grátis' : 'Assinar'}
               </Button>
@@ -146,6 +151,8 @@ export function Plans() {
           ))}
         </div>
       </div>
+
+      <LeadModal open={showSignup} onClose={() => setShowSignup(false)} mode="signup" />
     </section>
   )
 }

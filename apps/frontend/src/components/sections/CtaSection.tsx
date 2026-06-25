@@ -1,7 +1,12 @@
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Mail } from 'lucide-react'
+import { LeadModal } from '@/components/ui/LeadModal'
 
 export function CtaSection() {
+  const [showSignup, setShowSignup] = useState(false)
+  const [showContact, setShowContact] = useState(false)
+
   return (
     <section className="py-20 bg-gradient-to-r from-coffee-green-dark to-coffee-green text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -18,6 +23,7 @@ export function CtaSection() {
             variant="secondary"
             size="lg"
             className="gap-2"
+            onClick={() => setShowSignup(true)}
           >
             Começar Grátis
             <ArrowRight className="h-5 w-5" />
@@ -26,12 +32,16 @@ export function CtaSection() {
             variant="outline"
             size="lg"
             className="border-white/30 text-white hover:bg-white/10 gap-2"
+            onClick={() => setShowContact(true)}
           >
             <Mail className="h-5 w-5" />
             Falar com Vendas
           </Button>
         </div>
       </div>
+
+      <LeadModal open={showSignup} onClose={() => setShowSignup(false)} mode="signup" />
+      <LeadModal open={showContact} onClose={() => setShowContact(false)} mode="contact" />
     </section>
   )
 }
