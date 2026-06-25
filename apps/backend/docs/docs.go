@@ -18,6 +18,357 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/tenants": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "List all tenants (platform_owner only)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tenants"
+                ],
+                "summary": "List tenants",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Tenant"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new tenant (platform_owner only)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tenants"
+                ],
+                "summary": "Create a tenant",
+                "parameters": [
+                    {
+                        "description": "Tenant data",
+                        "name": "tenant",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createTenantRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Tenant"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tenants/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a single tenant (platform_owner only)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tenants"
+                ],
+                "summary": "Get tenant by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tenant ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Tenant"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update tenant data (platform_owner only)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tenants"
+                ],
+                "summary": "Update a tenant",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tenant ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated tenant data",
+                        "name": "tenant",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.updateTenantRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Tenant"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a tenant by ID (platform_owner only)",
+                "tags": [
+                    "tenants"
+                ],
+                "summary": "Delete a tenant",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tenant ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/api/v1/users": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "List all users (platform_owner only)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "List users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.User"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new user (platform_owner only)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Create a user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update user data (platform_owner only)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update a user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated user data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.updateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a user by ID (platform_owner only)",
+                "tags": [
+                    "users"
+                ],
+                "summary": "Delete a user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
         "/api/v1/{tenant_id}/dashboard": {
             "get": {
                 "security": [
@@ -46,7 +397,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.DashboardResponse"
+                            "$ref": "#/definitions/handler.DashboardResponse"
                         }
                     }
                 }
@@ -82,7 +433,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_api_handler.SwaggerFarm"
+                                "$ref": "#/definitions/handler.SwaggerFarm"
                             }
                         }
                     },
@@ -128,7 +479,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.createFarmRequest"
+                            "$ref": "#/definitions/handler.createFarmRequest"
                         }
                     }
                 ],
@@ -136,7 +487,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.SwaggerFarm"
+                            "$ref": "#/definitions/handler.SwaggerFarm"
                         }
                     },
                     "400": {
@@ -188,7 +539,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_api_handler.SwaggerPlot"
+                                "$ref": "#/definitions/handler.SwaggerPlot"
                             }
                         }
                     },
@@ -239,7 +590,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.SwaggerFarm"
+                            "$ref": "#/definitions/handler.SwaggerFarm"
                         }
                     },
                     "404": {
@@ -291,7 +642,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.SwaggerFarm"
+                            "$ref": "#/definitions/handler.SwaggerFarm"
                         }
                     }
                 ],
@@ -299,7 +650,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.SwaggerFarm"
+                            "$ref": "#/definitions/handler.SwaggerFarm"
                         }
                     },
                     "400": {
@@ -386,7 +737,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_api_handler.SwaggerHarvest"
+                                "$ref": "#/definitions/handler.SwaggerHarvest"
                             }
                         }
                     },
@@ -432,7 +783,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.createHarvestRequest"
+                            "$ref": "#/definitions/handler.createHarvestRequest"
                         }
                     }
                 ],
@@ -440,7 +791,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.SwaggerHarvest"
+                            "$ref": "#/definitions/handler.SwaggerHarvest"
                         }
                     },
                     "400": {
@@ -490,7 +841,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.SwaggerHarvest"
+                            "$ref": "#/definitions/handler.SwaggerHarvest"
                         }
                     },
                     "404": {
@@ -586,7 +937,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_api_handler.SwaggerHarvestProduction"
+                                "$ref": "#/definitions/handler.SwaggerHarvestProduction"
                             }
                         }
                     },
@@ -639,7 +990,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.recordProductionRequest"
+                            "$ref": "#/definitions/handler.recordProductionRequest"
                         }
                     }
                 ],
@@ -647,7 +998,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.SwaggerHarvestProduction"
+                            "$ref": "#/definitions/handler.SwaggerHarvestProduction"
                         }
                     },
                     "400": {
@@ -692,7 +1043,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_api_handler.SwaggerOperation"
+                                "$ref": "#/definitions/handler.SwaggerOperation"
                             }
                         }
                     },
@@ -738,7 +1089,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.createOperationRequest"
+                            "$ref": "#/definitions/handler.createOperationRequest"
                         }
                     }
                 ],
@@ -746,7 +1097,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.SwaggerOperation"
+                            "$ref": "#/definitions/handler.SwaggerOperation"
                         }
                     },
                     "400": {
@@ -797,7 +1148,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_api_handler.SwaggerOperation"
+                                "$ref": "#/definitions/handler.SwaggerOperation"
                             }
                         }
                     },
@@ -848,7 +1199,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.SwaggerOperation"
+                            "$ref": "#/definitions/handler.SwaggerOperation"
                         }
                     },
                     "404": {
@@ -935,7 +1286,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_api_handler.SwaggerPlot"
+                                "$ref": "#/definitions/handler.SwaggerPlot"
                             }
                         }
                     },
@@ -981,7 +1332,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.createPlotRequest"
+                            "$ref": "#/definitions/handler.createPlotRequest"
                         }
                     }
                 ],
@@ -989,7 +1340,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.SwaggerPlot"
+                            "$ref": "#/definitions/handler.SwaggerPlot"
                         }
                     },
                     "400": {
@@ -1039,7 +1390,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.SwaggerPlot"
+                            "$ref": "#/definitions/handler.SwaggerPlot"
                         }
                     },
                     "404": {
@@ -1091,7 +1442,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.SwaggerPlot"
+                            "$ref": "#/definitions/handler.SwaggerPlot"
                         }
                     }
                 ],
@@ -1099,7 +1450,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.SwaggerPlot"
+                            "$ref": "#/definitions/handler.SwaggerPlot"
                         }
                     },
                     "400": {
@@ -1193,7 +1544,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_api_handler.SwaggerOperation"
+                                "$ref": "#/definitions/handler.SwaggerOperation"
                             }
                         }
                     },
@@ -1229,7 +1580,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.loginRequest"
+                            "$ref": "#/definitions/handler.loginRequest"
                         }
                     }
                 ],
@@ -1237,7 +1588,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_api_handler.loginResponse"
+                            "$ref": "#/definitions/handler.loginResponse"
                         }
                     },
                     "401": {
@@ -1277,7 +1628,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_aralvesandrade_cafeos_internal_domain_entity.HarvestStatus": {
+        "entity.HarvestStatus": {
             "type": "string",
             "enum": [
                 "planejada",
@@ -1290,7 +1641,7 @@ const docTemplate = `{
                 "HarvestFinalizada"
             ]
         },
-        "github_com_aralvesandrade_cafeos_internal_domain_entity.OperationType": {
+        "entity.OperationType": {
             "type": "string",
             "enum": [
                 "adubacao",
@@ -1307,7 +1658,7 @@ const docTemplate = `{
                 "OpColheita"
             ]
         },
-        "github_com_aralvesandrade_cafeos_internal_domain_entity.Plot": {
+        "entity.Plot": {
             "type": "object",
             "properties": {
                 "altitude": {
@@ -1345,7 +1696,101 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.CostPerBag": {
+        "entity.Tenant": {
+            "type": "object",
+            "properties": {
+                "brand_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "logo_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "plan": {
+                    "type": "string"
+                },
+                "primary_color": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.User": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/entity.UserRole"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.UserRole": {
+            "type": "string",
+            "enum": [
+                "platform_owner",
+                "tenant_admin",
+                "proprietario",
+                "gerente_agricola",
+                "engenheiro_agronomo",
+                "tecnico_agricola",
+                "operador_campo",
+                "financeiro",
+                "consultor_externo",
+                "auditor"
+            ],
+            "x-enum-varnames": [
+                "RolePlatformOwner",
+                "RoleTenantAdmin",
+                "RoleProprietario",
+                "RoleGerente",
+                "RoleEngenheiro",
+                "RoleTecnico",
+                "RoleOperador",
+                "RoleFinanceiro",
+                "RoleConsultor",
+                "RoleAuditor"
+            ]
+        },
+        "handler.CostPerBag": {
             "type": "object",
             "properties": {
                 "cost": {
@@ -1356,25 +1801,25 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.DashboardResponse": {
+        "handler.DashboardResponse": {
             "type": "object",
             "properties": {
                 "cost_per_bag": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_api_handler.CostPerBag"
+                        "$ref": "#/definitions/handler.CostPerBag"
                     }
                 },
                 "production_by_harvest": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_api_handler.ProductionByHarvest"
+                        "$ref": "#/definitions/handler.ProductionByHarvest"
                     }
                 },
                 "recent_operations": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_api_handler.RecentOperationItem"
+                        "$ref": "#/definitions/handler.RecentOperationItem"
                     }
                 },
                 "total_cost": {
@@ -1391,7 +1836,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.ProductionByHarvest": {
+        "handler.ProductionByHarvest": {
             "type": "object",
             "properties": {
                 "production": {
@@ -1402,7 +1847,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.RecentOperationItem": {
+        "handler.RecentOperationItem": {
             "type": "object",
             "properties": {
                 "cost": {
@@ -1422,7 +1867,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.SwaggerFarm": {
+        "handler.SwaggerFarm": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -1446,7 +1891,7 @@ const docTemplate = `{
                 "plots": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.Plot"
+                        "$ref": "#/definitions/entity.Plot"
                     }
                 },
                 "tenant_id": {
@@ -1460,7 +1905,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.SwaggerHarvest": {
+        "handler.SwaggerHarvest": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -1476,7 +1921,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.HarvestStatus"
+                    "$ref": "#/definitions/entity.HarvestStatus"
                 },
                 "tenant_id": {
                     "type": "string"
@@ -1489,7 +1934,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.SwaggerHarvestProduction": {
+        "handler.SwaggerHarvestProduction": {
             "type": "object",
             "properties": {
                 "harvest_id": {
@@ -1515,7 +1960,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.SwaggerOperation": {
+        "handler.SwaggerOperation": {
             "type": "object",
             "properties": {
                 "cost": {
@@ -1549,11 +1994,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.OperationType"
+                    "$ref": "#/definitions/entity.OperationType"
                 }
             }
         },
-        "internal_api_handler.SwaggerPlot": {
+        "handler.SwaggerPlot": {
             "type": "object",
             "properties": {
                 "altitude": {
@@ -1591,7 +2036,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.createFarmRequest": {
+        "handler.createFarmRequest": {
             "type": "object",
             "properties": {
                 "location": {
@@ -1611,7 +2056,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.createHarvestRequest": {
+        "handler.createHarvestRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -1625,7 +2070,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.createOperationRequest": {
+        "handler.createOperationRequest": {
             "type": "object",
             "properties": {
                 "cost": {
@@ -1654,7 +2099,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.createPlotRequest": {
+        "handler.createPlotRequest": {
             "type": "object",
             "properties": {
                 "altitude": {
@@ -1680,7 +2125,41 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.loginRequest": {
+        "handler.createTenantRequest": {
+            "type": "object",
+            "properties": {
+                "brand_name": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "plan": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.createUserRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.loginRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -1691,7 +2170,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.loginResponse": {
+        "handler.loginResponse": {
             "type": "object",
             "properties": {
                 "tenant_id": {
@@ -1719,7 +2198,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_api_handler.recordProductionRequest": {
+        "handler.recordProductionRequest": {
             "type": "object",
             "properties": {
                 "notes": {
@@ -1730,6 +2209,37 @@ const docTemplate = `{
                 },
                 "quantity": {
                     "type": "number"
+                }
+            }
+        },
+        "handler.updateTenantRequest": {
+            "type": "object",
+            "properties": {
+                "brand_name": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "plan": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.updateUserRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
                 }
             }
         }

@@ -8,4 +8,5 @@ type TenantRepository interface {
 	GetBySlug(slug string) (*entity.Tenant, error)
 	List() ([]*entity.Tenant, error)
 	Update(tenant *entity.Tenant) error
+	Delete(id string) error
 }

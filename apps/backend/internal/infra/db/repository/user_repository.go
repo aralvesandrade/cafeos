@@ -42,3 +42,13 @@ func (r *UserRepository) ListByTenant(tenantID string) ([]*entity.User, error) {
 func (r *UserRepository) Update(u *entity.User) error {
 	return r.db.Save(u).Error
 }
+
+func (r *UserRepository) List() ([]*entity.User, error) {
+	var users []*entity.User
+	err := r.db.Order("name").Find(&users).Error
+	return users, err
+}
+
+func (r *UserRepository) Delete(id string) error {
+	return r.db.Delete(&entity.User{}, "id = ?", id).Error
+}

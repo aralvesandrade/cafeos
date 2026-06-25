@@ -4,6 +4,7 @@ interface RequestOptions {
   method?: string
   body?: unknown
   params?: Record<string, string>
+  admin?: boolean
 }
 
 function getToken(): string | null {
@@ -23,6 +24,8 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   let url: string
   if (isPublic) {
     url = `${API_BASE}${path}`
+  } else if (options.admin) {
+    url = `${API_BASE}/api/v1${path}`
   } else {
     url = `${API_BASE}/api/v1${tenantId ? `/${tenantId}` : ''}${path}`
   }

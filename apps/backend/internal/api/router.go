@@ -5,6 +5,7 @@ import (
 
 	"github.com/aralvesandrade/cafeos/internal/api/handler"
 	"github.com/aralvesandrade/cafeos/internal/api/middleware"
+	"github.com/aralvesandrade/cafeos/internal/domain/entity"
 	domainSvc "github.com/aralvesandrade/cafeos/internal/domain/service"
 	"github.com/aralvesandrade/cafeos/internal/event"
 	infraRepo "github.com/aralvesandrade/cafeos/internal/infra/db/repository"
@@ -39,8 +40,11 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, jwtSecret string) http.Handler {
 	harvestH := handler.NewHarvestHandler(harvestSvc)
 	dashboardH := handler.NewDashboardHandler(harvestRepo, indicatorRepo, opRepo, plotRepo, farmRepo)
 	authH := handler.NewAuthHandler(userRepo, tenantRepo, jwtSecret)
+	tenantH := handler.NewTenantHandler(tenantRepo)
+	userH := handler.NewUserHandler(userRepo)
 
 	authMw := middleware.Auth(jwtSecret)
+	adminMw := middleware.RequireRole(entity.RolePlatformOwner)
 	corsMw := middleware.CORS
 
 	// Auth (public)
@@ -92,6 +96,23 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, jwtSecret string) http.Handler {
 
 	// Dashboard
 	mux.Handle("GET /api/v1/{tenant_id}/dashboard", chain(dashboardH.GetDashboard))
+
+	// Admin — Tenant management (platform_owner only)
+	adminChain := func(h http.HandlerFunc) http.Handler {
+		return authMw(adminMw(http.HandlerFunc(h)))
+	}
+
+	mux.Handle("GET /api/v1/tenants", adminChain(tenantH.List))
+	mux.Handle("POST /api/v1/tenants", adminChain(tenantH.Create))
+	mux.Handle("GET /api/v1/tenants/{id}", adminChain(tenantH.GetByID))
+	mux.Handle("PUT /api/v1/tenants/{id}", adminChain(tenantH.Update))
+	mux.Handle("DELETE /api/v1/tenants/{id}", adminChain(tenantH.Delete))
+
+	// Admin — User management (platform_owner only)
+	mux.Handle("GET /api/v1/users", adminChain(userH.List))
+	mux.Handle("POST /api/v1/users", adminChain(userH.Create))
+	mux.Handle("PUT /api/v1/users/{id}", adminChain(userH.Update))
+	mux.Handle("DELETE /api/v1/users/{id}", adminChain(userH.Delete))
 
 	return corsMw(mux)
 }

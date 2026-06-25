@@ -11,6 +11,7 @@ type Tenant struct {
 	PrimaryColor string    `json:"primary_color" gorm:"default:'#2E7D32'"`
 	Plan         string    `json:"plan" gorm:"default:'free'"`
 	Domain       string    `json:"domain" gorm:"default:''"`
+	Status       string    `json:"status" gorm:"default:'active'"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }

@@ -42,3 +42,7 @@ func (r *TenantRepository) List() ([]*entity.Tenant, error) {
 func (r *TenantRepository) Update(t *entity.Tenant) error {
 	return r.db.Save(t).Error
 }
+
+func (r *TenantRepository) Delete(id string) error {
+	return r.db.Delete(&entity.Tenant{}, "id = ?", id).Error
+}

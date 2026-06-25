@@ -1,10 +1,18 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Coffee, LogIn } from 'lucide-react'
+import { Coffee, LogIn, UserCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/lib/auth'
 import { apiRequest } from '@/lib/api'
+
+const profiles = [
+  { label: 'Administrador', email: 'admin@cafeos.com.br', password: 'admin123', role: 'platform_owner' },
+  { label: 'Proprietário', email: 'joao@cafeos.com.br', password: '123456', role: 'proprietario' },
+  { label: 'Gerente Agrícola', email: 'maria@cafeos.com.br', password: '123456', role: 'gerente_agricola' },
+  { label: 'Eng. Agrônomo', email: 'carlos@cafeos.com.br', password: '123456', role: 'engenheiro_agronomo' },
+  { label: 'Operador Campo', email: 'ana@cafeos.com.br', password: '123456', role: 'operador_campo' },
+]
 
 export function Login() {
   const [email, setEmail] = useState('admin@cafeos.com.br')
@@ -85,6 +93,34 @@ export function Login() {
           <LogIn className="h-4 w-4" />
         </Button>
       </form>
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mt-4">
+        <p className="text-xs font-medium text-coffee-text-light mb-3 flex items-center gap-1">
+          <UserCircle className="h-3 w-3" />
+          ACESSO RÁPIDO — SELECIONE UM PERFIL
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          {profiles.map((p) => (
+            <button
+              key={p.email}
+              type="button"
+              onClick={() => {
+                setEmail(p.email)
+                setPassword(p.password)
+                setError('')
+              }}
+              className={`text-left text-xs px-3 py-2 rounded-lg border transition-colors ${
+                email === p.email
+                  ? 'border-coffee-green bg-coffee-green/10 text-coffee-green-dark font-medium'
+                  : 'border-gray-200 text-coffee-text hover:border-coffee-green/50 hover:bg-coffee-beige'
+              }`}
+            >
+              <div className="truncate font-medium">{p.label}</div>
+              <div className="truncate text-[10px] opacity-60">{p.role}</div>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

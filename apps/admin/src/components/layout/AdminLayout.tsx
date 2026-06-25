@@ -1,15 +1,23 @@
 import { useState } from 'react'
-import { Outlet, Navigate } from 'react-router-dom'
+import { Outlet, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/lib/auth'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 
+const adminRoutes = ['/tenants', '/users']
+
 export function AdminLayout() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
+  const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
+  }
+
+  const isAdminRoute = adminRoutes.some((route) => location.pathname.startsWith(route))
+  if (isAdminRoute && user?.role !== 'platform_owner') {
+    return <Navigate to="/" replace />
   }
 
   return (
