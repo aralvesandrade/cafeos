@@ -81,6 +81,7 @@ const plans = [
 
 export function Plans() {
   const [showSignup, setShowSignup] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState('Grátis')
 
   return (
     <section className="py-20 bg-coffee-beige" id="plans">
@@ -143,7 +144,7 @@ export function Plans() {
               <Button
                 variant={plan.featured ? 'secondary' : 'outline'}
                 className="w-full"
-                onClick={() => setShowSignup(true)}
+                onClick={() => { setSelectedPlan(plan.name); setShowSignup(true) }}
               >
                 {plan.name === 'Grátis' ? 'Assinar Grátis' : 'Assinar'}
               </Button>
@@ -152,7 +153,7 @@ export function Plans() {
         </div>
       </div>
 
-      <LeadModal open={showSignup} onClose={() => setShowSignup(false)} mode="signup" />
+      <LeadModal open={showSignup} onClose={() => setShowSignup(false)} mode="signup" plan={selectedPlan} />
     </section>
   )
 }

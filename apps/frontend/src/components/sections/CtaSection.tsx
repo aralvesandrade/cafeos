@@ -35,7 +35,7 @@ export function CtaSection() {
             onClick={() => setShowContact(true)}
           >
             <Mail className="h-5 w-5" />
-            Falar com Vendas
+            Fale Conosco
           </Button>
         </div>
       </div>
