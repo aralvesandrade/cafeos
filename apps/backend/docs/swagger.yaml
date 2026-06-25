@@ -1,24 +1,5 @@
 basePath: /api/v1/{tenant_id}
 definitions:
-  github_com_aralvesandrade_cafeos_internal_domain_entity.Harvest:
-    properties:
-      created_at:
-        type: string
-      description:
-        type: string
-      estimated_production:
-        type: number
-      id:
-        type: string
-      status:
-        $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.HarvestStatus'
-      tenant_id:
-        type: string
-      updated_at:
-        type: string
-      year:
-        type: integer
-    type: object
   github_com_aralvesandrade_cafeos_internal_domain_entity.HarvestStatus:
     enum:
     - planejada
@@ -29,64 +10,6 @@ definitions:
     - HarvestPlanejada
     - HarvestEmAndamento
     - HarvestFinalizada
-  github_com_aralvesandrade_cafeos_internal_domain_entity.Indicator:
-    properties:
-      calculated_at:
-        type: string
-      harvest_id:
-        type: string
-      id:
-        type: string
-      plot_id:
-        type: string
-      tenant_id:
-        type: string
-      type:
-        $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.IndicatorType'
-      value:
-        type: number
-    type: object
-  github_com_aralvesandrade_cafeos_internal_domain_entity.IndicatorType:
-    enum:
-    - sacas_por_hectare
-    - custo_por_saca
-    - rentabilidade
-    - bienalidade
-    - producao_total
-    - custo_total
-    type: string
-    x-enum-varnames:
-    - IndSacasHA
-    - IndCustoSaca
-    - IndRentabilidade
-    - IndBienalidade
-    - IndProducaoTotal
-    - IndCustoTotal
-  github_com_aralvesandrade_cafeos_internal_domain_entity.Operation:
-    properties:
-      cost:
-        type: number
-      created_at:
-        type: string
-      date:
-        type: string
-      id:
-        type: string
-      notes:
-        type: string
-      plot_id:
-        type: string
-      product_used:
-        type: string
-      quantity:
-        type: number
-      responsible:
-        type: string
-      tenant_id:
-        type: string
-      type:
-        $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.OperationType'
-    type: object
   github_com_aralvesandrade_cafeos_internal_domain_entity.OperationType:
     enum:
     - adubacao
@@ -101,28 +24,80 @@ definitions:
     - OpIrrigacao
     - OpPoda
     - OpColheita
+  github_com_aralvesandrade_cafeos_internal_domain_entity.Plot:
+    properties:
+      altitude:
+        type: integer
+      area_ha:
+        type: number
+      created_at:
+        type: string
+      cultivar:
+        type: string
+      farm_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      planting_year:
+        type: integer
+      soil_type:
+        type: string
+      tenant_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  internal_api_handler.CostPerBag:
+    properties:
+      cost:
+        type: number
+      year:
+        type: string
+    type: object
   internal_api_handler.DashboardResponse:
     properties:
-      cost_per_saca:
-        type: number
-      harvests:
+      cost_per_bag:
         items:
-          $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.Harvest'
+          $ref: '#/definitions/internal_api_handler.CostPerBag'
         type: array
-      indicators:
+      production_by_harvest:
         items:
-          $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.Indicator'
+          $ref: '#/definitions/internal_api_handler.ProductionByHarvest'
         type: array
       recent_operations:
         items:
-          $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.Operation'
+          $ref: '#/definitions/internal_api_handler.RecentOperationItem'
         type: array
-      sacas_per_ha:
-        type: number
       total_cost:
         type: number
+      total_farms:
+        type: integer
+      total_plots:
+        type: integer
       total_production:
         type: number
+    type: object
+  internal_api_handler.ProductionByHarvest:
+    properties:
+      production:
+        type: number
+      year:
+        type: string
+    type: object
+  internal_api_handler.RecentOperationItem:
+    properties:
+      cost:
+        type: number
+      date:
+        type: string
+      id:
+        type: string
+      plot_name:
+        type: string
+      type:
+        type: string
     type: object
   internal_api_handler.SwaggerFarm:
     properties:
@@ -138,6 +113,10 @@ definitions:
         type: string
       planted_area_ha:
         type: number
+      plots:
+        items:
+          $ref: '#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.Plot'
+        type: array
       tenant_id:
         type: string
       total_area_ha:
@@ -288,6 +267,31 @@ definitions:
         type: integer
       soil_type:
         type: string
+    type: object
+  internal_api_handler.loginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  internal_api_handler.loginResponse:
+    properties:
+      tenant_id:
+        type: string
+      token:
+        type: string
+      user:
+        properties:
+          email:
+            type: string
+          id:
+            type: string
+          name:
+            type: string
+          role:
+            type: string
+        type: object
     type: object
   internal_api_handler.recordProductionRequest:
     properties:
@@ -488,7 +492,8 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update farm data by ID
+      description: Update farm data by ID (partial update - only provided fields are
+        changed)
       parameters:
       - description: Tenant ID
         in: path
@@ -1002,7 +1007,8 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update plot data by ID
+      description: Update plot data by ID (partial update - only provided fields are
+        changed)
       parameters:
       - description: Tenant ID
         in: path
@@ -1072,6 +1078,34 @@ paths:
       summary: List operations by plot
       tags:
       - operations
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate with email and password
+      parameters:
+      - description: Credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_api_handler.loginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_api_handler.loginResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login
+      tags:
+      - auth
   /health:
     get:
       description: Returns API health status

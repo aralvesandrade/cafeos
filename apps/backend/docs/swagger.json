@@ -256,7 +256,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update farm data by ID",
+                "description": "Update farm data by ID (partial update - only provided fields are changed)",
                 "consumes": [
                     "application/json"
                 ],
@@ -1056,7 +1056,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update plot data by ID",
+                "description": "Update plot data by ID (partial update - only provided fields are changed)",
                 "consumes": [
                     "application/json"
                 ],
@@ -1206,6 +1206,49 @@
                 }
             }
         },
+        "/auth/login": {
+            "post": {
+                "description": "Authenticate with email and password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "Credentials",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_api_handler.loginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_api_handler.loginResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/health": {
             "get": {
                 "description": "Returns API health status",
@@ -1231,35 +1274,6 @@
         }
     },
     "definitions": {
-        "github_com_aralvesandrade_cafeos_internal_domain_entity.Harvest": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "estimated_production": {
-                    "type": "number"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "status": {
-                    "$ref": "#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.HarvestStatus"
-                },
-                "tenant_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "year": {
-                    "type": "integer"
-                }
-            }
-        },
         "github_com_aralvesandrade_cafeos_internal_domain_entity.HarvestStatus": {
             "type": "string",
             "enum": [
@@ -1272,89 +1286,6 @@
                 "HarvestEmAndamento",
                 "HarvestFinalizada"
             ]
-        },
-        "github_com_aralvesandrade_cafeos_internal_domain_entity.Indicator": {
-            "type": "object",
-            "properties": {
-                "calculated_at": {
-                    "type": "string"
-                },
-                "harvest_id": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "plot_id": {
-                    "type": "string"
-                },
-                "tenant_id": {
-                    "type": "string"
-                },
-                "type": {
-                    "$ref": "#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.IndicatorType"
-                },
-                "value": {
-                    "type": "number"
-                }
-            }
-        },
-        "github_com_aralvesandrade_cafeos_internal_domain_entity.IndicatorType": {
-            "type": "string",
-            "enum": [
-                "sacas_por_hectare",
-                "custo_por_saca",
-                "rentabilidade",
-                "bienalidade",
-                "producao_total",
-                "custo_total"
-            ],
-            "x-enum-varnames": [
-                "IndSacasHA",
-                "IndCustoSaca",
-                "IndRentabilidade",
-                "IndBienalidade",
-                "IndProducaoTotal",
-                "IndCustoTotal"
-            ]
-        },
-        "github_com_aralvesandrade_cafeos_internal_domain_entity.Operation": {
-            "type": "object",
-            "properties": {
-                "cost": {
-                    "type": "number"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "date": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "notes": {
-                    "type": "string"
-                },
-                "plot_id": {
-                    "type": "string"
-                },
-                "product_used": {
-                    "type": "string"
-                },
-                "quantity": {
-                    "type": "number"
-                },
-                "responsible": {
-                    "type": "string"
-                },
-                "tenant_id": {
-                    "type": "string"
-                },
-                "type": {
-                    "$ref": "#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.OperationType"
-                }
-            }
         },
         "github_com_aralvesandrade_cafeos_internal_domain_entity.OperationType": {
             "type": "string",
@@ -1373,38 +1304,118 @@
                 "OpColheita"
             ]
         },
+        "github_com_aralvesandrade_cafeos_internal_domain_entity.Plot": {
+            "type": "object",
+            "properties": {
+                "altitude": {
+                    "type": "integer"
+                },
+                "area_ha": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "cultivar": {
+                    "type": "string"
+                },
+                "farm_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "planting_year": {
+                    "type": "integer"
+                },
+                "soil_type": {
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_api_handler.CostPerBag": {
+            "type": "object",
+            "properties": {
+                "cost": {
+                    "type": "number"
+                },
+                "year": {
+                    "type": "string"
+                }
+            }
+        },
         "internal_api_handler.DashboardResponse": {
             "type": "object",
             "properties": {
-                "cost_per_saca": {
-                    "type": "number"
-                },
-                "harvests": {
+                "cost_per_bag": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.Harvest"
+                        "$ref": "#/definitions/internal_api_handler.CostPerBag"
                     }
                 },
-                "indicators": {
+                "production_by_harvest": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.Indicator"
+                        "$ref": "#/definitions/internal_api_handler.ProductionByHarvest"
                     }
                 },
                 "recent_operations": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.Operation"
+                        "$ref": "#/definitions/internal_api_handler.RecentOperationItem"
                     }
-                },
-                "sacas_per_ha": {
-                    "type": "number"
                 },
                 "total_cost": {
                     "type": "number"
                 },
+                "total_farms": {
+                    "type": "integer"
+                },
+                "total_plots": {
+                    "type": "integer"
+                },
                 "total_production": {
                     "type": "number"
+                }
+            }
+        },
+        "internal_api_handler.ProductionByHarvest": {
+            "type": "object",
+            "properties": {
+                "production": {
+                    "type": "number"
+                },
+                "year": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_api_handler.RecentOperationItem": {
+            "type": "object",
+            "properties": {
+                "cost": {
+                    "type": "number"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "plot_name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },
@@ -1428,6 +1439,12 @@
                 },
                 "planted_area_ha": {
                     "type": "number"
+                },
+                "plots": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_aralvesandrade_cafeos_internal_domain_entity.Plot"
+                    }
                 },
                 "tenant_id": {
                     "type": "string"
@@ -1657,6 +1674,45 @@
                 },
                 "soil_type": {
                     "type": "string"
+                }
+            }
+        },
+        "internal_api_handler.loginRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_api_handler.loginResponse": {
+            "type": "object",
+            "properties": {
+                "tenant_id": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "object",
+                    "properties": {
+                        "email": {
+                            "type": "string"
+                        },
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "role": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },

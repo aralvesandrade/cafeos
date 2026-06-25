@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/aralvesandrade/cafeos/internal/api/middleware"
-	"github.com/aralvesandrade/cafeos/internal/domain/entity"
 	"github.com/aralvesandrade/cafeos/internal/domain/service"
 )
 
@@ -121,7 +120,7 @@ func (h *PlotHandler) List(w http.ResponseWriter, r *http.Request) {
 
 // Update updates an existing plot
 // @Summary Update a plot
-// @Description Update plot data by ID
+// @Description Update plot data by ID (partial update - only provided fields are changed)
 // @Tags plots
 // @Accept json
 // @Produce json
@@ -134,18 +133,54 @@ func (h *PlotHandler) List(w http.ResponseWriter, r *http.Request) {
 // @Router /api/v1/{tenant_id}/plots/{id} [put]
 func (h *PlotHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	var plot entity.Plot
-	if err := json.NewDecoder(r.Body).Decode(&plot); err != nil {
+
+	existing, err := h.svc.GetByID(id)
+	if err != nil {
+		writeError(w, "plot not found", http.StatusNotFound)
+		return
+	}
+
+	var input struct {
+		Name         *string  `json:"name"`
+		FarmID       *string  `json:"farm_id"`
+		AreaHA       *float64 `json:"area_ha"`
+		Cultivar     *string  `json:"cultivar"`
+		SoilType     *string  `json:"soil_type"`
+		Altitude     *int     `json:"altitude"`
+		PlantingYear *int     `json:"planting_year"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		writeError(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
-	plot.ID = id
 
-	if err := h.svc.Update(&plot); err != nil {
+	if input.Name != nil {
+		existing.Name = *input.Name
+	}
+	if input.FarmID != nil {
+		existing.FarmID = *input.FarmID
+	}
+	if input.AreaHA != nil {
+		existing.AreaHA = *input.AreaHA
+	}
+	if input.Cultivar != nil {
+		existing.Cultivar = *input.Cultivar
+	}
+	if input.SoilType != nil {
+		existing.SoilType = *input.SoilType
+	}
+	if input.Altitude != nil {
+		existing.Altitude = *input.Altitude
+	}
+	if input.PlantingYear != nil {
+		existing.PlantingYear = *input.PlantingYear
+	}
+
+	if err := h.svc.Update(existing); err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	writeJSON(w, plot, http.StatusOK)
+	writeJSON(w, existing, http.StatusOK)
 }
 
 // Delete removes a plot

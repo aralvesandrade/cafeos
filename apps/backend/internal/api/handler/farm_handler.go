@@ -108,7 +108,7 @@ func (h *FarmHandler) List(w http.ResponseWriter, r *http.Request) {
 
 // Update updates an existing farm
 // @Summary Update a farm
-// @Description Update farm data by ID
+// @Description Update farm data by ID (partial update - only provided fields are changed)
 // @Tags farms
 // @Accept json
 // @Produce json
@@ -122,19 +122,46 @@ func (h *FarmHandler) List(w http.ResponseWriter, r *http.Request) {
 func (h *FarmHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	var farm entity.Farm
-	if err := json.NewDecoder(r.Body).Decode(&farm); err != nil {
+	existing, err := h.svc.GetByID(id)
+	if err != nil {
+		writeError(w, "farm not found", http.StatusNotFound)
+		return
+	}
+
+	var input struct {
+		Name         *string  `json:"name"`
+		Owner        *string  `json:"owner"`
+		Location     *string  `json:"location"`
+		TotalAreaHA  *float64 `json:"total_area_ha"`
+		PlantedAreaHA *float64 `json:"planted_area_ha"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		writeError(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
-	farm.ID = id
 
-	if err := h.svc.Update(&farm); err != nil {
+	if input.Name != nil {
+		existing.Name = *input.Name
+	}
+	if input.Owner != nil {
+		existing.Owner = *input.Owner
+	}
+	if input.Location != nil {
+		existing.Location = *input.Location
+	}
+	if input.TotalAreaHA != nil {
+		existing.TotalAreaHA = *input.TotalAreaHA
+	}
+	if input.PlantedAreaHA != nil {
+		existing.PlantedAreaHA = *input.PlantedAreaHA
+	}
+
+	if err := h.svc.Update(existing); err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	writeJSON(w, farm, http.StatusOK)
+	writeJSON(w, existing, http.StatusOK)
 }
 
 // Delete removes a farm
