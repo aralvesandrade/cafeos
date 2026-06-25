@@ -161,6 +161,7 @@ Rotas multi-tenant sob `/api/v1/{tenant_id}`:
 | GET    | `/operations`                  | Listar operações             |
 | GET    | `/operations/recent`           | Operações recentes           |
 | GET    | `/operations/{id}`             | Detalhe da operação          |
+| DELETE | `/operations/{id}`             | Remover operação             |
 | GET    | `/plots/{plot_id}/operations`  | Operações por talhão         |
 | POST   | `/harvests`                    | Criar safra                  |
 | GET    | `/harvests`                    | Listar safras                |
