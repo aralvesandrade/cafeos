@@ -29,8 +29,10 @@ cafeos/
 │   └── shared/           # Tipos e utilitários compartilhados
 ├── infra/
 │   └── dev/              # Docker Compose para desenvolvimento
+├── .specify/             # Spec-kit (constitution, templates, workflows)
 ├── docs/                 # Documentação técnica
 ├── scripts/              # Scripts de desenvolvimento
+├── plans/                # Planos de arquitetura e features
 ├── PRD_CONSOLIDADO.md    # Product Requirements Document
 ├── PRD1.md               # PRD original (SPEC-001)
 └── PRD2.md               # PRD original (SPEC-002)
@@ -361,6 +363,29 @@ cd apps/backend && go run ./cmd/worker/main.go
 ## Desenvolvimento com IA
 
 O arquivo `AGENTS.md` na raiz do projeto contém o resumo técnico para agentes de IA (stack, rotas, convenções, credenciais de seed).
+
+## Spec-kit
+
+Projeto configurado com [spec-kit](https://github.com/anomalyco/spec-kit) (`extensão brownfield`) para desenvolvimento assistido por IA. O fluxo segue:
+
+| Comando | Descrição |
+|---------|-----------|
+| `/speckit.brownfield.scan` | Escanear projeto existente e detectar stack + convenções |
+| `/speckit.brownfield.bootstrap` | Gerar constitution + templates personalizados |
+| `/speckit.brownfield.validate` | Validar configuração contra o projeto |
+| `/speckit.brownfield.migrate` | Reverter engenharia de specs para features existentes |
+| `/speckit.specify` | Criar especificação de nova feature |
+| `/speckit.clarify` | Esclarecer requisitos da spec |
+| `/speckit.plan` | Gerar plano de implementação |
+| `/speckit.tasks` | Gerar lista de tarefas |
+| `/speckit.checklist` | Gerar checklist de verificação |
+| `/speckit.analyze` | Analisar impacto de mudanças |
+
+Configuração em `.specify/`:
+- `memory/constitution.md` — Regras do projeto (stack, módulos, convenções, RBAC)
+- `templates/` — Templates de spec, plan, tasks, checklist
+- `extensions/brownfield/` — Extensão de brownfield migration
+- `extensions/git/` — Extensão de automação git
 
 ## Licença
 

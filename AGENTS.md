@@ -110,3 +110,8 @@ apps/
 | Gerente | maria@cafeos.com.br | 123456 | gerente_agricola |
 | Engenheiro | carlos@cafeos.com.br | 123456 | engenheiro_agronomo |
 | Operador | ana@cafeos.com.br | 123456 | operador_campo |
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->
