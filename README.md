@@ -11,9 +11,9 @@ Plataforma SaaS multi-tenant para gestão operacional, produtiva, financeira e a
 | Backend   | Go (REST API, workers, engine de regras)                |
 | Frontend  | React + Vite + Tailwind CSS v4 (landing page)           |
 | Admin     | React + Vite + Tailwind CSS v4 + Recharts               |
-| Mobile    | React Native _(futuro)_                                 |
+| Mobile    | Flutter 3.x + drift + dio + riverpod |
 | Banco     | PostgreSQL + Redis (GORM ORM)                            |
-| Mensageria| RabbitMQ / Kafka _(futuro)_                             |
+| Mensageria| RabbitMQ                                                 |
 | Infra     | Docker, Kubernetes, ArgoCD, Grafana, Prometheus         |
 
 ## Monorepo Structure
@@ -24,11 +24,10 @@ cafeos/
 │   ├── backend/          # Go API (MVP atual)
 │   ├── frontend/         # React + Vite (landing page)
 │   ├── admin/            # React + Vite (painel administrativo)
-│   └── mobile/           # React Native (futuro)
+│   ├── mobile/           # Expo (deprecated — migrando p/ Flutter)
+│   └── mobile_flutter/   # Flutter 3.x + drift + dio + riverpod
 ├── packages/
 │   └── shared/           # Tipos e utilitários compartilhados
-├── infra/
-│   └── dev/              # Docker Compose para desenvolvimento
 ├── .specify/             # Spec-kit (constitution, templates, workflows)
 ├── docs/                 # Documentação técnica
 ├── scripts/              # Scripts de desenvolvimento
@@ -249,9 +248,9 @@ transactor.RunInTx(func(repos repository.TransactionProvider) error {
 })
 ```
 
-## Mobile — `apps/mobile/`
+## Mobile — `apps/mobile/` (deprecated)
 
-App React Native (Expo) offline-first para operações de campo:
+App Expo offline-first para operações de campo. Sendo substituído pelo Flutter.
 
 ```
 src/
@@ -268,6 +267,42 @@ cd apps/mobile
 npm install
 npx expo start
 ```
+
+---
+
+## Mobile Flutter — `apps/mobile_flutter/` (ativo)
+
+App Flutter offline-first, mesmo contrato de API e sincronização. Riverpod + drift + dio.
+
+```
+lib/
+├── api/            # Dio client + flutter_secure_storage
+├── db/             # Drift database (4 tabelas)
+├── models/         # Operation, Plot, Farm
+├── repos/          # CRUD local
+├── services/       # Auth, Sync, Offline
+├── screens/        # Login, Home, Operations, PendingSync
+├── router/         # GoRouter
+└── shared/         # Theme + widgets
+```
+
+```bash
+cd apps/mobile_flutter
+flutter pub get
+flutter run          # Requer dispositivo/emulador
+```
+
+### Providers Riverpod
+
+| Provider | Tipo | Uso |
+|----------|------|-----|
+| `databaseProvider` | Provider | Drift DB instance |
+| `authServiceProvider` | Provider | Login, JWT storage |
+| `offlineServiceProvider` | Provider | CRUD offline + enqueue |
+| `syncServiceProvider` | Provider | SyncAll batch |
+| `loginControllerProvider` | StateNotifierProvider | Login form state |
+| `operationsControllerProvider` | StateNotifierProvider | Operations list + form |
+| `pendingSyncControllerProvider` | StateNotifierProvider | Sync queue viewer |
 
 ## Worker — `cmd/worker`
 
@@ -308,7 +343,8 @@ cd apps/backend && go run ./cmd/worker/main.go
 ./scripts/dev.sh api       # API Go na :5001
 ./scripts/dev.sh worker    # Worker RabbitMQ
 ./scripts/dev.sh admin     # Admin panel na :5174
-./scripts/dev.sh mobile    # App mobile na :8081
+./scripts/dev.sh mobile    # Expo mobile na :8081 (deprecated)
+./scripts/dev.sh mobile:dev # Flutter mobile (hot reload)
 
 # Utilitários
 ./scripts/dev.sh db:migrate  # Rodar migrations
@@ -349,9 +385,10 @@ cd apps/backend && go run ./cmd/worker/main.go
 - [x] Mão de Obra (equipes, trabalhadores, apontamento de horas)
 
 ### Fase 3 ✅ (MVP)
-- [x] Mobile offline (React Native + SQLite + sync engine)
+- [x] Mobile offline (Expo + SQLite + sync engine)
 - [x] RabbitMQ para fila de sincronização
 - [x] Worker para processar registros offline (cmd/worker)
+- [x] Migração Expo → Flutter (v1: Login, Operações, Pendências)
 - [ ] Cooperativas e consultorias (pendente)
 - [ ] Integrações externas (pendente)
 
