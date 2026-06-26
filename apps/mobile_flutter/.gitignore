@@ -1,8 +1,0 @@
-.dart_tool/
-.packages
-build/
-*.iml
-.idea/
-.metadata
-*.lock
-.env
