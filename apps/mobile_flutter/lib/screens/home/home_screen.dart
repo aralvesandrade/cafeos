@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../shared/theme/app_theme.dart';
 
 class HomeScreen extends StatelessWidget {
   final Widget child;
@@ -21,8 +20,8 @@ class HomeScreen extends StatelessWidget {
             label: 'Início',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.precision_agriculture_outlined),
-            activeIcon: Icon(Icons.precision_agriculture),
+            icon: Icon(Icons.agriculture_outlined),
+            activeIcon: Icon(Icons.agriculture),
             label: 'Operações',
           ),
           BottomNavigationBarItem(

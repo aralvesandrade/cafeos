@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/services.dart';
+import '../../services/sync_service.dart';
 import '../../shared/theme/app_theme.dart';
 
 final pendingSyncControllerProvider =
     StateNotifierProvider<PendingSyncController, PendingSyncState>((ref) {
-  return PendingSyncController(ref.read(syncServiceProvider), ref.read(offlineServiceProvider));
+  return PendingSyncController(
+    ref.read(syncServiceProvider),
+    ref.read(offlineServiceProvider),
+  );
 });
 
 class PendingSyncState {
@@ -147,9 +151,7 @@ class PendingSyncScreen extends ConsumerWidget {
           child: ListTile(
             leading: _statusIcon(item.status),
             title: Text(item.eventType),
-            subtitle: Text(
-              '${item.createdAt}\nTentativas: ${item.retryCount}',
-            ),
+            subtitle: Text('${item.createdAt}\nTentativas: ${item.retryCount}'),
             trailing: Text(
               _statusLabel(item.status),
               style: TextStyle(

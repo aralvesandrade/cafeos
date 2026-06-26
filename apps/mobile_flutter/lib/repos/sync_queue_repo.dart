@@ -1,10 +1,30 @@
 import 'dart:convert';
+import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
-import '../db/schema.dart';
-import '../models/models.dart';
+import '../db/schema.dart' as db;
+
+class SyncQueueItem {
+  final String id;
+  final String eventType;
+  final String payload;
+  final String clientTimestamp;
+  final String status;
+  final int retryCount;
+  final String createdAt;
+
+  SyncQueueItem({
+    required this.id,
+    required this.eventType,
+    required this.payload,
+    required this.clientTimestamp,
+    required this.status,
+    this.retryCount = 0,
+    this.createdAt = '',
+  });
+}
 
 class SyncQueueRepo {
-  final AppDatabase _db;
+  final db.AppDatabase _db;
 
   SyncQueueRepo(this._db);
 
@@ -27,28 +47,25 @@ class SyncQueueRepo {
   Future<void> enqueue(String eventType, Map<String, dynamic> payload) async {
     final id = const Uuid().v4();
     final now = DateTime.now().toUtc().toIso8601String();
-    await _db.into(_db.syncQueue).insert(SyncQueueCompanion.insert(
-          id: Value(id),
-          eventType: Value(eventType),
-          payload: Value(jsonEncode(payload)),
-          clientTimestamp: Value(now),
+    await _db.into(_db.syncQueue).insert(db.SyncQueueCompanion.insert(
+          id: id,
+          eventType: eventType,
+          payload: jsonEncode(payload),
+          clientTimestamp: now,
+          createdAt: now,
         ));
   }
 
   Future<void> markSynced(String id) async {
     await (_db.update(_db.syncQueue)
           ..where((t) => t.id.equals(id)))
-        .write(const SyncQueueCompanion(
-          status: Value('synced'),
-        ));
+        .write(const db.SyncQueueCompanion(status: Value('synced')));
   }
 
   Future<void> markFailed(String id) async {
     await (_db.update(_db.syncQueue)
           ..where((t) => t.id.equals(id)))
-        .write(const SyncQueueCompanion(
-          status: Value('failed'),
-        ));
+        .write(const db.SyncQueueCompanion(status: Value('failed')));
   }
 
   Future<void> incrementRetry(String id) async {
@@ -59,14 +76,14 @@ class SyncQueueRepo {
     } else {
       await (_db.update(_db.syncQueue)
             ..where((t) => t.id.equals(id)))
-          .write(SyncQueueCompanion(
+          .write(db.SyncQueueCompanion(
             retryCount: Value(newCount),
             status: const Value('pending'),
           ));
     }
   }
 
-  SyncQueueItem _fromRow(SyncQueueData row) => SyncQueueItem(
+  SyncQueueItem _fromRow(db.SyncQueueData row) => SyncQueueItem(
         id: row.id,
         eventType: row.eventType,
         payload: row.payload,
@@ -75,24 +92,4 @@ class SyncQueueRepo {
         retryCount: row.retryCount,
         createdAt: row.createdAt,
       );
-}
-
-class SyncQueueItem {
-  final String id;
-  final String eventType;
-  final String payload;
-  final String clientTimestamp;
-  final String status;
-  final int retryCount;
-  final String createdAt;
-
-  SyncQueueItem({
-    required this.id,
-    required this.eventType,
-    required this.payload,
-    required this.clientTimestamp,
-    required this.status,
-    this.retryCount = 0,
-    this.createdAt = '',
-  });
 }

@@ -1,12 +1,13 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../api/client.dart';
 import '../api/storage.dart';
+import '../db/schema.dart' as db;
+import '../models/models.dart' as models;
 import '../repos/operation_repo.dart';
 import '../repos/plot_repo.dart';
 import '../repos/sync_queue_repo.dart';
-import '../models/models.dart';
+import 'sync_service.dart';
 
 class AuthService {
   Future<AuthResult> login(String email, String password) async {
@@ -84,8 +85,8 @@ class OfflineService {
     required this.syncQueueRepo,
   });
 
-  Future<List<Operation>> getOperations() => operationRepo.getAll();
-  Future<List<Plot>> getPlots() => plotRepo.getAll();
+  Future<List<models.Operation>> getOperations() => operationRepo.getAll();
+  Future<List<models.Plot>> getPlots() => plotRepo.getAll();
 
   Future<void> createOperation({
     required String plotId,
@@ -112,7 +113,7 @@ class OfflineService {
     };
 
     await syncQueueRepo.enqueue('operation.created', payload);
-    await operationRepo.insert(Operation(
+    await operationRepo.insert(models.Operation(
       id: id,
       plotId: plotId,
       type: type,
@@ -130,21 +131,21 @@ class OfflineService {
   Future<void> refreshPlots() async {
     final response = await ApiClient.request('/plots');
     final data = response.data as List<dynamic>;
-    final plots = data.map((j) => Plot.fromJson(j as Map<String, dynamic>)).toList();
+    final plots = data.map((j) => models.Plot.fromJson(j as Map<String, dynamic>)).toList();
     await plotRepo.upsertAll(plots);
   }
 }
 
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 final offlineServiceProvider = Provider<OfflineService>((ref) {
-  final db = ref.read(databaseProvider);
+  final database = ref.read(db.databaseProvider);
   return OfflineService(
-    operationRepo: OperationRepo(db),
-    plotRepo: PlotRepo(db),
-    syncQueueRepo: SyncQueueRepo(db),
+    operationRepo: OperationRepo(database),
+    plotRepo: PlotRepo(database),
+    syncQueueRepo: SyncQueueRepo(database),
   );
 });
 final syncServiceProvider = Provider<SyncService>((ref) {
-  final db = ref.read(databaseProvider);
-  return SyncService(SyncQueueRepo(db));
+  final database = ref.read(db.databaseProvider);
+  return SyncService(SyncQueueRepo(database));
 });

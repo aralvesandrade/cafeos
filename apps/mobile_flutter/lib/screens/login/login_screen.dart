@@ -84,7 +84,7 @@ class LoginScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.coffee, size: 64, color: AppTheme.green),
+                    const Icon(Icons.coffee, size: 64, color: AppTheme.green),
                     const SizedBox(height: 8),
                     Text(
                       'CafeOS',

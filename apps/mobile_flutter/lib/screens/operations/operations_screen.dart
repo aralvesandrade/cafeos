@@ -368,7 +368,7 @@ class _OperationFormState extends State<_OperationForm> {
               Text('Nova Operação', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _plotId.isEmpty ? null : _plotId,
+                initialValue: _plotId.isEmpty ? null : _plotId,
                 decoration: const InputDecoration(labelText: 'Talhão'),
                 items: widget.plots
                     .map((p) => DropdownMenuItem(value: p.id, child: Text(p.name)))
