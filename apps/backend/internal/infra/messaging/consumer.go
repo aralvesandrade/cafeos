@@ -2,7 +2,7 @@ package messaging
 
 import (
 	"encoding/json"
-	"log"
+	"log/slog"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -37,13 +37,13 @@ func (c *Consumer) Start() error {
 		for d := range msgs {
 			var msg SyncMessage
 			if err := json.Unmarshal(d.Body, &msg); err != nil {
-				log.Printf("[CONSUMER] unmarshal error: %v", err)
-				d.Nack(false, false) // discard
+				slog.Error("consumer unmarshal error", "error", err)
+				d.Nack(false, false)
 				continue
 			}
 
 			if err := c.handler(msg); err != nil {
-				log.Printf("[CONSUMER] handler error: %v", err)
+				slog.Error("consumer handler error", "error", err)
 				d.Nack(false, !d.Redelivered)
 				continue
 			}

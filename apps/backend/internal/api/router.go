@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/aralvesandrade/cafeos/internal/api/handler"
@@ -17,7 +18,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
-func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, jwtSecret string) http.Handler {
+func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, jwtSecret string, log *slog.Logger) http.Handler {
 	mux := http.NewServeMux()
 
 	farmRepo := infraRepo.NewFarmRepository(db)
@@ -182,5 +183,6 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 		mux.Handle("POST /api/v1/{tenant_id}/sync", chain(syncH.Sync))
 	}
 
-	return corsMw(mux)
+	loggingMw := middleware.RequestLogging(log)
+	return loggingMw(corsMw(mux))
 }

@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
+	"os"
 	"time"
 
 	"github.com/aralvesandrade/cafeos/internal/domain/entity"
 	"github.com/aralvesandrade/cafeos/internal/infra/config"
 	"github.com/aralvesandrade/cafeos/internal/infra/db/postgres"
+	infraLogger "github.com/aralvesandrade/cafeos/internal/infra/logger"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -19,19 +21,29 @@ const (
 
 func main() {
 	cfg := config.Load()
-	db, err := postgres.NewConnection(cfg.DatabaseURL)
+
+	log := infraLogger.New(infraLogger.Config{
+		Level:  cfg.LogLevel,
+		Format: cfg.LogFormat,
+	})
+	slog.SetDefault(log)
+
+	db, err := postgres.NewConnection(cfg.DatabaseURL, log, slog.LevelInfo)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		log.Error("failed to connect to database", "error", err)
+		os.Exit(1)
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Fatalf("failed to get sql.DB: %v", err)
+		log.Error("failed to get sql.DB", "error", err)
+		os.Exit(1)
 	}
 	defer sqlDB.Close()
 
 	if err := seed(db); err != nil {
-		log.Fatalf("seed failed: %v", err)
+		log.Error("seed failed", "error", err)
+		os.Exit(1)
 	}
 
 	fmt.Println("Seed concluído com sucesso!")

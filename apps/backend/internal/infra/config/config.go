@@ -8,6 +8,8 @@ type Config struct {
 	RedisURL    string
 	RabbitMQURL string
 	JWTSecret   string
+	LogLevel    string
+	LogFormat   string
 }
 
 func Load() *Config {
@@ -17,6 +19,8 @@ func Load() *Config {
 		RedisURL:    getEnv("REDIS_URL", "redis://localhost:6379"),
 		RabbitMQURL: getEnv("RABBITMQ_URL", "amqp://cafeos:cafeos@localhost:5672/"),
 		JWTSecret:   getEnv("JWT_SECRET", "dev-secret-change-in-production"),
+		LogLevel:    getEnv("LOG_LEVEL", "info"),
+		LogFormat:   getEnv("LOG_FORMAT", "json"),
 	}
 }
 

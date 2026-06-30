@@ -2,16 +2,18 @@ package postgres
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/aralvesandrade/cafeos/internal/domain/entity"
+	infraLogger "github.com/aralvesandrade/cafeos/internal/infra/logger"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
-func NewConnection(databaseURL string) (*gorm.DB, error) {
+func NewConnection(databaseURL string, log *slog.Logger, gormLevel slog.Level) (*gorm.DB, error) {
+	gormLogger := infraLogger.NewGORMLogger(log, gormLevel)
 	db, err := gorm.Open(postgres.Open(databaseURL), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Warn),
+		Logger: gormLogger,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)

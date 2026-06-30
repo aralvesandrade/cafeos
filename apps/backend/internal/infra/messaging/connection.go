@@ -1,7 +1,7 @@
 package messaging
 
 import (
-	"log"
+	"log/slog"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -42,14 +42,14 @@ func (c *Connection) connect() error {
 func (c *Connection) handleReconnect() {
 	notify := c.conn.NotifyClose(make(chan *amqp.Error))
 	<-notify
-	log.Println("[RABBITMQ] connection lost, reconnecting...")
+	slog.Warn("rabbitmq connection lost, reconnecting...")
 	for {
 		time.Sleep(3 * time.Second)
 		if err := c.connect(); err != nil {
-			log.Printf("[RABBITMQ] reconnect failed: %v, retrying...", err)
+			slog.Error("rabbitmq reconnect failed, retrying", "error", err)
 			continue
 		}
-		log.Println("[RABBITMQ] reconnected")
+		slog.Info("rabbitmq reconnected")
 		return
 	}
 }

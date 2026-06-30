@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,6 +14,7 @@ import (
 	"github.com/aralvesandrade/cafeos/internal/infra/config"
 	"github.com/aralvesandrade/cafeos/internal/infra/db/postgres"
 	infraRepo "github.com/aralvesandrade/cafeos/internal/infra/db/repository"
+	infraLogger "github.com/aralvesandrade/cafeos/internal/infra/logger"
 	"github.com/aralvesandrade/cafeos/internal/infra/messaging"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -24,15 +25,23 @@ var db *gorm.DB
 func main() {
 	cfg := config.Load()
 
+	log := infraLogger.New(infraLogger.Config{
+		Level:  cfg.LogLevel,
+		Format: cfg.LogFormat,
+	})
+	slog.SetDefault(log)
+
 	var err error
-	db, err = postgres.NewConnection(cfg.DatabaseURL)
+	db, err = postgres.NewConnection(cfg.DatabaseURL, log, slog.LevelInfo)
 	if err != nil {
-		log.Fatalf("failed to connect database: %v", err)
+		log.Error("failed to connect database", "error", err)
+		os.Exit(1)
 	}
 
 	conn, err := messaging.NewConnection(cfg.RabbitMQURL)
 	if err != nil {
-		log.Fatalf("failed to connect rabbitmq: %v", err)
+		log.Error("failed to connect rabbitmq", "error", err)
+		os.Exit(1)
 	}
 	defer conn.Close()
 
@@ -42,7 +51,8 @@ func main() {
 	pub := messaging.NewPublisher(ch)
 	for _, q := range queues {
 		if err := pub.DeclareQueue(q); err != nil {
-			log.Fatalf("failed to declare queue %s: %v", q, err)
+			log.Error("failed to declare queue", "queue", q, "error", err)
+			os.Exit(1)
 		}
 	}
 
@@ -52,21 +62,22 @@ func main() {
 	for _, q := range queues {
 		consumer := messaging.NewConsumer(ch, q, processMessage)
 		if err := consumer.Start(); err != nil {
-			log.Fatalf("failed to start consumer for %s: %v", q, err)
+			log.Error("failed to start consumer", "queue", q, "error", err)
+			os.Exit(1)
 		}
-		log.Printf("[WORKER] listening on queue: %s", q)
+		log.Info("listening on queue", "queue", q)
 	}
 
-	log.Println("[WORKER] started, waiting for messages...")
+	log.Info("worker started, waiting for messages")
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	<-sig
-	log.Println("[WORKER] shutting down")
+	log.Info("worker shutting down")
 }
 
 func processMessage(msg messaging.SyncMessage) error {
-	log.Printf("[WORKER] processing event=%s client=%s tenant=%s", msg.EventType, msg.ClientID, msg.TenantID)
+	slog.Info("processing message", "event", msg.EventType, "client", msg.ClientID, "tenant", msg.TenantID)
 
 	payload, err := json.Marshal(msg.Payload)
 	if err != nil {
@@ -85,7 +96,7 @@ func processMessage(msg messaging.SyncMessage) error {
 	case "labor.shift":
 		return processLaborShift(msg.TenantID, payload)
 	default:
-		log.Printf("[WORKER] unknown event type: %s", msg.EventType)
+		slog.Warn("unknown event type", "event", msg.EventType)
 		return nil
 	}
 }
