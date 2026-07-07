@@ -20,14 +20,16 @@ func NewOperationHandler(svc *service.OperationService) *OperationHandler {
 }
 
 type createOperationRequest struct {
-	PlotID      string  `json:"plot_id"`
-	Type        string  `json:"type"`
-	Date        string  `json:"date"`
-	Responsible string  `json:"responsible"`
-	ProductUsed string  `json:"product_used"`
-	Quantity    float64 `json:"quantity"`
-	Cost        float64 `json:"cost"`
-	Notes       string  `json:"notes"`
+	PlotID       string   `json:"plot_id"`
+	HarvestID    *string  `json:"harvest_id"`
+	CostCenterID *string  `json:"cost_center_id"`
+	Type         string   `json:"type"`
+	Date         string   `json:"date"`
+	Responsible  string   `json:"responsible"`
+	ProductUsed  string   `json:"product_used"`
+	Quantity     float64  `json:"quantity"`
+	Cost         float64  `json:"cost"`
+	Notes        string   `json:"notes"`
 }
 
 // Create registers a new agricultural operation
@@ -56,7 +58,7 @@ func (h *OperationHandler) Create(w http.ResponseWriter, r *http.Request) {
 		date = time.Now()
 	}
 
-	op, err := h.svc.Create(tenantID, req.PlotID, entity.OperationType(req.Type), date, req.Responsible, req.ProductUsed, req.Quantity, req.Cost, req.Notes)
+	op, err := h.svc.Create(tenantID, req.PlotID, entity.OperationType(req.Type), date, req.Responsible, req.ProductUsed, req.Quantity, req.Cost, req.Notes, req.HarvestID, req.CostCenterID)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return

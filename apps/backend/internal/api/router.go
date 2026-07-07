@@ -38,16 +38,22 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	workerRepo := infraRepo.NewWorkerRepository(db)
 	shiftRepo := infraRepo.NewWorkShiftRepository(db)
 	prodRepo := infraRepo.NewAgriculturalProductRepository(db)
+	ccRepo := infraRepo.NewCostCenterRepository(db)
+	budgetRepo := infraRepo.NewBudgetRepository(db)
+	allocRepo := infraRepo.NewCostAllocationRepository(db)
 	transactor := postgres.NewTransactor(db)
 
 	farmSvc := domainSvc.NewFarmService(farmRepo)
 	plotSvc := domainSvc.NewPlotService(plotRepo)
 	opSvc := domainSvc.NewOperationService(opRepo, eventBus)
-	harvestSvc := domainSvc.NewHarvestService(harvestRepo, hpRepo, indicatorRepo, plotRepo, opRepo, transactor, eventBus)
+	harvestSvc := domainSvc.NewHarvestService(harvestRepo, hpRepo, indicatorRepo, plotRepo, opRepo, maintRepo, shiftRepo, finRepo, allocRepo, transactor, eventBus)
 	finSvc := domainSvc.NewFinancialService(finRepo)
 	stockSvc := domainSvc.NewStockService(stockItemRepo, stockMovRepo)
 	fleetSvc := domainSvc.NewFleetService(vehRepo, maintRepo)
 	laborSvc := domainSvc.NewLaborService(teamRepo, workerRepo, shiftRepo)
+	ccSvc := domainSvc.NewCostCenterService(ccRepo)
+	budgetSvc := domainSvc.NewBudgetService(budgetRepo)
+	allocSvc := domainSvc.NewCostAllocationService(allocRepo, plotRepo)
 
 	farmH := handler.NewFarmHandler(farmSvc)
 	plotH := handler.NewPlotHandler(plotSvc)
@@ -62,6 +68,9 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	fleetH := handler.NewFleetHandler(fleetSvc)
 	laborH := handler.NewLaborHandler(laborSvc)
 	prodH := handler.NewProductHandler(prodRepo)
+	ccH := handler.NewCostCenterHandler(ccSvc)
+	budgetH := handler.NewBudgetHandler(budgetSvc)
+	allocH := handler.NewCostAllocationHandler(allocSvc)
 
 	authMw := middleware.Auth(jwtSecret)
 	adminMw := middleware.RequireRole(entity.RolePlatformOwner)
@@ -176,6 +185,26 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	mux.Handle("POST /api/v1/admin/users", adminChain(userH.Create))
 	mux.Handle("PUT /api/v1/admin/users/{id}", adminChain(userH.Update))
 	mux.Handle("DELETE /api/v1/admin/users/{id}", adminChain(userH.Delete))
+
+	// Cost Centers
+	mux.Handle("POST /api/v1/{tenant_id}/cost-centers", chain(ccH.Create))
+	mux.Handle("GET /api/v1/{tenant_id}/cost-centers", chain(ccH.List))
+	mux.Handle("GET /api/v1/{tenant_id}/cost-centers/{id}", chain(ccH.GetByID))
+	mux.Handle("PUT /api/v1/{tenant_id}/cost-centers/{id}", chain(ccH.Update))
+	mux.Handle("DELETE /api/v1/{tenant_id}/cost-centers/{id}", chain(ccH.Delete))
+
+	// Budgets
+	mux.Handle("POST /api/v1/{tenant_id}/budgets", chain(budgetH.Create))
+	mux.Handle("GET /api/v1/{tenant_id}/harvests/{harvest_id}/budgets", chain(budgetH.ListByHarvest))
+	mux.Handle("GET /api/v1/{tenant_id}/budgets/{id}", chain(budgetH.GetByID))
+	mux.Handle("PUT /api/v1/{tenant_id}/budgets/{id}", chain(budgetH.Update))
+	mux.Handle("DELETE /api/v1/{tenant_id}/budgets/{id}", chain(budgetH.Delete))
+
+	// Cost Allocations
+	mux.Handle("POST /api/v1/{tenant_id}/cost-allocations", chain(allocH.Create))
+	mux.Handle("GET /api/v1/{tenant_id}/harvests/{harvest_id}/cost-allocations", chain(allocH.ListByHarvest))
+	mux.Handle("GET /api/v1/{tenant_id}/cost-allocations/{id}", chain(allocH.GetByID))
+	mux.Handle("DELETE /api/v1/{tenant_id}/cost-allocations/{id}", chain(allocH.Delete))
 
 	// Sync — offline mobile (requires RabbitMQ publisher)
 	if publisher != nil {

@@ -19,7 +19,7 @@ func NewOperationService(repo repository.OperationRepository, eventBus event.Bus
 	return &OperationService{repo: repo, eventBus: eventBus}
 }
 
-func (s *OperationService) Create(tenantID, plotID string, opType entity.OperationType, date time.Time, responsible, productUsed string, quantity, cost float64, notes string) (*entity.Operation, error) {
+func (s *OperationService) Create(tenantID, plotID string, opType entity.OperationType, date time.Time, responsible, productUsed string, quantity, cost float64, notes string, harvestID, costCenterID *string) (*entity.Operation, error) {
 	if plotID == "" {
 		return nil, errors.New("plot is required")
 	}
@@ -31,17 +31,19 @@ func (s *OperationService) Create(tenantID, plotID string, opType entity.Operati
 	}
 
 	op := &entity.Operation{
-		ID:          uuid.New().String(),
-		TenantID:    tenantID,
-		PlotID:      plotID,
-		Type:        opType,
-		Date:        date,
-		Responsible: responsible,
-		ProductUsed: productUsed,
-		Quantity:    quantity,
-		Cost:        cost,
-		Notes:       notes,
-		CreatedAt:   time.Now(),
+		ID:           uuid.New().String(),
+		TenantID:     tenantID,
+		PlotID:       plotID,
+		HarvestID:    harvestID,
+		CostCenterID: costCenterID,
+		Type:         opType,
+		Date:         date,
+		Responsible:  responsible,
+		ProductUsed:  productUsed,
+		Quantity:     quantity,
+		Cost:         cost,
+		Notes:        notes,
+		CreatedAt:    time.Now(),
 	}
 
 	if err := s.repo.Create(op); err != nil {

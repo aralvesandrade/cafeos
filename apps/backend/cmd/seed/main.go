@@ -172,6 +172,33 @@ func seed(db *gorm.DB) error {
 	}
 	fmt.Printf("  ✓ Produções: %d criadas\n", len(productions))
 
+	// Cost Centers (default seed)
+	costCenters := []entity.CostCenter{
+		{TenantID: tenant.ID, Name: "Adubos", Code: "DESP_ADUBOS", Type: entity.CCDespesa, Description: "Fertilizantes e corretivos"},
+		{TenantID: tenant.ID, Name: "Defensivos", Code: "DESP_DEFENSIVOS", Type: entity.CCDespesa, Description: "Agrotóxicos e defensivos agrícolas"},
+		{TenantID: tenant.ID, Name: "Combustíveis", Code: "DESP_COMBUSTIVEL", Type: entity.CCDespesa, Description: "Diesel, gasolina e lubrificantes"},
+		{TenantID: tenant.ID, Name: "Mão de Obra", Code: "DESP_MAO_OBRA", Type: entity.CCDespesa, Description: "Salários e encargos trabalhistas"},
+		{TenantID: tenant.ID, Name: "Frete", Code: "DESP_FRETE", Type: entity.CCDespesa, Description: "Transporte de insumos e produção"},
+		{TenantID: tenant.ID, Name: "Manutenção", Code: "DESP_MANUTENCAO", Type: entity.CCDespesa, Description: "Manutenção de máquinas e equipamentos"},
+		{TenantID: tenant.ID, Name: "Irrigação", Code: "DESP_IRRIGACAO", Type: entity.CCDespesa, Description: "Custo de irrigação e água"},
+		{TenantID: tenant.ID, Name: "Análise de Solo", Code: "DESP_ANALISE_SOLO", Type: entity.CCDespesa, Description: "Análises laboratoriais de solo e folha"},
+		{TenantID: tenant.ID, Name: "Outros Insumos", Code: "DESP_OUTROS_INSUMOS", Type: entity.CCDespesa, Description: "Outros insumos agrícolas"},
+		{TenantID: tenant.ID, Name: "Serviços Terceiros", Code: "DESP_SERV_TERCEIROS", Type: entity.CCDespesa, Description: "Serviços contratados de terceiros"},
+		{TenantID: tenant.ID, Name: "Energia", Code: "DESP_ENERGIA", Type: entity.CCDespesa, Description: "Energia elétrica"},
+		{TenantID: tenant.ID, Name: "Depreciação", Code: "DESP_DEPRECIACAO", Type: entity.CCDespesa, Description: "Depreciação de máquinas e benfeitorias"},
+		{TenantID: tenant.ID, Name: "Administrativo", Code: "DESP_ADMINISTRATIVO", Type: entity.CCDespesa, Description: "Despesas administrativas"},
+		{TenantID: tenant.ID, Name: "Outras Despesas", Code: "DESP_OUTRAS", Type: entity.CCDespesa, Description: "Outras despesas operacionais"},
+		{TenantID: tenant.ID, Name: "Venda de Café", Code: "REC_CAFE", Type: entity.CCReceita, Description: "Receita com venda de café"},
+		{TenantID: tenant.ID, Name: "Venda de Mudas", Code: "REC_MUDAS", Type: entity.CCReceita, Description: "Receita com venda de mudas"},
+		{TenantID: tenant.ID, Name: "Outras Receitas", Code: "REC_OUTRAS", Type: entity.CCReceita, Description: "Outras receitas"},
+	}
+	for _, cc := range costCenters {
+		if err := db.Create(&cc).Error; err != nil {
+			return fmt.Errorf("create cost center %s: %w", cc.Name, err)
+		}
+	}
+	fmt.Printf("  ✓ Centros de Custo: %d criados\n", len(costCenters))
+
 	// Indicators for finalized harvest
 	indicators := []entity.Indicator{
 		{TenantID: tenant.ID, HarvestID: harvests[0].ID, Type: entity.IndProducaoTotal, Value: 3600, CalculatedAt: now.AddDate(0, -4, 0)},

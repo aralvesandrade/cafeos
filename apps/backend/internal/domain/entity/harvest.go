@@ -17,6 +17,8 @@ type Harvest struct {
 	Description         string        `json:"description" gorm:"default:''"`
 	EstimatedProduction float64       `json:"estimated_production" gorm:"type:numeric(12,2);default:0"`
 	Status              HarvestStatus `json:"status" gorm:"default:'planejada'"`
+	StartDate           *time.Time    `json:"start_date"`
+	EndDate             *time.Time    `json:"end_date"`
 	CreatedAt           time.Time     `json:"created_at"`
 	UpdatedAt           time.Time     `json:"updated_at"`
 	Tenant              Tenant        `json:"-" gorm:"foreignKey:TenantID"`

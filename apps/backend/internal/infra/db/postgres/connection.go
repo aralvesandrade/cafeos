@@ -47,6 +47,10 @@ func NewConnection(databaseURL string, log *slog.Logger, gormLevel slog.Level) (
 		&entity.Team{},
 		&entity.Worker{},
 		&entity.WorkShift{},
+		&entity.CostCenter{},
+		&entity.Budget{},
+		&entity.CostAllocation{},
+		&entity.CostAllocationItem{},
 	); err != nil {
 		return nil, fmt.Errorf("auto migrate: %w", err)
 	}

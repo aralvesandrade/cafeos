@@ -13,7 +13,7 @@ type FinancialTransaction struct {
 	ID            string          `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	TenantID      string          `json:"tenant_id" gorm:"type:uuid;not null;index"`
 	Type          TransactionType `json:"type" gorm:"not null"`
-	Category      string          `json:"category" gorm:"default:''"`
+	CostCenterID  *string         `json:"cost_center_id" gorm:"type:uuid;index"`
 	Description   string          `json:"description" gorm:"not null"`
 	Amount        float64         `json:"amount" gorm:"type:numeric(12,2);not null"`
 	Date          time.Time       `json:"date" gorm:"not null;index"`
@@ -25,4 +25,5 @@ type FinancialTransaction struct {
 	CreatedAt     time.Time       `json:"created_at"`
 	UpdatedAt     time.Time       `json:"updated_at"`
 	Tenant        Tenant          `json:"-" gorm:"foreignKey:TenantID"`
+	CostCenter    *CostCenter     `json:"-" gorm:"foreignKey:CostCenterID"`
 }

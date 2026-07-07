@@ -19,13 +19,13 @@ func NewFinancialHandler(svc *service.FinancialService) *FinancialHandler {
 }
 
 type createFinancialRequest struct {
-	Type        string  `json:"type"`
-	Category    string  `json:"category"`
-	Description string  `json:"description"`
-	Amount      float64 `json:"amount"`
-	Date        string  `json:"date"`
-	DueDate     string  `json:"due_date"`
-	Notes       string  `json:"notes"`
+	Type         string  `json:"type"`
+	CostCenterID *string `json:"cost_center_id"`
+	Description  string  `json:"description"`
+	Amount       float64 `json:"amount"`
+	Date         string  `json:"date"`
+	DueDate      string  `json:"due_date"`
+	Notes        string  `json:"notes"`
 }
 
 func (h *FinancialHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +37,7 @@ func (h *FinancialHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	date, _ := time.Parse("2006-01-02", req.Date)
 	dueDate, _ := time.Parse("2006-01-02", req.DueDate)
-	tx, err := h.svc.Create(tenantID, req.Type, req.Category, req.Description, req.Amount, date, dueDate, req.Notes)
+	tx, err := h.svc.Create(tenantID, req.Type, req.CostCenterID, req.Description, req.Amount, date, dueDate, req.Notes)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -73,12 +73,12 @@ func (h *FinancialHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var req struct {
-		Type        *string  `json:"type"`
-		Category    *string  `json:"category"`
-		Description *string  `json:"description"`
-		Amount      *float64 `json:"amount"`
-		Status      *string  `json:"status"`
-		Notes       *string  `json:"notes"`
+		Type         *string  `json:"type"`
+		CostCenterID *string  `json:"cost_center_id"`
+		Description  *string  `json:"description"`
+		Amount       *float64 `json:"amount"`
+		Status       *string  `json:"status"`
+		Notes        *string  `json:"notes"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, "invalid request body", http.StatusBadRequest)
@@ -87,8 +87,8 @@ func (h *FinancialHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if req.Type != nil {
 		existing.Type = entity.TransactionType(*req.Type)
 	}
-	if req.Category != nil {
-		existing.Category = *req.Category
+	if req.CostCenterID != nil {
+		existing.CostCenterID = req.CostCenterID
 	}
 	if req.Description != nil {
 		existing.Description = *req.Description

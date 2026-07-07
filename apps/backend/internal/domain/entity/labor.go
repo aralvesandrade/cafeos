@@ -28,15 +28,17 @@ type Worker struct {
 }
 
 type WorkShift struct {
-	ID          string     `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	TenantID    string     `json:"tenant_id" gorm:"type:uuid;not null;index"`
-	WorkerID    string     `json:"worker_id" gorm:"type:uuid;not null;index"`
-	OperationID *string    `json:"operation_id" gorm:"type:uuid;index"`
-	Date        time.Time  `json:"date" gorm:"not null;index"`
-	Hours       float64    `json:"hours" gorm:"type:numeric(5,2);not null"`
-	Cost        float64    `json:"cost" gorm:"type:numeric(10,2);default:0"`
-	Notes       string     `json:"notes" gorm:"default:''"`
-	CreatedAt   time.Time  `json:"created_at"`
-	Tenant      Tenant     `json:"-" gorm:"foreignKey:TenantID"`
-	Worker      Worker     `json:"-" gorm:"foreignKey:WorkerID"`
+	ID           string      `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	TenantID     string      `json:"tenant_id" gorm:"type:uuid;not null;index"`
+	WorkerID     string      `json:"worker_id" gorm:"type:uuid;not null;index"`
+	OperationID  *string     `json:"operation_id" gorm:"type:uuid;index"`
+	CostCenterID *string     `json:"cost_center_id" gorm:"type:uuid;index"`
+	Date         time.Time   `json:"date" gorm:"not null;index"`
+	Hours        float64     `json:"hours" gorm:"type:numeric(5,2);not null"`
+	Cost         float64     `json:"cost" gorm:"type:numeric(10,2);default:0"`
+	Notes        string      `json:"notes" gorm:"default:''"`
+	CreatedAt    time.Time   `json:"created_at"`
+	Tenant       Tenant      `json:"-" gorm:"foreignKey:TenantID"`
+	Worker       Worker      `json:"-" gorm:"foreignKey:WorkerID"`
+	CostCenter   *CostCenter `json:"-" gorm:"foreignKey:CostCenterID"`
 }

@@ -14,7 +14,7 @@ func TestOperationService_Create(t *testing.T) {
 	bus := event.NewInMemoryBus()
 	svc := NewOperationService(repo, bus)
 
-	op, err := svc.Create("t1", "plot-1", entity.OpAdubacao, time.Now(), "João", "NPK 20-05-20", 500, 1500.00, "")
+	op, err := svc.Create("t1", "plot-1", entity.OpAdubacao, time.Now(), "João", "NPK 20-05-20", 500, 1500.00, "", nil, nil)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -45,7 +45,7 @@ func TestOperationService_Validation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := svc.Create("t1", tt.plotID, tt.opType, time.Now(), "", "", 0, tt.cost, "")
+			_, err := svc.Create("t1", tt.plotID, tt.opType, time.Now(), "", "", 0, tt.cost, "", nil, nil)
 			if err == nil {
 				t.Error("expected error, got nil")
 			}
@@ -65,7 +65,7 @@ func TestOperationService_EventPublished(t *testing.T) {
 		}
 	})
 
-	svc.Create("t1", "p1", entity.OpPulverizacao, time.Now(), "", "", 0, 500, "")
+	svc.Create("t1", "p1", entity.OpPulverizacao, time.Now(), "", "", 0, 500, "", nil, nil)
 
 	if !received {
 		t.Error("expected OperationRegistered event to be published")
@@ -78,7 +78,7 @@ func TestOperationService_ListRecent(t *testing.T) {
 	svc := NewOperationService(repo, bus)
 
 	for i := 0; i < 15; i++ {
-		svc.Create("t1", "p1", entity.OpIrrigacao, time.Now(), "", "", 0, 100, "")
+		svc.Create("t1", "p1", entity.OpIrrigacao, time.Now(), "", "", 0, 100, "", nil, nil)
 	}
 
 	recent, _ := svc.ListRecent("t1", 5)
@@ -92,7 +92,7 @@ func TestOperationService_Delete(t *testing.T) {
 	bus := event.NewInMemoryBus()
 	svc := NewOperationService(repo, bus)
 
-	op, _ := svc.Create("t1", "p1", entity.OpPoda, time.Now(), "", "", 0, 100, "")
+	op, _ := svc.Create("t1", "p1", entity.OpPoda, time.Now(), "", "", 0, 100, "", nil, nil)
 	err := svc.Delete(op.ID)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)

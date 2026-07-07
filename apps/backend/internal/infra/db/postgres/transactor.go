@@ -59,3 +59,19 @@ func (p *txProvider) Tenant() repository.TenantRepository {
 func (p *txProvider) AgriculturalProduct() repository.AgriculturalProductRepository {
 	return infraRepo.NewAgriculturalProductRepository(p.tx)
 }
+
+func (p *txProvider) Maintenance() repository.MaintenanceRepository {
+	return infraRepo.NewMaintenanceRepository(p.tx)
+}
+
+func (p *txProvider) WorkShift() repository.WorkShiftRepository {
+	return infraRepo.NewWorkShiftRepository(p.tx)
+}
+
+func (p *txProvider) Financial() repository.FinancialRepository {
+	return infraRepo.NewFinancialRepository(p.tx)
+}
+
+func (p *txProvider) CostAllocation() repository.CostAllocationRepository {
+	return infraRepo.NewCostAllocationRepository(p.tx)
+}

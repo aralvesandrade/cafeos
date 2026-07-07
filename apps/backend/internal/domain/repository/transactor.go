@@ -14,4 +14,8 @@ type TransactionProvider interface {
 	User() UserRepository
 	Tenant() TenantRepository
 	AgriculturalProduct() AgriculturalProductRepository
+	Maintenance() MaintenanceRepository
+	WorkShift() WorkShiftRepository
+	Financial() FinancialRepository
+	CostAllocation() CostAllocationRepository
 }

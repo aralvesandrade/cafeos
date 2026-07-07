@@ -28,16 +28,18 @@ type Vehicle struct {
 }
 
 type Maintenance struct {
-	ID          string    `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	TenantID    string    `json:"tenant_id" gorm:"type:uuid;not null;index"`
-	VehicleID   string    `json:"vehicle_id" gorm:"type:uuid;not null;index"`
-	Date        time.Time `json:"date" gorm:"not null;index"`
-	Type        string    `json:"type" gorm:"default:'preventive'"` // "preventive" | "corrective"
-	Description string    `json:"description" gorm:"default:''"`
-	Cost        float64   `json:"cost" gorm:"type:numeric(12,2);default:0"`
-	Odometer    float64   `json:"odometer" gorm:"type:numeric(12,2);default:0"`
-	Notes       string    `json:"notes" gorm:"default:''"`
-	CreatedAt   time.Time `json:"created_at"`
-	Tenant      Tenant    `json:"-" gorm:"foreignKey:TenantID"`
-	Vehicle     Vehicle   `json:"-" gorm:"foreignKey:VehicleID"`
+	ID           string      `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	TenantID     string      `json:"tenant_id" gorm:"type:uuid;not null;index"`
+	VehicleID    string      `json:"vehicle_id" gorm:"type:uuid;not null;index"`
+	CostCenterID *string     `json:"cost_center_id" gorm:"type:uuid;index"`
+	Date         time.Time   `json:"date" gorm:"not null;index"`
+	Type         string      `json:"type" gorm:"default:'preventive'"` // "preventive" | "corrective"
+	Description  string      `json:"description" gorm:"default:''"`
+	Cost         float64     `json:"cost" gorm:"type:numeric(12,2);default:0"`
+	Odometer     float64     `json:"odometer" gorm:"type:numeric(12,2);default:0"`
+	Notes        string      `json:"notes" gorm:"default:''"`
+	CreatedAt    time.Time   `json:"created_at"`
+	Tenant       Tenant      `json:"-" gorm:"foreignKey:TenantID"`
+	Vehicle      Vehicle     `json:"-" gorm:"foreignKey:VehicleID"`
+	CostCenter   *CostCenter `json:"-" gorm:"foreignKey:CostCenterID"`
 }

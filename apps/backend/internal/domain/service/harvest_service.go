@@ -11,13 +11,17 @@ import (
 )
 
 type HarvestService struct {
-	harvestRepo           repository.HarvestRepository
-	productionRepo        repository.HarvestProductionRepository
-	indicatorRepo         repository.IndicatorRepository
-	plotRepo              repository.PlotRepository
-	operationRepo         repository.OperationRepository
-	transactor            repository.Transactor
-	eventBus              event.Bus
+	harvestRepo    repository.HarvestRepository
+	productionRepo repository.HarvestProductionRepository
+	indicatorRepo  repository.IndicatorRepository
+	plotRepo       repository.PlotRepository
+	operationRepo  repository.OperationRepository
+	maintenanceRepo repository.MaintenanceRepository
+	shiftRepo      repository.WorkShiftRepository
+	financialRepo  repository.FinancialRepository
+	allocationRepo repository.CostAllocationRepository
+	transactor     repository.Transactor
+	eventBus       event.Bus
 }
 
 func NewHarvestService(
@@ -26,17 +30,25 @@ func NewHarvestService(
 	indicatorRepo repository.IndicatorRepository,
 	plotRepo repository.PlotRepository,
 	operationRepo repository.OperationRepository,
+	maintenanceRepo repository.MaintenanceRepository,
+	shiftRepo repository.WorkShiftRepository,
+	financialRepo repository.FinancialRepository,
+	allocationRepo repository.CostAllocationRepository,
 	transactor repository.Transactor,
 	eventBus event.Bus,
 ) *HarvestService {
 	return &HarvestService{
-		harvestRepo:    harvestRepo,
-		productionRepo: productionRepo,
-		indicatorRepo:  indicatorRepo,
-		plotRepo:       plotRepo,
-		operationRepo:  operationRepo,
-		transactor:     transactor,
-		eventBus:       eventBus,
+		harvestRepo:     harvestRepo,
+		productionRepo:  productionRepo,
+		indicatorRepo:   indicatorRepo,
+		plotRepo:        plotRepo,
+		operationRepo:   operationRepo,
+		maintenanceRepo: maintenanceRepo,
+		shiftRepo:       shiftRepo,
+		financialRepo:   financialRepo,
+		allocationRepo:  allocationRepo,
+		transactor:      transactor,
+		eventBus:        eventBus,
 	}
 }
 
@@ -148,15 +160,13 @@ func (s *HarvestService) calculateIndicators(harvest *entity.Harvest) error {
 		totalPlantedArea += p.AreaHA
 	}
 
-	operations, err := s.operationRepo.ListByTenant(harvest.TenantID)
-	if err != nil {
-		return err
-	}
-
-	var totalCost float64
-	for _, op := range operations {
-		totalCost += op.Cost
-	}
+	totalCost := s.calculateTotalCost(harvest,
+		s.operationRepo.ListByTenant,
+		s.maintenanceRepo.ListByTenant,
+		s.shiftRepo.ListByTenant,
+		s.financialRepo.ListByTenant,
+		s.allocationRepo.ListByHarvest,
+	)
 
 	indicators := s.buildIndicators(harvest, totalProduction, totalPlantedArea, totalCost)
 
@@ -190,15 +200,7 @@ func (s *HarvestService) calculateIndicatorsWithRepos(harvest *entity.Harvest, r
 		totalPlantedArea += p.AreaHA
 	}
 
-	operations, err := repos.Operation().ListByTenant(harvest.TenantID)
-	if err != nil {
-		return err
-	}
-
-	var totalCost float64
-	for _, op := range operations {
-		totalCost += op.Cost
-	}
+	totalCost := s.calculateTotalCostWithRepos(harvest, repos)
 
 	indicators := s.buildIndicators(harvest, totalProduction, totalPlantedArea, totalCost)
 
@@ -209,6 +211,111 @@ func (s *HarvestService) calculateIndicatorsWithRepos(harvest *entity.Harvest, r
 	}
 
 	return nil
+}
+
+func (s *HarvestService) calculateTotalCost(harvest *entity.Harvest,
+	listOps func(string) ([]*entity.Operation, error),
+	listMaint func(string) ([]*entity.Maintenance, error),
+	listShifts func(string) ([]*entity.WorkShift, error),
+	listFin func(string) ([]*entity.FinancialTransaction, error),
+	listAllocs func(string) ([]*entity.CostAllocation, error),
+) float64 {
+	var totalCost float64
+
+	// Operations by HarvestID
+	ops, _ := listOps(harvest.TenantID)
+	for _, op := range ops {
+		if op.HarvestID != nil && *op.HarvestID == harvest.ID {
+			totalCost += op.Cost
+		}
+	}
+
+	start := harvest.StartDate
+	end := harvest.EndDate
+
+	// Maintenance by date range
+	maints, _ := listMaint(harvest.TenantID)
+	for _, m := range maints {
+		if inDateRange(m.Date, start, end) {
+			totalCost += m.Cost
+		}
+	}
+
+	// WorkShift by date range
+	shifts, _ := listShifts(harvest.TenantID)
+	for _, ws := range shifts {
+		if inDateRange(ws.Date, start, end) {
+			totalCost += ws.Cost
+		}
+	}
+
+	// FinancialTransaction (despesas) by date range
+	transactions, _ := listFin(harvest.TenantID)
+	for _, ft := range transactions {
+		if ft.Type == entity.TranDespesa && inDateRange(ft.Date, start, end) {
+			totalCost += ft.Amount
+		}
+	}
+
+	// CostAllocation by HarvestID
+	allocs, _ := listAllocs(harvest.ID)
+	for _, a := range allocs {
+		totalCost += a.TotalAmount
+	}
+
+	return totalCost
+}
+
+func (s *HarvestService) calculateTotalCostWithRepos(harvest *entity.Harvest, repos repository.TransactionProvider) float64 {
+	var totalCost float64
+
+	ops, _ := repos.Operation().ListByTenant(harvest.TenantID)
+	for _, op := range ops {
+		if op.HarvestID != nil && *op.HarvestID == harvest.ID {
+			totalCost += op.Cost
+		}
+	}
+
+	start := harvest.StartDate
+	end := harvest.EndDate
+
+	maints, _ := repos.Maintenance().ListByTenant(harvest.TenantID)
+	for _, m := range maints {
+		if inDateRange(m.Date, start, end) {
+			totalCost += m.Cost
+		}
+	}
+
+	shifts, _ := repos.WorkShift().ListByTenant(harvest.TenantID)
+	for _, ws := range shifts {
+		if inDateRange(ws.Date, start, end) {
+			totalCost += ws.Cost
+		}
+	}
+
+	transactions, _ := repos.Financial().ListByTenant(harvest.TenantID)
+	for _, ft := range transactions {
+		if ft.Type == entity.TranDespesa && inDateRange(ft.Date, start, end) {
+			totalCost += ft.Amount
+		}
+	}
+
+	allocs, _ := repos.CostAllocation().ListByHarvest(harvest.ID)
+	for _, a := range allocs {
+		totalCost += a.TotalAmount
+	}
+
+	return totalCost
+}
+
+func inDateRange(d time.Time, start, end *time.Time) bool {
+	if start != nil && d.Before(*start) {
+		return false
+	}
+	if end != nil && d.After(*end) {
+		return false
+	}
+	return true
 }
 
 func (s *HarvestService) buildIndicators(harvest *entity.Harvest, totalProduction, totalPlantedArea, totalCost float64) []*entity.Indicator {

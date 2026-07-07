@@ -160,12 +160,12 @@ func processStockMovement(tenantID string, payload []byte) error {
 }
 
 type financialPayload struct {
-	Type        string  `json:"type"`
-	Category    string  `json:"category"`
-	Description string  `json:"description"`
-	Amount      float64 `json:"amount"`
-	Date        string  `json:"date"`
-	Notes       string  `json:"notes"`
+	Type         string  `json:"type"`
+	CostCenterID *string `json:"cost_center_id"`
+	Description  string  `json:"description"`
+	Amount       float64 `json:"amount"`
+	Date         string  `json:"date"`
+	Notes        string  `json:"notes"`
 }
 
 func processFinancialTransaction(tenantID string, payload []byte) error {
@@ -175,14 +175,14 @@ func processFinancialTransaction(tenantID string, payload []byte) error {
 	}
 	repo := infraRepo.NewFinancialRepository(db)
 	tx := &entity.FinancialTransaction{
-		ID:          uuid.New().String(),
-		TenantID:    tenantID,
-		Type:        entity.TransactionType(p.Type),
-		Category:    p.Category,
-		Description: p.Description,
-		Amount:      p.Amount,
-		Date:        parseTime(p.Date),
-		Status:      "pending",
+		ID:           uuid.New().String(),
+		TenantID:     tenantID,
+		Type:         entity.TransactionType(p.Type),
+		CostCenterID: p.CostCenterID,
+		Description:  p.Description,
+		Amount:       p.Amount,
+		Date:         parseTime(p.Date),
+		Status:       "pending",
 	}
 	return repo.Create(tx)
 }

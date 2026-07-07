@@ -17,7 +17,7 @@ func NewFinancialService(repo repository.FinancialRepository) *FinancialService 
 	return &FinancialService{repo: repo}
 }
 
-func (s *FinancialService) Create(tenantID, txType, category, description string, amount float64, date time.Time, dueDate time.Time, notes string) (*entity.FinancialTransaction, error) {
+func (s *FinancialService) Create(tenantID, txType string, costCenterID *string, description string, amount float64, date time.Time, dueDate time.Time, notes string) (*entity.FinancialTransaction, error) {
 	if description == "" {
 		return nil, errors.New("description is required")
 	}
@@ -25,17 +25,17 @@ func (s *FinancialService) Create(tenantID, txType, category, description string
 		return nil, errors.New("amount must be greater than zero")
 	}
 	tx := &entity.FinancialTransaction{
-		ID:          uuid.New().String(),
-		TenantID:    tenantID,
-		Type:        entity.TransactionType(txType),
-		Category:    category,
-		Description: description,
-		Amount:      amount,
-		Date:        date,
-		DueDate:     dueDate,
-		Status:      "pending",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		ID:           uuid.New().String(),
+		TenantID:     tenantID,
+		Type:         entity.TransactionType(txType),
+		CostCenterID: costCenterID,
+		Description:  description,
+		Amount:       amount,
+		Date:         date,
+		DueDate:      dueDate,
+		Status:       "pending",
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 	if err := s.repo.Create(tx); err != nil {
 		return nil, err
