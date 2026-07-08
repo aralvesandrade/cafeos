@@ -126,7 +126,7 @@ interface FarmFormProps {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-coffee-green-dark border-b border-gray-200 pb-1">{title}</h3>
+      <h3 className="text-sm font-semibold text-primary border-b border-border pb-1">{title}</h3>
       {children}
     </div>
   )
@@ -135,7 +135,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-coffee-text mb-1">{label}</label>
+      <label className="block text-sm font-medium text-foreground mb-1">{label}</label>
       {children}
     </div>
   )
@@ -157,8 +157,8 @@ function DocField({
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label className="block text-sm font-medium text-coffee-text">{label}</label>
-        <label className="flex items-center gap-1 text-xs text-coffee-text-light">
+        <label className="block text-sm font-medium text-foreground">{label}</label>
+        <label className="flex items-center gap-1 text-xs text-muted-foreground">
           <input type="checkbox" checked={hasNone} onChange={(e) => onHasNoneChange(e.target.checked)} />
           Não possui
         </label>
@@ -240,7 +240,7 @@ export function FarmForm({ initial, onSave, onCancel, loading }: FarmFormProps) 
 
       <Section title="Dados gerais da propriedade">
         <div className="grid grid-cols-3 gap-4 items-end">
-          <label className="flex items-center gap-2 text-sm text-coffee-text">
+          <label className="flex items-center gap-2 text-sm text-foreground">
             <input type="checkbox" checked={form.fully_leased} onChange={(e) => set('fully_leased', e.target.checked)} />
             Propriedade totalmente arrendada?
           </label>
@@ -338,7 +338,7 @@ export function FarmForm({ initial, onSave, onCancel, loading }: FarmFormProps) 
         </div>
       </Section>
 
-      <div className="flex justify-end gap-3 pt-2 sticky bottom-0 bg-white">
+      <div className="flex justify-end gap-3 pt-2 sticky bottom-0 bg-background">
         <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
         <Button type="submit" disabled={loading}>
           {loading ? 'Salvando...' : 'Salvar'}

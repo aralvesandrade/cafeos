@@ -24,11 +24,11 @@ export function ProductionChart({ data }: { data: ProductionData[] }) {
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="year" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="year" tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }} />
+              <YAxis tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }} />
               <Tooltip />
-              <Bar dataKey="production" fill="#2E7D32" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="production" fill="var(--primary)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

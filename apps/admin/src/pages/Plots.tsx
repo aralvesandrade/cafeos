@@ -170,14 +170,14 @@ export function Plots() {
     setDialogOpen(true)
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-coffee-text-light">Carregando...</div>
+  if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-coffee-green-dark">Talhões</h1>
-          <p className="text-sm text-coffee-text-light">Gerencie os talhões das suas fazendas</p>
+          <h1 className="text-2xl font-bold text-primary">Talhões</h1>
+          <p className="text-sm text-muted-foreground">Gerencie os talhões das suas fazendas</p>
         </div>
         <Button onClick={openCreate}><Plus className="h-4 w-4" /> Novo Talhão</Button>
       </div>
@@ -199,7 +199,7 @@ export function Plots() {
           {plots.map((plot) => (
             <TableRow key={plot.id}>
               <TableCell className="font-medium">
-                <Link to={`/plots/${plot.id}`} className="text-coffee-green hover:underline">
+                <Link to={`/plots/${plot.id}`} className="text-primary hover:underline">
                   {plot.name}
                 </Link>
               </TableCell>
@@ -221,13 +221,13 @@ export function Plots() {
                     </Link>
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => openEdit(plot)}><Pencil className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleDelete(plot.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
+                  <Button variant="ghost" size="sm" onClick={() => handleDelete(plot.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                 </div>
               </TableCell>
             </TableRow>
           ))}
           {plots.length === 0 && (
-            <TableRow><TableCell colSpan={8} className="text-center text-coffee-text-light py-8">Nenhum talhão cadastrado.</TableCell></TableRow>
+            <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">Nenhum talhão cadastrado.</TableCell></TableRow>
           )}
         </TableBody>
       </Table>

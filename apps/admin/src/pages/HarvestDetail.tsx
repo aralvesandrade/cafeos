@@ -104,13 +104,13 @@ export function HarvestDetail() {
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64 text-coffee-text-light">Carregando...</div>
+    return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
   }
 
   if (!harvest) {
     return (
       <div className="text-center py-16">
-        <p className="text-coffee-text-light mb-4">Safra não encontrada.</p>
+        <p className="text-muted-foreground mb-4">Safra não encontrada.</p>
         <Button variant="outline" onClick={() => navigate('/harvests')}>Voltar</Button>
       </div>
     )
@@ -126,7 +126,7 @@ export function HarvestDetail() {
           <Button variant="ghost" size="sm" onClick={() => navigate('/harvests')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold text-coffee-green-dark flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
             <Calendar className="h-6 w-6" />
             Safra {harvest.year}
           </h1>
@@ -145,42 +145,42 @@ export function HarvestDetail() {
       </div>
 
       {harvest.description && (
-        <p className="text-coffee-text-light -mt-4">{harvest.description}</p>
+        <p className="text-muted-foreground -mt-4">{harvest.description}</p>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Package className="h-4 w-4 text-coffee-green" />
-            <CardTitle className="text-sm font-medium text-coffee-text-light">Estimativa</CardTitle>
+            <Package className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Estimativa</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold text-coffee-text">{harvest.estimated_production} sacas</p>
+            <p className="text-lg font-semibold text-foreground">{harvest.estimated_production} sacas</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Package className="h-4 w-4 text-coffee-green" />
-            <CardTitle className="text-sm font-medium text-coffee-text-light">Produzido</CardTitle>
+            <Package className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Produzido</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold text-coffee-text">{totalProduced} sacas</p>
+            <p className="text-lg font-semibold text-foreground">{totalProduced} sacas</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Calendar className="h-4 w-4 text-coffee-green" />
-            <CardTitle className="text-sm font-medium text-coffee-text-light">Criada em</CardTitle>
+            <Calendar className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Criada em</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold text-coffee-text">{harvest.created_at}</p>
+            <p className="text-lg font-semibold text-foreground">{harvest.created_at}</p>
           </CardContent>
         </Card>
       </div>
 
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-coffee-green-dark flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-primary flex items-center gap-2">
             <Package className="h-5 w-5" />
             Produção
           </h2>
@@ -208,14 +208,14 @@ export function HarvestDetail() {
                 <TableRow key={p.id}>
                   <TableCell className="font-medium">{plot?.name || p.plot_id}</TableCell>
                   <TableCell>{p.quantity}</TableCell>
-                  <TableCell className="text-coffee-text-light">{p.notes || '—'}</TableCell>
+                  <TableCell className="text-muted-foreground">{p.notes || '—'}</TableCell>
                   <TableCell>{p.recorded_at}</TableCell>
                 </TableRow>
               )
             })}
             {productions.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-coffee-text-light py-8">
+                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                   Nenhuma produção registrada.
                 </TableCell>
               </TableRow>
@@ -231,7 +231,7 @@ export function HarvestDetail() {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-coffee-text mb-1">Talhão</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Talhão</label>
             <Select value={form.plot_id} onChange={(e) => setForm({ ...form, plot_id: e.target.value })} required>
               <option value="">Selecione...</option>
               {plots.map((pl) => (
@@ -240,7 +240,7 @@ export function HarvestDetail() {
             </Select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-coffee-text mb-1">Quantidade (sacas)</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Quantidade (sacas)</label>
             <Input
               type="number"
               step="0.01"
@@ -250,7 +250,7 @@ export function HarvestDetail() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-coffee-text mb-1">Observações</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Observações</label>
             <Input
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}

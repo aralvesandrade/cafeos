@@ -65,14 +65,14 @@ export function Harvests() {
     }
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-coffee-text-light">Carregando...</div>
+  if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-coffee-green-dark">Safras</h1>
-          <p className="text-sm text-coffee-text-light">Gerencie as safras da sua propriedade</p>
+          <h1 className="text-2xl font-bold text-primary">Safras</h1>
+          <p className="text-sm text-muted-foreground">Gerencie as safras da sua propriedade</p>
         </div>
         <Button onClick={() => setDialogOpen(true)}><Plus className="h-4 w-4" /> Nova Safra</Button>
       </div>
@@ -91,7 +91,7 @@ export function Harvests() {
           {harvests.map((h) => (
             <TableRow key={h.id}>
               <TableCell className="font-medium">
-                <Link to={`/harvests/${h.id}`} className="flex items-center gap-2 text-coffee-green hover:underline">
+                <Link to={`/harvests/${h.id}`} className="flex items-center gap-2 text-primary hover:underline">
                   <Calendar className="h-4 w-4" />
                   {h.year}
                 </Link>
@@ -120,7 +120,7 @@ export function Harvests() {
             </TableRow>
           ))}
           {harvests.length === 0 && (
-            <TableRow><TableCell colSpan={5} className="text-center text-coffee-text-light py-8">Nenhuma safra cadastrada.</TableCell></TableRow>
+            <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhuma safra cadastrada.</TableCell></TableRow>
           )}
         </TableBody>
       </Table>
@@ -128,11 +128,11 @@ export function Harvests() {
       <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setYear(''); setEstimated('') }} title="Nova Safra">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-coffee-text mb-1">Ano da Safra</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Ano da Safra</label>
             <Input type="text" value={year} onChange={(e) => setYear(e.target.value)} placeholder="2025/2026" required />
           </div>
           <div>
-            <label className="block text-sm font-medium text-coffee-text mb-1">Estimativa de Produção (sacas)</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Estimativa de Produção (sacas)</label>
             <Input type="number" value={estimated} onChange={(e) => setEstimated(e.target.value)} required />
           </div>
           <div className="flex justify-end gap-3 pt-2">

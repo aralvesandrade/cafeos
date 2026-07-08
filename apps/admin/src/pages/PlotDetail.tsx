@@ -76,13 +76,13 @@ export function PlotDetail() {
   useEffect(() => { load() }, [load])
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64 text-coffee-text-light">Carregando...</div>
+    return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
   }
 
   if (!plot) {
     return (
       <div className="text-center py-16">
-        <p className="text-coffee-text-light mb-4">Talhão não encontrado.</p>
+        <p className="text-muted-foreground mb-4">Talhão não encontrado.</p>
         <Button variant="outline" onClick={() => navigate('/plots')}>Voltar</Button>
       </div>
     )
@@ -94,12 +94,12 @@ export function PlotDetail() {
         <Button variant="ghost" size="sm" onClick={() => navigate('/plots')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-2xl font-bold text-coffee-green-dark">{plot.name}</h1>
+        <h1 className="text-2xl font-bold text-primary">{plot.name}</h1>
       </div>
 
       {farm && (
-        <p className="text-sm text-coffee-text-light flex items-center gap-1 -mt-4">
-          Fazenda: <Link to={`/farms/${farm.id}`} className="text-coffee-green hover:underline font-medium">{farm.name}</Link>
+        <p className="text-sm text-muted-foreground flex items-center gap-1 -mt-4">
+          Fazenda: <Link to={`/farms/${farm.id}`} className="text-primary hover:underline font-medium">{farm.name}</Link>
         </p>
       )}
 
@@ -114,102 +114,102 @@ export function PlotDetail() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Ruler className="h-4 w-4 text-coffee-green" />
-            <CardTitle className="text-sm font-medium text-coffee-text-light">Área</CardTitle>
+            <Ruler className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Área</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold text-coffee-text">{plot.area_ha} ha</p>
+            <p className="text-lg font-semibold text-foreground">{plot.area_ha} ha</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Sprout className="h-4 w-4 text-coffee-green" />
-            <CardTitle className="text-sm font-medium text-coffee-text-light">Cultivar</CardTitle>
+            <Sprout className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Cultivar</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold text-coffee-text">{plot.cultivar || '—'}</p>
+            <p className="text-lg font-semibold text-foreground">{plot.cultivar || '—'}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Grid3X3 className="h-4 w-4 text-coffee-green" />
-            <CardTitle className="text-sm font-medium text-coffee-text-light">Tipo de Solo</CardTitle>
+            <Grid3X3 className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Tipo de Solo</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold text-coffee-text capitalize">{plot.soil_type || '—'}</p>
+            <p className="text-lg font-semibold text-foreground capitalize">{plot.soil_type || '—'}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Mountain className="h-4 w-4 text-coffee-green" />
-            <CardTitle className="text-sm font-medium text-coffee-text-light">Altitude</CardTitle>
+            <Mountain className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Altitude</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold text-coffee-text">{plot.altitude} m</p>
+            <p className="text-lg font-semibold text-foreground">{plot.altitude} m</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <CalendarDays className="h-4 w-4 text-coffee-green" />
-            <CardTitle className="text-sm font-medium text-coffee-text-light">Ano Plantio</CardTitle>
+            <CalendarDays className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Ano Plantio</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold text-coffee-text">{plot.planting_year}</p>
+            <p className="text-lg font-semibold text-foreground">{plot.planting_year}</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader className="flex flex-row items-center gap-2 pb-2">
-          <Droplets className="h-4 w-4 text-coffee-green" />
-          <CardTitle className="text-sm font-medium text-coffee-text-light">Informações da atividade</CardTitle>
+          <Droplets className="h-4 w-4 text-primary" />
+          <CardTitle className="text-sm font-medium text-muted-foreground">Informações da atividade</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
-              <p className="text-coffee-text-light">Tipo</p>
-              <p className="font-medium text-coffee-text capitalize">{plot.crop_type || '—'}</p>
+              <p className="text-muted-foreground">Tipo</p>
+              <p className="font-medium text-foreground capitalize">{plot.crop_type || '—'}</p>
             </div>
             <div>
-              <p className="text-coffee-text-light">Irrigação</p>
-              <p className="font-medium text-coffee-text">{plot.irrigation || '—'}</p>
+              <p className="text-muted-foreground">Irrigação</p>
+              <p className="font-medium text-foreground">{plot.irrigation || '—'}</p>
             </div>
             <div>
-              <p className="text-coffee-text-light">Custo de formação/ha</p>
-              <p className="font-medium text-coffee-text">{plot.formation_cost_per_ha ? `R$ ${plot.formation_cost_per_ha.toFixed(2)}` : '—'}</p>
+              <p className="text-muted-foreground">Custo de formação/ha</p>
+              <p className="font-medium text-foreground">{plot.formation_cost_per_ha ? `R$ ${plot.formation_cost_per_ha.toFixed(2)}` : '—'}</p>
             </div>
             <div>
-              <p className="text-coffee-text-light">Vida útil</p>
-              <p className="font-medium text-coffee-text">{plot.useful_life_years ? `${plot.useful_life_years} anos` : '—'}</p>
+              <p className="text-muted-foreground">Vida útil</p>
+              <p className="font-medium text-foreground">{plot.useful_life_years ? `${plot.useful_life_years} anos` : '—'}</p>
             </div>
             <div>
-              <p className="text-coffee-text-light">Espaçamento (linha x planta)</p>
-              <p className="font-medium text-coffee-text">{plot.row_spacing_m || plot.plant_spacing_m ? `${plot.row_spacing_m} x ${plot.plant_spacing_m} m` : '—'}</p>
+              <p className="text-muted-foreground">Espaçamento (linha x planta)</p>
+              <p className="font-medium text-foreground">{plot.row_spacing_m || plot.plant_spacing_m ? `${plot.row_spacing_m} x ${plot.plant_spacing_m} m` : '—'}</p>
             </div>
             <div>
-              <p className="text-coffee-text-light">Nº de plantas</p>
-              <p className="font-medium text-coffee-text">{plot.plant_count || '—'}</p>
+              <p className="text-muted-foreground">Nº de plantas</p>
+              <p className="font-medium text-foreground">{plot.plant_count || '—'}</p>
             </div>
             <div>
-              <p className="text-coffee-text-light">Data de plantio</p>
-              <p className="font-medium text-coffee-text">{plot.planting_date ? new Date(plot.planting_date).toLocaleDateString('pt-BR') : '—'}</p>
+              <p className="text-muted-foreground">Data de plantio</p>
+              <p className="font-medium text-foreground">{plot.planting_date ? new Date(plot.planting_date).toLocaleDateString('pt-BR') : '—'}</p>
             </div>
             <div>
-              <p className="text-coffee-text-light">Data de ativação</p>
-              <p className="font-medium text-coffee-text">{plot.activation_date ? new Date(plot.activation_date).toLocaleDateString('pt-BR') : '—'}</p>
+              <p className="text-muted-foreground">Data de ativação</p>
+              <p className="font-medium text-foreground">{plot.activation_date ? new Date(plot.activation_date).toLocaleDateString('pt-BR') : '—'}</p>
             </div>
           </div>
           {plot.notes && (
             <div className="mt-4 text-sm">
-              <p className="text-coffee-text-light">Observações</p>
-              <p className="font-medium text-coffee-text">{plot.notes}</p>
+              <p className="text-muted-foreground">Observações</p>
+              <p className="font-medium text-foreground">{plot.notes}</p>
             </div>
           )}
         </CardContent>
       </Card>
 
       <div>
-        <h2 className="text-xl font-semibold text-coffee-green-dark flex items-center gap-2 mb-4">
+        <h2 className="text-xl font-semibold text-primary flex items-center gap-2 mb-4">
           <Tractor className="h-5 w-5" />
           Operações
         </h2>
@@ -238,7 +238,7 @@ export function PlotDetail() {
             ))}
             {operations.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-coffee-text-light py-8">
+                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                   Nenhuma operação registrada para este talhão.
                 </TableCell>
               </TableRow>

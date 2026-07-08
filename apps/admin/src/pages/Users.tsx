@@ -85,14 +85,14 @@ export function Users() {
     } catch (err) { console.error(err) }
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-coffee-text-light">Carregando...</div>
+  if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-coffee-green-dark">Usuários</h1>
-          <p className="text-sm text-coffee-text-light">Gerenciar usuários do sistema</p>
+          <h1 className="text-2xl font-bold text-primary">Usuários</h1>
+          <p className="text-sm text-muted-foreground">Gerenciar usuários do sistema</p>
         </div>
         <Button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: '', role: '', tenant_id: '' }); setDialogOpen(true) }}>
           <Plus className="h-4 w-4" /> Novo Usuário
@@ -117,13 +117,13 @@ export function Users() {
               <TableRow key={u.id}>
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-coffee-green" />
+                    <User className="h-4 w-4 text-primary" />
                     {u.name}
                   </div>
                 </TableCell>
                 <TableCell>{u.email}</TableCell>
                 <TableCell><Badge>{roleLabels[u.role] || u.role}</Badge></TableCell>
-                <TableCell className="text-coffee-text-light text-sm">
+                <TableCell className="text-muted-foreground text-sm">
                   <div className="flex items-center gap-1">
                     <Building2 className="h-3 w-3" />
                     {tenantName}
@@ -140,7 +140,7 @@ export function Users() {
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => handleDelete(u.id)}>
-                      <Trash2 className="h-4 w-4 text-red-500" />
+                      <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
                 </TableCell>
@@ -148,7 +148,7 @@ export function Users() {
             )
           })}
           {users.length === 0 && (
-            <TableRow><TableCell colSpan={6} className="text-center text-coffee-text-light py-8">Nenhum usuário cadastrado.</TableCell></TableRow>
+            <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhum usuário cadastrado.</TableCell></TableRow>
           )}
         </TableBody>
       </Table>
@@ -156,22 +156,22 @@ export function Users() {
       <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Usuário' : 'Novo Usuário'}>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-coffee-text mb-1">Nome</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Nome</label>
             <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           </div>
           <div>
-            <label className="block text-sm font-medium text-coffee-text mb-1">Email</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Email</label>
             <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
           </div>
           {!editing && (
             <div>
-              <label className="block text-sm font-medium text-coffee-text mb-1">Senha</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Senha</label>
               <Input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium text-coffee-text mb-1">Perfil</label>
-            <select className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-coffee-text" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
+            <label className="block text-sm font-medium text-foreground mb-1">Perfil</label>
+            <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
               {Object.entries(roleLabels).map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}
@@ -179,8 +179,8 @@ export function Users() {
           </div>
           {!editing && (
             <div>
-              <label className="block text-sm font-medium text-coffee-text mb-1">Tenant</label>
-              <select className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-coffee-text" value={form.tenant_id} onChange={(e) => setForm({ ...form, tenant_id: e.target.value })}>
+              <label className="block text-sm font-medium text-foreground mb-1">Tenant</label>
+              <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.tenant_id} onChange={(e) => setForm({ ...form, tenant_id: e.target.value })}>
                 <option value="">Selecione um tenant</option>
                 {tenants.map((t) => (
                   <option key={t.id} value={t.id}>{t.name}</option>

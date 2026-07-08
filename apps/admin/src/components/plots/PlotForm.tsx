@@ -82,7 +82,7 @@ interface PlotFormProps {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-coffee-green-dark border-b border-gray-200 pb-1">{title}</h3>
+      <h3 className="text-sm font-semibold text-primary border-b border-border pb-1">{title}</h3>
       {children}
     </div>
   )
@@ -91,7 +91,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-coffee-text mb-1">{label}</label>
+      <label className="block text-sm font-medium text-foreground mb-1">{label}</label>
       {children}
     </div>
   )
@@ -115,7 +115,7 @@ export function PlotForm({ initial, farms, onSave, onCancel, loading }: PlotForm
     <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto pr-1">
       <Section title="Informações do talhão">
         <div className="grid grid-cols-2 gap-4">
-          <label className="flex items-center gap-2 text-sm text-coffee-text col-span-2">
+          <label className="flex items-center gap-2 text-sm text-foreground col-span-2">
             <input type="checkbox" checked={form.leased} onChange={(e) => set('leased', e.target.checked)} />
             Arrendado?
           </label>
@@ -149,7 +149,7 @@ export function PlotForm({ initial, farms, onSave, onCancel, loading }: PlotForm
           <Field label="Data Desativação">
             <Input type="date" value={form.deactivation_date} onChange={(e) => set('deactivation_date', e.target.value)} />
           </Field>
-          <label className="flex items-center gap-2 text-sm text-coffee-text">
+          <label className="flex items-center gap-2 text-sm text-foreground">
             <input type="checkbox" checked={form.intercropped} onChange={(e) => set('intercropped', e.target.checked)} />
             Consorciada
           </label>
@@ -229,7 +229,7 @@ export function PlotForm({ initial, farms, onSave, onCancel, loading }: PlotForm
         </div>
       </Section>
 
-      <div className="flex justify-end gap-3 pt-2 sticky bottom-0 bg-white">
+      <div className="flex justify-end gap-3 pt-2 sticky bottom-0 bg-background">
         <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
         <Button type="submit" disabled={loading}>
           {loading ? 'Salvando...' : 'Salvar'}

@@ -244,15 +244,15 @@ export function Farms() {
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64 text-coffee-text-light">Carregando...</div>
+    return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-coffee-green-dark">Fazendas</h1>
-          <p className="text-sm text-coffee-text-light">Gerencie suas propriedades rurais</p>
+          <h1 className="text-2xl font-bold text-primary">Fazendas</h1>
+          <p className="text-sm text-muted-foreground">Gerencie suas propriedades rurais</p>
         </div>
         <Button onClick={openCreate}>
           <Plus className="h-4 w-4" />

@@ -55,14 +55,14 @@ export function Tenants() {
     }
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-coffee-text-light">Carregando...</div>
+  if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-coffee-green-dark">Tenants</h1>
-          <p className="text-sm text-coffee-text-light">Gerenciar clientes da plataforma</p>
+          <h1 className="text-2xl font-bold text-primary">Tenants</h1>
+          <p className="text-sm text-muted-foreground">Gerenciar clientes da plataforma</p>
         </div>
         <Button onClick={() => { setEditing(null); setForm({ name: '', plan: 'free' }); setDialogOpen(true) }}>
           <Plus className="h-4 w-4" /> Novo Tenant
@@ -84,11 +84,11 @@ export function Tenants() {
             <TableRow key={t.id}>
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4 text-coffee-green" />
+                  <Building2 className="h-4 w-4 text-primary" />
                   {t.name}
                 </div>
               </TableCell>
-              <TableCell className="text-coffee-text-light text-sm">{t.slug}</TableCell>
+              <TableCell className="text-muted-foreground text-sm">{t.slug}</TableCell>
               <TableCell><Badge>{t.plan}</Badge></TableCell>
               <TableCell>
                 <Badge variant={t.status === 'active' ? 'success' : 'default'}>
@@ -103,7 +103,7 @@ export function Tenants() {
             </TableRow>
           ))}
           {tenants.length === 0 && (
-            <TableRow><TableCell colSpan={5} className="text-center text-coffee-text-light py-8">Nenhum tenant cadastrado.</TableCell></TableRow>
+            <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhum tenant cadastrado.</TableCell></TableRow>
           )}
         </TableBody>
       </Table>
@@ -111,12 +111,12 @@ export function Tenants() {
       <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Tenant' : 'Novo Tenant'}>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-coffee-text mb-1">Nome</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Nome</label>
             <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           </div>
           <div>
-            <label className="block text-sm font-medium text-coffee-text mb-1">Plano</label>
-            <select className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-coffee-text" value={form.plan} onChange={(e) => setForm({ ...form, plan: e.target.value })}>
+            <label className="block text-sm font-medium text-foreground mb-1">Plano</label>
+            <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.plan} onChange={(e) => setForm({ ...form, plan: e.target.value })}>
               <option value="free">Grátis</option>
               <option value="pro">Pro</option>
               <option value="cooperativa">Cooperativa</option>

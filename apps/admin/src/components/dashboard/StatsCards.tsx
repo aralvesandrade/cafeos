@@ -21,12 +21,12 @@ export function StatsCards({ stats }: { stats: Stats }) {
       {items.map((item) => (
         <Card key={item.label}>
           <CardContent className="flex items-center gap-4 p-4">
-            <div className="w-10 h-10 rounded-lg bg-coffee-green/10 flex items-center justify-center text-coffee-green">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
               <item.icon className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs text-coffee-text-light">{item.label}</p>
-              <p className="text-xl font-bold text-coffee-green-dark">{item.value}</p>
+              <p className="text-xs text-muted-foreground">{item.label}</p>
+              <p className="text-xl font-bold text-primary">{item.value}</p>
             </div>
           </CardContent>
         </Card>

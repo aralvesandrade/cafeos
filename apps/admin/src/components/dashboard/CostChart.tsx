@@ -24,16 +24,16 @@ export function CostChart({ data }: { data: CostData[] }) {
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="year" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="year" tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }} />
+              <YAxis tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }} />
               <Tooltip />
               <Line
                 type="monotone"
                 dataKey="cost"
-                stroke="#795548"
+                stroke="var(--primary)"
                 strokeWidth={2}
-                dot={{ fill: '#795548', r: 4 }}
+                dot={{ fill: 'var(--primary)', r: 4 }}
               />
             </LineChart>
           </ResponsiveContainer>

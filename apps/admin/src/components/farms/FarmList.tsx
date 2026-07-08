@@ -27,7 +27,7 @@ export function FarmList({ farms, onEdit, onDelete }: FarmListProps) {
         {farms.map((farm) => (
           <TableRow key={farm.id}>
             <TableCell className="font-medium">
-              <Link to={`/farms/${farm.id}`} className="text-coffee-green hover:underline">
+              <Link to={`/farms/${farm.id}`} className="text-primary hover:underline">
                 {farm.name}
               </Link>
             </TableCell>
@@ -46,7 +46,7 @@ export function FarmList({ farms, onEdit, onDelete }: FarmListProps) {
                   <Pencil className="h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => onDelete(farm.id)}>
-                  <Trash2 className="h-4 w-4 text-red-500" />
+                  <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </div>
             </TableCell>
@@ -54,7 +54,7 @@ export function FarmList({ farms, onEdit, onDelete }: FarmListProps) {
         ))}
         {farms.length === 0 && (
           <TableRow>
-            <TableCell colSpan={6} className="text-center text-coffee-text-light py-8">
+            <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
               Nenhuma fazenda cadastrada.
             </TableCell>
           </TableRow>

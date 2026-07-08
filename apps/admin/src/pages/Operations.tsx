@@ -51,17 +51,17 @@ export function Operations() {
       (op.responsible || '').toLowerCase().includes(search.toLowerCase())
   )
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-coffee-text-light">Carregando...</div>
+  if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-coffee-green-dark">Operações</h1>
-        <p className="text-sm text-coffee-text-light">Histórico de operações agrícolas</p>
+        <h1 className="text-2xl font-bold text-primary">Operações</h1>
+        <p className="text-sm text-muted-foreground">Histórico de operações agrícolas</p>
       </div>
 
       <div className="relative w-full max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           className="pl-9"
           placeholder="Buscar por talhão, tipo, responsável..."
@@ -88,7 +88,7 @@ export function Operations() {
               <TableCell>{new Date(op.date).toLocaleDateString()}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <Tractor className="h-4 w-4 text-coffee-green" />
+                  <Tractor className="h-4 w-4 text-primary" />
                   <Badge variant={typeColors[op.type] || 'default'}>{op.type}</Badge>
                 </div>
               </TableCell>
@@ -100,7 +100,7 @@ export function Operations() {
             </TableRow>
           ))}
           {filtered.length === 0 && (
-            <TableRow><TableCell colSpan={7} className="text-center text-coffee-text-light py-8">Nenhuma operação encontrada.</TableCell></TableRow>
+            <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhuma operação encontrada.</TableCell></TableRow>
           )}
         </TableBody>
       </Table>

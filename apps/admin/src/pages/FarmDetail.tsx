@@ -69,13 +69,13 @@ export function FarmDetail() {
   useEffect(() => { load() }, [load])
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64 text-coffee-text-light">Carregando...</div>
+    return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
   }
 
   if (!farm) {
     return (
       <div className="text-center py-16">
-        <p className="text-coffee-text-light mb-4">Fazenda não encontrada.</p>
+        <p className="text-muted-foreground mb-4">Fazenda não encontrada.</p>
         <Button variant="outline" onClick={() => navigate('/farms')}>Voltar</Button>
       </div>
     )
@@ -87,44 +87,44 @@ export function FarmDetail() {
         <Button variant="ghost" size="sm" onClick={() => navigate('/farms')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-2xl font-bold text-coffee-green-dark">{farm.name}</h1>
+        <h1 className="text-2xl font-bold text-primary">{farm.name}</h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <HardHat className="h-4 w-4 text-coffee-green" />
-            <CardTitle className="text-sm font-medium text-coffee-text-light">Proprietário</CardTitle>
+            <HardHat className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Proprietário</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold text-coffee-text">{farm.owner || '—'}</p>
+            <p className="text-lg font-semibold text-foreground">{farm.owner || '—'}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Map className="h-4 w-4 text-coffee-green" />
-            <CardTitle className="text-sm font-medium text-coffee-text-light">Localização</CardTitle>
+            <Map className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Localização</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold text-coffee-text">{farm.location || '—'}</p>
+            <p className="text-lg font-semibold text-foreground">{farm.location || '—'}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Ruler className="h-4 w-4 text-coffee-green" />
-            <CardTitle className="text-sm font-medium text-coffee-text-light">Área Total</CardTitle>
+            <Ruler className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Área Total</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold text-coffee-text">{farm.total_area_ha} ha</p>
+            <p className="text-lg font-semibold text-foreground">{farm.total_area_ha} ha</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Ruler className="h-4 w-4 text-coffee-green" />
-            <CardTitle className="text-sm font-medium text-coffee-text-light">Área Plantada</CardTitle>
+            <Ruler className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Área Plantada</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold text-coffee-text">{farm.planted_area_ha} ha</p>
+            <p className="text-lg font-semibold text-foreground">{farm.planted_area_ha} ha</p>
           </CardContent>
         </Card>
       </div>
@@ -132,26 +132,26 @@ export function FarmDetail() {
       {farm.producer && (
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <User className="h-4 w-4 text-coffee-green" />
-            <CardTitle className="text-sm font-medium text-coffee-text-light">Produtor</CardTitle>
+            <User className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Produtor</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <p className="text-coffee-text-light">Nome</p>
-                <p className="font-medium text-coffee-text">{farm.producer.name || '—'}</p>
+                <p className="text-muted-foreground">Nome</p>
+                <p className="font-medium text-foreground">{farm.producer.name || '—'}</p>
               </div>
               <div>
-                <p className="text-coffee-text-light">CPF</p>
-                <p className="font-medium text-coffee-text">{farm.producer.cpf || '—'}</p>
+                <p className="text-muted-foreground">CPF</p>
+                <p className="font-medium text-foreground">{farm.producer.cpf || '—'}</p>
               </div>
               <div>
-                <p className="text-coffee-text-light">Telefone</p>
-                <p className="font-medium text-coffee-text">{farm.producer.phone || '—'}</p>
+                <p className="text-muted-foreground">Telefone</p>
+                <p className="font-medium text-foreground">{farm.producer.phone || '—'}</p>
               </div>
               <div>
-                <p className="text-coffee-text-light">E-mail</p>
-                <p className="font-medium text-coffee-text">{farm.producer.email || '—'}</p>
+                <p className="text-muted-foreground">E-mail</p>
+                <p className="font-medium text-foreground">{farm.producer.email || '—'}</p>
               </div>
             </div>
           </CardContent>
@@ -160,7 +160,7 @@ export function FarmDetail() {
 
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-coffee-green-dark flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-primary flex items-center gap-2">
             <Grid3X3 className="h-5 w-5" />
             Talhões
           </h2>
@@ -199,7 +199,7 @@ export function FarmDetail() {
             ))}
             {plots.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-coffee-text-light py-8">
+                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                   Nenhum talhão cadastrado nesta fazenda.
                 </TableCell>
               </TableRow>

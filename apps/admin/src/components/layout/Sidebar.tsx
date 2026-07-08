@@ -58,16 +58,18 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
       <aside
         className={cn(
-          'fixed top-0 left-0 z-50 h-full w-64 bg-coffee-green-dark text-white flex flex-col transition-transform lg:translate-x-0 lg:static lg:z-auto',
+          'fixed top-0 left-0 z-50 h-full w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col transition-transform lg:translate-x-0 lg:static lg:z-auto',
           open ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <div className="flex items-center justify-between px-4 h-16 border-b border-white/10">
-          <NavLink to="/" className="flex items-center gap-2 font-bold text-lg">
-            <Sprout className="h-6 w-6" />
+        <div className="flex items-center justify-between px-4 h-16 border-b border-sidebar-border">
+          <NavLink to="/" className="flex items-center gap-2 font-bold text-lg text-foreground">
+            <span className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
+              <Sprout className="h-4 w-4" />
+            </span>
             CafeOS
           </NavLink>
-          <button onClick={onClose} className="lg:hidden text-white/60 hover:text-white">
+          <button onClick={onClose} className="lg:hidden text-sidebar-foreground/60 hover:text-sidebar-foreground">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -83,8 +85,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 cn(
                   'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
                   isActive
-                    ? 'bg-white/20 text-white font-medium'
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                    ? 'bg-sidebar-active-bg text-sidebar-active-foreground font-medium'
+                    : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50'
                 )
               }
             >
@@ -93,8 +95,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             </NavLink>
           ))}
 
-          <div className="pt-4 mt-4 border-t border-white/10">
-            <p className="px-3 text-xs font-medium text-white/40 uppercase tracking-wider mb-2">
+          <div className="pt-4 mt-4 border-t border-sidebar-border">
+            <p className="px-3 text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider mb-2">
               Gestão
             </p>
             {phase2Items.map((item) => (
@@ -106,8 +108,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   cn(
                     'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
                     isActive
-                      ? 'bg-white/20 text-white font-medium'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                      ? 'bg-sidebar-active-bg text-sidebar-active-foreground font-medium'
+                      : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50'
                   )
                 }
               >
@@ -118,8 +120,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </div>
 
           {isAdmin && (
-            <div className="pt-4 mt-4 border-t border-white/10">
-              <p className="px-3 text-xs font-medium text-white/40 uppercase tracking-wider mb-2">
+            <div className="pt-4 mt-4 border-t border-sidebar-border">
+              <p className="px-3 text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider mb-2">
                 Administração
               </p>
               {adminItems.map((item) => (
@@ -131,8 +133,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                     cn(
                       'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
                       isActive
-                        ? 'bg-white/20 text-white font-medium'
-                        : 'text-white/70 hover:text-white hover:bg-white/10'
+                        ? 'bg-sidebar-active-bg text-sidebar-active-foreground font-medium'
+                        : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50'
                     )
                   }
                 >

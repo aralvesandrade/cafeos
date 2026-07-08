@@ -28,7 +28,7 @@ export function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64 text-coffee-text-light">
+      <div className="flex items-center justify-center h-64 text-muted-foreground">
         Carregando...
       </div>
     )
@@ -36,7 +36,7 @@ export function Dashboard() {
 
   if (!data) {
     return (
-      <div className="flex items-center justify-center h-64 text-red-600">
+      <div className="flex items-center justify-center h-64 text-destructive">
         Erro ao carregar dashboard.
       </div>
     )
@@ -45,8 +45,8 @@ export function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-coffee-green-dark">Dashboard</h1>
-        <p className="text-sm text-coffee-text-light">Visão geral da sua produção</p>
+        <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
+        <p className="text-sm text-muted-foreground">Visão geral da sua produção</p>
       </div>
 
       <StatsCards

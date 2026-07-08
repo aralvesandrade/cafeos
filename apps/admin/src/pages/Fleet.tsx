@@ -63,11 +63,11 @@ export function Fleet() {
     finally { setSaving(false) }
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-coffee-text-light">Carregando...</div>
+  if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
 
   return (<div className="space-y-6">
     <div className="flex items-center justify-between">
-      <div><h1 className="text-2xl font-bold text-coffee-green-dark">Frota</h1><p className="text-sm text-coffee-text-light">Veículos e manutenções</p></div>
+      <div><h1 className="text-2xl font-bold text-primary">Frota</h1><p className="text-sm text-muted-foreground">Veículos e manutenções</p></div>
       <div className="flex gap-2">
         <Button variant="outline" onClick={() => { setMaintForm({ vehicle_id: '', type: 'preventive', description: '', cost: '', odometer: '', date: '', notes: '' }); setMaintDialogOpen(true) }}><Wrench className="h-4 w-4" /> Nova Manutenção</Button>
         <Button onClick={() => { setEditing(null); setForm({ name: '', type: 'trator', plate: '', brand: '', model: '', year: '' }); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Novo Veículo</Button>
@@ -80,46 +80,46 @@ export function Fleet() {
     {tab === 'vehicles' ? (<Table>
       <TableHead><TableRow><TableHeader>Nome</TableHeader><TableHeader>Tipo</TableHeader><TableHeader>Placa</TableHeader><TableHeader>Marca/Modelo</TableHeader><TableHeader>Ano</TableHeader><TableHeader>Status</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
       <TableBody>{vehicles.map((v) => (<TableRow key={v.id}>
-        <TableCell className="font-medium"><div className="flex items-center gap-2"><Truck className="h-4 w-4 text-coffee-green" />{v.name}</div></TableCell>
+        <TableCell className="font-medium"><div className="flex items-center gap-2"><Truck className="h-4 w-4 text-primary" />{v.name}</div></TableCell>
         <TableCell>{typeLabels[v.type] || v.type}</TableCell><TableCell>{v.plate || '-'}</TableCell>
         <TableCell className="text-sm">{(v.brand || '') + ' ' + (v.model || '')}</TableCell>
         <TableCell>{v.year || '-'}</TableCell>
         <TableCell><Badge variant={v.status === 'maintenance' ? 'warning' : 'success'}>{statusLabels[v.status] || v.status}</Badge></TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
           <Button variant="ghost" size="sm" onClick={() => { setEditing(v); setForm({ name: v.name, type: v.type, plate: v.plate, brand: v.brand, model: v.model, year: String(v.year) }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover veículo?')) apiRequest(`/fleet/vehicles/${v.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-red-500" /></Button>
+          <Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover veículo?')) apiRequest(`/fleet/vehicles/${v.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
         </div></TableCell>
       </TableRow>))}
-      {vehicles.length === 0 && <TableRow><TableCell colSpan={7} className="text-center text-coffee-text-light py-8">Nenhum veículo cadastrado.</TableCell></TableRow>}
+      {vehicles.length === 0 && <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhum veículo cadastrado.</TableCell></TableRow>}
       </TableBody>
     </Table>) : (<Table>
       <TableHead><TableRow><TableHeader>Veículo</TableHeader><TableHeader>Data</TableHeader><TableHeader>Tipo</TableHeader><TableHeader>Descrição</TableHeader><TableHeader>Custo</TableHeader><TableHeader>Horímetro</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
       <TableBody>{maintenance.map((m) => (<TableRow key={m.id}>
-        <TableCell className="font-medium"><div className="flex items-center gap-2"><Truck className="h-4 w-4 text-coffee-green" />{m.vehicle?.name || m.vehicle_id}</div></TableCell>
+        <TableCell className="font-medium"><div className="flex items-center gap-2"><Truck className="h-4 w-4 text-primary" />{m.vehicle?.name || m.vehicle_id}</div></TableCell>
         <TableCell className="text-sm">{m.date}</TableCell>
         <TableCell><Badge variant={m.type === 'corrective' ? 'danger' : 'default'}>{m.type === 'preventive' ? 'Preventiva' : 'Corretiva'}</Badge></TableCell>
         <TableCell className="text-sm">{m.description}</TableCell>
         <TableCell>R$ {m.cost.toFixed(2)}</TableCell>
         <TableCell className="text-sm">{m.odometer}h</TableCell>
-        <TableCell className="text-right"><Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover manutenção?')) apiRequest(`/fleet/maintenance/${m.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-red-500" /></Button></TableCell>
+        <TableCell className="text-right"><Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover manutenção?')) apiRequest(`/fleet/maintenance/${m.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
       </TableRow>))}
-      {maintenance.length === 0 && <TableRow><TableCell colSpan={7} className="text-center text-coffee-text-light py-8">Nenhuma manutenção registrada.</TableCell></TableRow>}
+      {maintenance.length === 0 && <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhuma manutenção registrada.</TableCell></TableRow>}
       </TableBody>
     </Table>)}
     <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Veículo' : 'Novo Veículo'}>
       <div className="space-y-4">
-        <div><label className="block text-sm font-medium text-coffee-text mb-1">Nome</label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
+        <div><label className="block text-sm font-medium text-foreground mb-1">Nome</label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
         <div className="grid grid-cols-2 gap-3">
-          <div><label className="block text-sm font-medium text-coffee-text mb-1">Tipo</label>
-            <select className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
+          <div><label className="block text-sm font-medium text-foreground mb-1">Tipo</label>
+            <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
               <option value="trator">Trator</option><option value="pulverizador">Pulverizador</option><option value="caminhao">Caminhão</option><option value="utilitario">Utilitário</option><option value="outro">Outro</option>
             </select></div>
-          <div><label className="block text-sm font-medium text-coffee-text mb-1">Placa</label><Input value={form.plate} onChange={(e) => setForm({ ...form, plate: e.target.value })} /></div>
+          <div><label className="block text-sm font-medium text-foreground mb-1">Placa</label><Input value={form.plate} onChange={(e) => setForm({ ...form, plate: e.target.value })} /></div>
         </div>
         <div className="grid grid-cols-3 gap-3">
-          <div><label className="block text-sm font-medium text-coffee-text mb-1">Marca</label><Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} /></div>
-          <div><label className="block text-sm font-medium text-coffee-text mb-1">Modelo</label><Input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} /></div>
-          <div><label className="block text-sm font-medium text-coffee-text mb-1">Ano</label><Input type="number" value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} /></div>
+          <div><label className="block text-sm font-medium text-foreground mb-1">Marca</label><Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} /></div>
+          <div><label className="block text-sm font-medium text-foreground mb-1">Modelo</label><Input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} /></div>
+          <div><label className="block text-sm font-medium text-foreground mb-1">Ano</label><Input type="number" value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} /></div>
         </div>
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="outline" onClick={() => { setDialogOpen(false); setEditing(null) }}>Cancelar</Button>
@@ -129,21 +129,21 @@ export function Fleet() {
     </Dialog>
     <Dialog open={maintDialogOpen} onClose={() => setMaintDialogOpen(false)} title="Nova Manutenção">
       <div className="space-y-4">
-        <div><label className="block text-sm font-medium text-coffee-text mb-1">Veículo</label>
-          <select className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm" value={maintForm.vehicle_id} onChange={(e) => setMaintForm({ ...maintForm, vehicle_id: e.target.value })}>
+        <div><label className="block text-sm font-medium text-foreground mb-1">Veículo</label>
+          <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={maintForm.vehicle_id} onChange={(e) => setMaintForm({ ...maintForm, vehicle_id: e.target.value })}>
             <option value="">Selecione</option>{vehicles.map((v) => <option key={v.id} value={v.id}>{v.name} - {v.plate}</option>)}
           </select></div>
         <div className="grid grid-cols-2 gap-3">
-          <div><label className="block text-sm font-medium text-coffee-text mb-1">Tipo</label>
-            <select className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm" value={maintForm.type} onChange={(e) => setMaintForm({ ...maintForm, type: e.target.value })}>
+          <div><label className="block text-sm font-medium text-foreground mb-1">Tipo</label>
+            <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={maintForm.type} onChange={(e) => setMaintForm({ ...maintForm, type: e.target.value })}>
               <option value="preventive">Preventiva</option><option value="corrective">Corretiva</option>
             </select></div>
-          <div><label className="block text-sm font-medium text-coffee-text mb-1">Data</label><Input type="date" value={maintForm.date} onChange={(e) => setMaintForm({ ...maintForm, date: e.target.value })} /></div>
+          <div><label className="block text-sm font-medium text-foreground mb-1">Data</label><Input type="date" value={maintForm.date} onChange={(e) => setMaintForm({ ...maintForm, date: e.target.value })} /></div>
         </div>
-        <div><label className="block text-sm font-medium text-coffee-text mb-1">Descrição</label><Input value={maintForm.description} onChange={(e) => setMaintForm({ ...maintForm, description: e.target.value })} /></div>
+        <div><label className="block text-sm font-medium text-foreground mb-1">Descrição</label><Input value={maintForm.description} onChange={(e) => setMaintForm({ ...maintForm, description: e.target.value })} /></div>
         <div className="grid grid-cols-2 gap-3">
-          <div><label className="block text-sm font-medium text-coffee-text mb-1">Custo (R$)</label><Input type="number" step="0.01" value={maintForm.cost} onChange={(e) => setMaintForm({ ...maintForm, cost: e.target.value })} /></div>
-          <div><label className="block text-sm font-medium text-coffee-text mb-1">Horímetro (h)</label><Input type="number" step="0.1" value={maintForm.odometer} onChange={(e) => setMaintForm({ ...maintForm, odometer: e.target.value })} /></div>
+          <div><label className="block text-sm font-medium text-foreground mb-1">Custo (R$)</label><Input type="number" step="0.01" value={maintForm.cost} onChange={(e) => setMaintForm({ ...maintForm, cost: e.target.value })} /></div>
+          <div><label className="block text-sm font-medium text-foreground mb-1">Horímetro (h)</label><Input type="number" step="0.1" value={maintForm.odometer} onChange={(e) => setMaintForm({ ...maintForm, odometer: e.target.value })} /></div>
         </div>
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="outline" onClick={() => setMaintDialogOpen(false)}>Cancelar</Button>

@@ -48,26 +48,26 @@ export function Login() {
   return (
     <div className="w-full max-w-sm">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-coffee-green/10 mb-4">
-          <Sprout className="h-8 w-8 text-coffee-green" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+          <Sprout className="h-8 w-8 text-primary" />
         </div>
-        <h1 className="text-2xl font-bold text-coffee-green-dark">CafeOS</h1>
-        <p className="text-sm text-coffee-text-light mt-1">
+        <h1 className="text-2xl font-bold text-primary">CafeOS</h1>
+        <p className="text-sm text-muted-foreground mt-1">
           Plataforma especialista em cafeicultura
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-coffee-green-dark">Entrar</h2>
+      <form onSubmit={handleSubmit} className="bg-card rounded-xl shadow-sm border border-border p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-primary">Entrar</h2>
 
         {error && (
-          <div className="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-2">
+          <div className="bg-danger-bg text-destructive text-sm rounded-lg px-4 py-2">
             {error}
           </div>
         )}
 
         <div>
-          <label className="block text-sm font-medium text-coffee-text mb-1">Email</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Email</label>
           <Input
             type="email"
             value={email}
@@ -78,7 +78,7 @@ export function Login() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-coffee-text mb-1">Senha</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Senha</label>
           <Input
             type="password"
             value={password}
@@ -94,8 +94,8 @@ export function Login() {
         </Button>
       </form>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mt-4">
-        <p className="text-xs font-medium text-coffee-text-light mb-3 flex items-center gap-1">
+      <div className="bg-card rounded-xl shadow-sm border border-border p-4 mt-4">
+        <p className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-1">
           <UserCircle className="h-3 w-3" />
           ACESSO RÁPIDO — SELECIONE UM PERFIL
         </p>
@@ -111,8 +111,8 @@ export function Login() {
               }}
               className={`text-left text-xs px-3 py-2 rounded-lg border transition-colors ${
                 email === p.email
-                  ? 'border-coffee-green bg-coffee-green/10 text-coffee-green-dark font-medium'
-                  : 'border-gray-200 text-coffee-text hover:border-coffee-green/50 hover:bg-coffee-beige'
+                  ? 'border-primary bg-primary/10 text-primary font-medium'
+                  : 'border-border text-foreground hover:border-primary/50 hover:bg-muted'
               }`}
             >
               <div className="truncate font-medium">{p.label}</div>

@@ -33,17 +33,17 @@ export function Dialog({ open, onClose, title, children, className }: DialogProp
     >
       <div
         className={cn(
-          'relative w-full max-w-lg rounded-xl bg-white p-6 shadow-lg',
+          'relative w-full max-w-lg rounded-xl border border-border bg-card text-card-foreground p-6 shadow-lg',
           className
         )}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
         >
           <X className="h-5 w-5" />
         </button>
-        <h2 className="text-lg font-semibold text-coffee-green-dark mb-4">{title}</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-4">{title}</h2>
         {children}
       </div>
     </div>
