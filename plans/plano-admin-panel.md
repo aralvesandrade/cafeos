@@ -170,10 +170,12 @@ apps/admin/
 
 ## Identidade Visual
 
-- **Paleta:** mesmas cores do frontend (`--color-coffee-green`, `--color-coffee-brown`, `--color-coffee-beige`)
-- **Sidebar:** fundo `coffee-green-dark`, texto branco
-- **Header:** fundo branco com sombra
-- **Fonte:** Inter (sans-serif)
+- **Design system:** CafeOS Design System (shadcn-style) — tokens semânticos (`--background`, `--foreground`, `--card`, `--primary`, `--muted`, `--sidebar`, etc.) em `src/index.css`, com variantes light e dark
+- **Cor de marca:** verde `primary` (`#15803d` light / `#22c55e` dark) sobre base neutra zinc
+- **Sidebar:** fundo `--sidebar`, item ativo `--sidebar-active-bg`/`--sidebar-active-foreground`
+- **Header:** fundo `--background` com borda inferior; inclui toggle de tema (claro/escuro)
+- **Tema:** `ThemeProvider` (`src/lib/theme.tsx`) persiste escolha em `localStorage`, com fallback a `prefers-color-scheme`; toggle também presente na tela de login
+- **Fonte:** Geist (interface) / Geist Mono (valores e código)
 - **Ícones:** Lucide React
 
 ## Passos de Implementação

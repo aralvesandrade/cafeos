@@ -121,12 +121,13 @@ src/
 ├── lib/
 │   ├── utils.ts      # cn() utility
 │   ├── api.ts        # Cliente HTTP com JWT
-│   └── auth.tsx      # AuthContext + hook
+│   ├── auth.tsx      # AuthContext + hook
+│   └── theme.tsx     # ThemeProvider + useTheme (light/dark)
 ├── pages/            # Login, Dashboard, Farms, Plots, Operations, Harvests, Tenants, Users, NotFound
 ├── router.tsx        # React Router DOM v7 (nested layouts, lazy routes)
 ├── App.tsx
 ├── main.tsx
-└── index.css         # Tailwind v4 @theme
+└── index.css         # Tokens do CafeOS Design System (light/dark) + Tailwind v4 @theme inline
 ```
 
 ```bash
@@ -134,6 +135,8 @@ cd apps/admin
 npm run dev      # Desenvolvimento (http://localhost:5174)
 npm run build    # Build produção
 ```
+
+Suporta tema claro/escuro (toggle no Header e na tela de login), persistido em `localStorage`.
 
 ### Swagger
 
