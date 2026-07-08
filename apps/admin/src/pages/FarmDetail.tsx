@@ -4,7 +4,20 @@ import { apiRequest } from '@/lib/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
-import { MapPin, ArrowLeft, Grid3X3, Ruler, HardHat, Map } from 'lucide-react'
+import { ArrowLeft, Grid3X3, Ruler, HardHat, Map, User } from 'lucide-react'
+
+interface Producer {
+  cpf: string
+  name: string
+  rg: string
+  issuing_body: string
+  gender: string
+  birth_date: string | null
+  marital_status: string
+  phone: string
+  email: string
+  education: string
+}
 
 interface Farm {
   id: string
@@ -14,6 +27,11 @@ interface Farm {
   total_area_ha: number
   planted_area_ha: number
   created_at: string
+  cnpj?: string
+  state?: string
+  city?: string
+  address?: string
+  producer?: Producer | null
 }
 
 interface Plot {
@@ -110,6 +128,35 @@ export function FarmDetail() {
           </CardContent>
         </Card>
       </div>
+
+      {farm.producer && (
+        <Card>
+          <CardHeader className="flex flex-row items-center gap-2 pb-2">
+            <User className="h-4 w-4 text-coffee-green" />
+            <CardTitle className="text-sm font-medium text-coffee-text-light">Produtor</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div>
+                <p className="text-coffee-text-light">Nome</p>
+                <p className="font-medium text-coffee-text">{farm.producer.name || '—'}</p>
+              </div>
+              <div>
+                <p className="text-coffee-text-light">CPF</p>
+                <p className="font-medium text-coffee-text">{farm.producer.cpf || '—'}</p>
+              </div>
+              <div>
+                <p className="text-coffee-text-light">Telefone</p>
+                <p className="font-medium text-coffee-text">{farm.producer.phone || '—'}</p>
+              </div>
+              <div>
+                <p className="text-coffee-text-light">E-mail</p>
+                <p className="font-medium text-coffee-text">{farm.producer.email || '—'}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div>
         <div className="flex items-center justify-between mb-4">

@@ -33,6 +33,7 @@ func NewConnection(databaseURL string, log *slog.Logger, gormLevel slog.Level) (
 		&entity.Tenant{},
 		&entity.User{},
 		&entity.Farm{},
+		&entity.Producer{},
 		&entity.Plot{},
 		&entity.Operation{},
 		&entity.Harvest{},

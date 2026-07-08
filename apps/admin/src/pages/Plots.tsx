@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom'
 import { apiRequest } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { PlotForm, type PlotData } from '@/components/plots/PlotForm'
 import { Plus, Pencil, Trash2, ExternalLink } from 'lucide-react'
 
-interface Plot {
+export interface Plot {
   id: string
   name: string
   farm_id: string
@@ -17,9 +17,94 @@ interface Plot {
   soil_type: string
   altitude: number
   planting_year: number
+
+  leased: boolean
+  stage: string
+  irrigation: string
+  activation_date: string | null
+  planting_date: string | null
+  deactivation_date: string | null
+  intercropped: boolean
+  secondary_crop: string
+  notes: string
+  crop_type: string
+  formation_cost_per_ha: number
+  useful_life_years: number
+  row_spacing_m: number
+  plant_spacing_m: number
+  plant_count: number
+  dam_area_ha: number
+  improvements_area_ha: number
+  roads_area_ha: number
+  app_area_ha: number
+  legal_reserve_area_ha: number
 }
 
 interface Farm { id: string; name: string }
+
+function plotToFormData(plot: Plot): PlotData {
+  return {
+    name: plot.name,
+    farm_id: plot.farm_id,
+    area: String(plot.area_ha),
+    cultivar: plot.cultivar ?? '',
+    soil_type: plot.soil_type ?? '',
+    altitude: String(plot.altitude ?? ''),
+    planting_year: String(plot.planting_year ?? ''),
+    leased: plot.leased ?? false,
+    stage: plot.stage || 'formacao',
+    irrigation: plot.irrigation ?? '',
+    activation_date: plot.activation_date ? plot.activation_date.slice(0, 10) : '',
+    planting_date: plot.planting_date ? plot.planting_date.slice(0, 10) : '',
+    deactivation_date: plot.deactivation_date ? plot.deactivation_date.slice(0, 10) : '',
+    intercropped: plot.intercropped ?? false,
+    secondary_crop: plot.secondary_crop ?? '',
+    notes: plot.notes ?? '',
+    crop_type: plot.crop_type ?? '',
+    formation_cost_per_ha: String(plot.formation_cost_per_ha ?? ''),
+    useful_life_years: String(plot.useful_life_years ?? ''),
+    row_spacing_m: String(plot.row_spacing_m ?? ''),
+    plant_spacing_m: String(plot.plant_spacing_m ?? ''),
+    plant_count: String(plot.plant_count ?? ''),
+    dam_area: String(plot.dam_area_ha ?? ''),
+    improvements_area: String(plot.improvements_area_ha ?? ''),
+    roads_area: String(plot.roads_area_ha ?? ''),
+    app_area: String(plot.app_area_ha ?? ''),
+    legal_reserve_area: String(plot.legal_reserve_area_ha ?? ''),
+  }
+}
+
+function formDataToPayload(form: PlotData) {
+  return {
+    name: form.name,
+    farm_id: form.farm_id,
+    area_ha: parseFloat(form.area) || 0,
+    cultivar: form.cultivar,
+    soil_type: form.soil_type,
+    altitude: parseInt(form.altitude) || 0,
+    planting_year: parseInt(form.planting_year) || 0,
+    leased: form.leased,
+    stage: form.stage,
+    irrigation: form.irrigation,
+    activation_date: form.activation_date || null,
+    planting_date: form.planting_date || null,
+    deactivation_date: form.deactivation_date || null,
+    intercropped: form.intercropped,
+    secondary_crop: form.secondary_crop,
+    notes: form.notes,
+    crop_type: form.crop_type,
+    formation_cost_per_ha: parseFloat(form.formation_cost_per_ha) || 0,
+    useful_life_years: parseInt(form.useful_life_years) || 0,
+    row_spacing_m: parseFloat(form.row_spacing_m) || 0,
+    plant_spacing_m: parseFloat(form.plant_spacing_m) || 0,
+    plant_count: parseInt(form.plant_count) || 0,
+    dam_area_ha: parseFloat(form.dam_area) || 0,
+    improvements_area_ha: parseFloat(form.improvements_area) || 0,
+    roads_area_ha: parseFloat(form.roads_area) || 0,
+    app_area_ha: parseFloat(form.app_area) || 0,
+    legal_reserve_area_ha: parseFloat(form.legal_reserve_area) || 0,
+  }
+}
 
 export function Plots() {
   const [plots, setPlots] = useState<Plot[]>([])
@@ -28,10 +113,6 @@ export function Plots() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<Plot | null>(null)
   const [saving, setSaving] = useState(false)
-
-  const [form, setForm] = useState({
-    name: '', farm_id: '', area: '', cultivar: '', soil_type: '', altitude: '', planting_year: '',
-  })
 
   const loadData = useCallback(async () => {
     try {
@@ -50,18 +131,10 @@ export function Plots() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  const handleSave = async () => {
+  const handleSave = async (formData: PlotData) => {
     setSaving(true)
     try {
-      const payload = {
-        name: form.name,
-        farm_id: form.farm_id,
-        area: parseFloat(form.area),
-        cultivar: form.cultivar,
-        soil_type: form.soil_type,
-        altitude: parseFloat(form.altitude),
-        planting_year: parseInt(form.planting_year),
-      }
+      const payload = formDataToPayload(formData)
 
       if (editing) {
         await apiRequest(`/plots/${editing.id}`, { method: 'PUT', body: payload })
@@ -89,17 +162,11 @@ export function Plots() {
 
   const openEdit = (plot: Plot) => {
     setEditing(plot)
-    setForm({
-      name: plot.name, farm_id: plot.farm_id, area: String(plot.area_ha),
-      cultivar: plot.cultivar, soil_type: plot.soil_type,
-      altitude: String(plot.altitude), planting_year: String(plot.planting_year),
-    })
     setDialogOpen(true)
   }
 
   const openCreate = () => {
     setEditing(null)
-    setForm({ name: '', farm_id: '', area: '', cultivar: '', soil_type: '', altitude: '', planting_year: '' })
     setDialogOpen(true)
   }
 
@@ -121,10 +188,10 @@ export function Plots() {
             <TableHeader>Nome</TableHeader>
             <TableHeader>Fazenda</TableHeader>
             <TableHeader>Área</TableHeader>
-            <TableHeader>Cultivar</TableHeader>
+            <TableHeader>Estágio</TableHeader>
+            <TableHeader>Variedade</TableHeader>
             <TableHeader>Solo</TableHeader>
             <TableHeader>Altitude</TableHeader>
-            <TableHeader>Ano Plantio</TableHeader>
             <TableHeader className="text-right">Ações</TableHeader>
           </TableRow>
         </TableHead>
@@ -138,10 +205,14 @@ export function Plots() {
               </TableCell>
               <TableCell>{farms.find((f) => f.id === plot.farm_id)?.name || plot.farm_id}</TableCell>
               <TableCell>{plot.area_ha} ha</TableCell>
+              <TableCell>
+                <Badge variant={plot.stage === 'producao' ? 'success' : 'info'}>
+                  {plot.stage === 'producao' ? 'Produção' : 'Formação'}
+                </Badge>
+              </TableCell>
               <TableCell>{plot.cultivar}</TableCell>
               <TableCell>{plot.soil_type}</TableCell>
               <TableCell>{plot.altitude} m</TableCell>
-              <TableCell>{plot.planting_year}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-1">
                   <Button variant="ghost" size="sm" asChild>
@@ -161,54 +232,19 @@ export function Plots() {
         </TableBody>
       </Table>
 
-      <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Talhão' : 'Novo Talhão'}>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-coffee-text mb-1">Nome</label>
-            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-coffee-text mb-1">Fazenda</label>
-            <Select value={form.farm_id} onChange={(e) => setForm({ ...form, farm_id: e.target.value })} required>
-              <option value="">Selecione...</option>
-              {farms.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
-            </Select>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-coffee-text mb-1">Área (ha)</label>
-              <Input type="number" step="0.01" value={form.area} onChange={(e) => setForm({ ...form, area: e.target.value })} required />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-coffee-text mb-1">Altitude (m)</label>
-              <Input type="number" value={form.altitude} onChange={(e) => setForm({ ...form, altitude: e.target.value })} required />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-coffee-text mb-1">Cultivar</label>
-            <Input value={form.cultivar} onChange={(e) => setForm({ ...form, cultivar: e.target.value })} required />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-coffee-text mb-1">Tipo de Solo</label>
-              <Select value={form.soil_type} onChange={(e) => setForm({ ...form, soil_type: e.target.value })} required>
-                <option value="">Selecione...</option>
-                <option value="argiloso">Argiloso</option>
-                <option value="arenoso">Arenoso</option>
-                <option value="siltoso">Siltoso</option>
-                <option value="organico">Orgânico</option>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-coffee-text mb-1">Ano Plantio</label>
-              <Input type="number" value={form.planting_year} onChange={(e) => setForm({ ...form, planting_year: e.target.value })} required />
-            </div>
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="outline" onClick={() => { setDialogOpen(false); setEditing(null) }}>Cancelar</Button>
-            <Button onClick={handleSave} disabled={saving}>{saving ? 'Salvando...' : 'Salvar'}</Button>
-          </div>
-        </div>
+      <Dialog
+        open={dialogOpen}
+        onClose={() => { setDialogOpen(false); setEditing(null) }}
+        title={editing ? 'Editar Talhão' : 'Novo Talhão'}
+        className="max-w-3xl"
+      >
+        <PlotForm
+          initial={editing ? plotToFormData(editing) : undefined}
+          farms={farms}
+          onSave={handleSave}
+          onCancel={() => { setDialogOpen(false); setEditing(null) }}
+          loading={saving}
+        />
       </Dialog>
     </div>
   )

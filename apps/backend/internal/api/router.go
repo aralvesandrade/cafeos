@@ -22,6 +22,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	mux := http.NewServeMux()
 
 	farmRepo := infraRepo.NewFarmRepository(db)
+	producerRepo := infraRepo.NewProducerRepository(db)
 	plotRepo := infraRepo.NewPlotRepository(db)
 	opRepo := infraRepo.NewOperationRepository(db)
 	harvestRepo := infraRepo.NewHarvestRepository(db)
@@ -43,7 +44,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	allocRepo := infraRepo.NewCostAllocationRepository(db)
 	transactor := postgres.NewTransactor(db)
 
-	farmSvc := domainSvc.NewFarmService(farmRepo)
+	farmSvc := domainSvc.NewFarmService(farmRepo, producerRepo)
 	plotSvc := domainSvc.NewPlotService(plotRepo)
 	opSvc := domainSvc.NewOperationService(opRepo, eventBus)
 	harvestSvc := domainSvc.NewHarvestService(harvestRepo, hpRepo, indicatorRepo, plotRepo, opRepo, maintRepo, shiftRepo, finRepo, allocRepo, transactor, eventBus)

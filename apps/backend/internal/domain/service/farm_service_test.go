@@ -7,11 +7,23 @@ import (
 	mock "github.com/aralvesandrade/cafeos/internal/domain/service/testing"
 )
 
-func TestFarmService_Create(t *testing.T) {
+func newFarmSvc() (*FarmService, *mock.InMemoryFarmRepo) {
 	repo := mock.NewInMemoryFarmRepo()
-	svc := NewFarmService(repo)
+	producerRepo := mock.NewInMemoryProducerRepo()
+	return NewFarmService(repo, producerRepo), repo
+}
 
-	farm, err := svc.Create("tenant-1", "Fazenda Boa Vista", "João", "MG", 100.0, 80.0)
+func TestFarmService_Create(t *testing.T) {
+	svc, _ := newFarmSvc()
+
+	farm, err := svc.Create(&entity.Farm{
+		TenantID:      "tenant-1",
+		Name:          "Fazenda Boa Vista",
+		Owner:         "João",
+		Location:      "MG",
+		TotalAreaHA:   100.0,
+		PlantedAreaHA: 80.0,
+	}, nil)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -27,15 +39,36 @@ func TestFarmService_Create(t *testing.T) {
 	}
 }
 
+func TestFarmService_Create_WithProducer(t *testing.T) {
+	svc, _ := newFarmSvc()
+
+	farm, err := svc.Create(&entity.Farm{
+		TenantID:    "tenant-1",
+		Name:        "Fazenda Boa Vista",
+		TotalAreaHA: 100.0,
+	}, &entity.Producer{
+		Name: "Carlos Eduardo Rosa",
+		CPF:  "930.744.338-68",
+	})
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if farm.Producer == nil {
+		t.Fatal("expected producer to be set")
+	}
+	if farm.Producer.FarmID != farm.ID {
+		t.Errorf("expected producer.farm_id %s, got %s", farm.ID, farm.Producer.FarmID)
+	}
+}
+
 func TestFarmService_Create_Validation(t *testing.T) {
-	repo := mock.NewInMemoryFarmRepo()
-	svc := NewFarmService(repo)
+	svc, _ := newFarmSvc()
 
 	tests := []struct {
-		name    string
+		name     string
 		farmName string
-		total   float64
-		planted float64
+		total    float64
+		planted  float64
 	}{
 		{"empty name", "", 100, 80},
 		{"zero total", "Farm", 0, 0},
@@ -44,7 +77,12 @@ func TestFarmService_Create_Validation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := svc.Create("t1", tt.farmName, "", "", tt.total, tt.planted)
+			_, err := svc.Create(&entity.Farm{
+				TenantID:      "t1",
+				Name:          tt.farmName,
+				TotalAreaHA:   tt.total,
+				PlantedAreaHA: tt.planted,
+			}, nil)
 			if err == nil {
 				t.Error("expected error, got nil")
 			}
@@ -53,12 +91,11 @@ func TestFarmService_Create_Validation(t *testing.T) {
 }
 
 func TestFarmService_ListByTenant(t *testing.T) {
-	repo := mock.NewInMemoryFarmRepo()
-	svc := NewFarmService(repo)
+	svc, _ := newFarmSvc()
 
-	svc.Create("t1", "Farm A", "", "", 100, 80)
-	svc.Create("t1", "Farm B", "", "", 200, 150)
-	svc.Create("t2", "Farm C", "", "", 50, 30)
+	svc.Create(&entity.Farm{TenantID: "t1", Name: "Farm A", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
+	svc.Create(&entity.Farm{TenantID: "t1", Name: "Farm B", TotalAreaHA: 200, PlantedAreaHA: 150}, nil)
+	svc.Create(&entity.Farm{TenantID: "t2", Name: "Farm C", TotalAreaHA: 50, PlantedAreaHA: 30}, nil)
 
 	farms, err := svc.ListByTenant("t1")
 	if err != nil {
@@ -71,8 +108,7 @@ func TestFarmService_ListByTenant(t *testing.T) {
 }
 
 func TestFarmService_GetByID_NotFound(t *testing.T) {
-	repo := mock.NewInMemoryFarmRepo()
-	svc := NewFarmService(repo)
+	svc, _ := newFarmSvc()
 
 	_, err := svc.GetByID("non-existent")
 	if err == nil {
@@ -81,10 +117,9 @@ func TestFarmService_GetByID_NotFound(t *testing.T) {
 }
 
 func TestFarmService_Update(t *testing.T) {
-	repo := mock.NewInMemoryFarmRepo()
-	svc := NewFarmService(repo)
+	svc, _ := newFarmSvc()
 
-	farm, _ := svc.Create("t1", "Old Name", "", "", 100, 80)
+	farm, _ := svc.Create(&entity.Farm{TenantID: "t1", Name: "Old Name", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
 	farm.Name = "New Name"
 	err := svc.Update(farm)
 	if err != nil {
@@ -98,10 +133,9 @@ func TestFarmService_Update(t *testing.T) {
 }
 
 func TestFarmService_Update_Validation(t *testing.T) {
-	repo := mock.NewInMemoryFarmRepo()
-	svc := NewFarmService(repo)
+	svc, _ := newFarmSvc()
 
-	farm, _ := svc.Create("t1", "Farm", "", "", 100, 80)
+	farm, _ := svc.Create(&entity.Farm{TenantID: "t1", Name: "Farm", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
 	farm.Name = ""
 	err := svc.Update(farm)
 	if err == nil {
@@ -118,10 +152,9 @@ func TestFarmService_Update_Validation(t *testing.T) {
 }
 
 func TestFarmService_Delete(t *testing.T) {
-	repo := mock.NewInMemoryFarmRepo()
-	svc := NewFarmService(repo)
+	svc, _ := newFarmSvc()
 
-	farm, _ := svc.Create("t1", "Farm", "", "", 100, 80)
+	farm, _ := svc.Create(&entity.Farm{TenantID: "t1", Name: "Farm", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
 	err := svc.Delete(farm.ID)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
@@ -133,18 +166,49 @@ func TestFarmService_Delete(t *testing.T) {
 	}
 }
 
+func TestFarmService_UpsertProducer(t *testing.T) {
+	svc, _ := newFarmSvc()
+
+	farm, _ := svc.Create(&entity.Farm{TenantID: "t1", Name: "Farm", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
+
+	producer, err := svc.UpsertProducer(farm.ID, &entity.Producer{Name: "Carlos"})
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if producer.FarmID != farm.ID {
+		t.Errorf("expected farm_id %s, got %s", farm.ID, producer.FarmID)
+	}
+
+	updated, err := svc.UpsertProducer(farm.ID, &entity.Producer{Name: "Carlos Eduardo"})
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if updated.ID != producer.ID {
+		t.Error("expected upsert to reuse the same producer ID")
+	}
+	if updated.Name != "Carlos Eduardo" {
+		t.Errorf("expected updated name, got %s", updated.Name)
+	}
+}
+
 func TestFarmService_EntityMapping(t *testing.T) {
 	farm := &entity.Farm{
-		ID:           "1",
-		TenantID:     "t1",
-		Name:         "Test Farm",
-		Owner:        "Owner",
-		Location:     "Location",
-		TotalAreaHA:  100.5,
+		ID:            "1",
+		TenantID:      "t1",
+		Name:          "Test Farm",
+		Owner:         "Owner",
+		Location:      "Location",
+		TotalAreaHA:   100.5,
 		PlantedAreaHA: 80.3,
 	}
 
-	if farm.Name != "Test Farm" { t.Error("name mismatch") }
-	if farm.TotalAreaHA != 100.5 { t.Error("total area mismatch") }
-	if farm.PlantedAreaHA != 80.3 { t.Error("planted area mismatch") }
+	if farm.Name != "Test Farm" {
+		t.Error("name mismatch")
+	}
+	if farm.TotalAreaHA != 100.5 {
+		t.Error("total area mismatch")
+	}
+	if farm.PlantedAreaHA != 80.3 {
+		t.Error("planted area mismatch")
+	}
 }

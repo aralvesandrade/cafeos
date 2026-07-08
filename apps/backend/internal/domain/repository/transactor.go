@@ -6,6 +6,7 @@ type Transactor interface {
 
 type TransactionProvider interface {
 	Farm() FarmRepository
+	Producer() ProducerRepository
 	Plot() PlotRepository
 	Operation() OperationRepository
 	Harvest() HarvestRepository

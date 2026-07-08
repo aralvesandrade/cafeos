@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/aralvesandrade/cafeos/internal/api/middleware"
 	"github.com/aralvesandrade/cafeos/internal/domain/entity"
@@ -12,6 +13,7 @@ import (
 // Types aliases for swagger documentation
 type (
 	SwaggerFarm              = entity.Farm
+	SwaggerProducer          = entity.Producer
 	SwaggerPlot              = entity.Plot
 	SwaggerOperation         = entity.Operation
 	SwaggerHarvest           = entity.Harvest
@@ -27,12 +29,129 @@ func NewFarmHandler(svc *service.FarmService) *FarmHandler {
 	return &FarmHandler{svc: svc}
 }
 
+type producerRequest struct {
+	CPF           string  `json:"cpf"`
+	Name          string  `json:"name"`
+	RG            string  `json:"rg"`
+	IssuingBody   string  `json:"issuing_body"`
+	Gender        string  `json:"gender"`
+	BirthDate     *string `json:"birth_date"`
+	MaritalStatus string  `json:"marital_status"`
+	Phone         string  `json:"phone"`
+	Email         string  `json:"email"`
+	Education     string  `json:"education"`
+}
+
+func (p *producerRequest) toEntity() (*entity.Producer, error) {
+	producer := &entity.Producer{
+		CPF:           p.CPF,
+		Name:          p.Name,
+		RG:            p.RG,
+		IssuingBody:   p.IssuingBody,
+		Gender:        p.Gender,
+		MaritalStatus: p.MaritalStatus,
+		Phone:         p.Phone,
+		Email:         p.Email,
+		Education:     p.Education,
+	}
+	if p.BirthDate != nil && *p.BirthDate != "" {
+		t, err := time.Parse("2006-01-02", *p.BirthDate)
+		if err != nil {
+			return nil, err
+		}
+		producer.BirthDate = &t
+	}
+	return producer, nil
+}
+
 type createFarmRequest struct {
-	Name         string  `json:"name"`
-	Owner        string  `json:"owner"`
-	Location     string  `json:"location"`
-	TotalAreaHA  float64 `json:"total_area_ha"`
+	Name     string `json:"name"`
+	Owner    string `json:"owner"`
+	Location string `json:"location"`
+
+	Phone                    string `json:"phone"`
+	Activities               string `json:"activities"`
+	MainCrop                 string `json:"main_crop"`
+	SecondaryCrop            string `json:"secondary_crop"`
+	State                    string `json:"state"`
+	City                     string `json:"city"`
+	Address                  string `json:"address"`
+	ProductionSystem         string `json:"production_system"`
+	CommercializationProduct string `json:"commercialization_product"`
+
+	HasNoCNPJ              bool   `json:"has_no_cnpj"`
+	CNPJ                   string `json:"cnpj"`
+	HasNoNIRF              bool   `json:"has_no_nirf"`
+	NIRF                   string `json:"nirf"`
+	HasNoINCRA             bool   `json:"has_no_incra"`
+	INCRARegistration      string `json:"incra_registration"`
+	HasNoStateRegistration bool   `json:"has_no_state_registration"`
+	StateRegistration      string `json:"state_registration"`
+	HasNoDAP               bool   `json:"has_no_dap"`
+	DAP                    string `json:"dap"`
+	HasNoCAR               bool   `json:"has_no_car"`
+	CAR                    string `json:"car"`
+
+	FullyLeased    bool    `json:"fully_leased"`
+	LandValuePerHA float64 `json:"land_value_per_ha"`
+
+	TotalAreaHA   float64 `json:"total_area_ha"`
 	PlantedAreaHA float64 `json:"planted_area_ha"`
+
+	DamAreaHA                   float64 `json:"dam_area_ha"`
+	ImprovementsAreaHA          float64 `json:"improvements_area_ha"`
+	RoadsAreaHA                 float64 `json:"roads_area_ha"`
+	APPAreaHA                   float64 `json:"app_area_ha"`
+	LegalReserveAreaHA          float64 `json:"legal_reserve_area_ha"`
+	NativeVegetationAreaHA      float64 `json:"native_vegetation_area_ha"`
+	LivestockAreaNotCoveredHA   float64 `json:"livestock_area_not_covered_ha"`
+	AgricultureAreaNotCoveredHA float64 `json:"agriculture_area_not_covered_ha"`
+	NonAgriculturalAreaHA       float64 `json:"non_agricultural_area_ha"`
+
+	Producer *producerRequest `json:"producer"`
+}
+
+func (req *createFarmRequest) toEntity(tenantID string) *entity.Farm {
+	return &entity.Farm{
+		TenantID:                    tenantID,
+		Name:                        req.Name,
+		Owner:                       req.Owner,
+		Location:                    req.Location,
+		Phone:                       req.Phone,
+		Activities:                  req.Activities,
+		MainCrop:                    req.MainCrop,
+		SecondaryCrop:               req.SecondaryCrop,
+		State:                       req.State,
+		City:                        req.City,
+		Address:                     req.Address,
+		ProductionSystem:            req.ProductionSystem,
+		CommercializationProduct:    req.CommercializationProduct,
+		HasNoCNPJ:                   req.HasNoCNPJ,
+		CNPJ:                        req.CNPJ,
+		HasNoNIRF:                   req.HasNoNIRF,
+		NIRF:                        req.NIRF,
+		HasNoINCRA:                  req.HasNoINCRA,
+		INCRARegistration:           req.INCRARegistration,
+		HasNoStateRegistration:      req.HasNoStateRegistration,
+		StateRegistration:           req.StateRegistration,
+		HasNoDAP:                    req.HasNoDAP,
+		DAP:                         req.DAP,
+		HasNoCAR:                    req.HasNoCAR,
+		CAR:                         req.CAR,
+		FullyLeased:                 req.FullyLeased,
+		LandValuePerHA:              req.LandValuePerHA,
+		TotalAreaHA:                 req.TotalAreaHA,
+		PlantedAreaHA:               req.PlantedAreaHA,
+		DamAreaHA:                   req.DamAreaHA,
+		ImprovementsAreaHA:          req.ImprovementsAreaHA,
+		RoadsAreaHA:                 req.RoadsAreaHA,
+		APPAreaHA:                   req.APPAreaHA,
+		LegalReserveAreaHA:          req.LegalReserveAreaHA,
+		NativeVegetationAreaHA:      req.NativeVegetationAreaHA,
+		LivestockAreaNotCoveredHA:   req.LivestockAreaNotCoveredHA,
+		AgricultureAreaNotCoveredHA: req.AgricultureAreaNotCoveredHA,
+		NonAgriculturalAreaHA:       req.NonAgriculturalAreaHA,
+	}
 }
 
 // Create registers a new farm for the authenticated tenant
@@ -56,7 +175,17 @@ func (h *FarmHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	farm, err := h.svc.Create(tenantID, req.Name, req.Owner, req.Location, req.TotalAreaHA, req.PlantedAreaHA)
+	var producer *entity.Producer
+	if req.Producer != nil {
+		p, err := req.Producer.toEntity()
+		if err != nil {
+			writeError(w, "invalid producer birth_date, expected YYYY-MM-DD", http.StatusBadRequest)
+			return
+		}
+		producer = p
+	}
+
+	farm, err := h.svc.Create(req.toEntity(tenantID), producer)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -129,11 +258,50 @@ func (h *FarmHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var input struct {
-		Name         *string  `json:"name"`
-		Owner        *string  `json:"owner"`
-		Location     *string  `json:"location"`
-		TotalAreaHA  *float64 `json:"total_area_ha"`
+		Name     *string `json:"name"`
+		Owner    *string `json:"owner"`
+		Location *string `json:"location"`
+
+		Phone                    *string `json:"phone"`
+		Activities               *string `json:"activities"`
+		MainCrop                 *string `json:"main_crop"`
+		SecondaryCrop            *string `json:"secondary_crop"`
+		State                    *string `json:"state"`
+		City                     *string `json:"city"`
+		Address                  *string `json:"address"`
+		ProductionSystem         *string `json:"production_system"`
+		CommercializationProduct *string `json:"commercialization_product"`
+
+		HasNoCNPJ              *bool   `json:"has_no_cnpj"`
+		CNPJ                   *string `json:"cnpj"`
+		HasNoNIRF              *bool   `json:"has_no_nirf"`
+		NIRF                   *string `json:"nirf"`
+		HasNoINCRA             *bool   `json:"has_no_incra"`
+		INCRARegistration      *string `json:"incra_registration"`
+		HasNoStateRegistration *bool   `json:"has_no_state_registration"`
+		StateRegistration      *string `json:"state_registration"`
+		HasNoDAP               *bool   `json:"has_no_dap"`
+		DAP                    *string `json:"dap"`
+		HasNoCAR               *bool   `json:"has_no_car"`
+		CAR                    *string `json:"car"`
+
+		FullyLeased    *bool    `json:"fully_leased"`
+		LandValuePerHA *float64 `json:"land_value_per_ha"`
+
+		TotalAreaHA   *float64 `json:"total_area_ha"`
 		PlantedAreaHA *float64 `json:"planted_area_ha"`
+
+		DamAreaHA                   *float64 `json:"dam_area_ha"`
+		ImprovementsAreaHA          *float64 `json:"improvements_area_ha"`
+		RoadsAreaHA                 *float64 `json:"roads_area_ha"`
+		APPAreaHA                   *float64 `json:"app_area_ha"`
+		LegalReserveAreaHA          *float64 `json:"legal_reserve_area_ha"`
+		NativeVegetationAreaHA      *float64 `json:"native_vegetation_area_ha"`
+		LivestockAreaNotCoveredHA   *float64 `json:"livestock_area_not_covered_ha"`
+		AgricultureAreaNotCoveredHA *float64 `json:"agriculture_area_not_covered_ha"`
+		NonAgriculturalAreaHA       *float64 `json:"non_agricultural_area_ha"`
+
+		Producer *producerRequest `json:"producer"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		writeError(w, "invalid request body", http.StatusBadRequest)
@@ -149,16 +317,126 @@ func (h *FarmHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if input.Location != nil {
 		existing.Location = *input.Location
 	}
+	if input.Phone != nil {
+		existing.Phone = *input.Phone
+	}
+	if input.Activities != nil {
+		existing.Activities = *input.Activities
+	}
+	if input.MainCrop != nil {
+		existing.MainCrop = *input.MainCrop
+	}
+	if input.SecondaryCrop != nil {
+		existing.SecondaryCrop = *input.SecondaryCrop
+	}
+	if input.State != nil {
+		existing.State = *input.State
+	}
+	if input.City != nil {
+		existing.City = *input.City
+	}
+	if input.Address != nil {
+		existing.Address = *input.Address
+	}
+	if input.ProductionSystem != nil {
+		existing.ProductionSystem = *input.ProductionSystem
+	}
+	if input.CommercializationProduct != nil {
+		existing.CommercializationProduct = *input.CommercializationProduct
+	}
+	if input.HasNoCNPJ != nil {
+		existing.HasNoCNPJ = *input.HasNoCNPJ
+	}
+	if input.CNPJ != nil {
+		existing.CNPJ = *input.CNPJ
+	}
+	if input.HasNoNIRF != nil {
+		existing.HasNoNIRF = *input.HasNoNIRF
+	}
+	if input.NIRF != nil {
+		existing.NIRF = *input.NIRF
+	}
+	if input.HasNoINCRA != nil {
+		existing.HasNoINCRA = *input.HasNoINCRA
+	}
+	if input.INCRARegistration != nil {
+		existing.INCRARegistration = *input.INCRARegistration
+	}
+	if input.HasNoStateRegistration != nil {
+		existing.HasNoStateRegistration = *input.HasNoStateRegistration
+	}
+	if input.StateRegistration != nil {
+		existing.StateRegistration = *input.StateRegistration
+	}
+	if input.HasNoDAP != nil {
+		existing.HasNoDAP = *input.HasNoDAP
+	}
+	if input.DAP != nil {
+		existing.DAP = *input.DAP
+	}
+	if input.HasNoCAR != nil {
+		existing.HasNoCAR = *input.HasNoCAR
+	}
+	if input.CAR != nil {
+		existing.CAR = *input.CAR
+	}
+	if input.FullyLeased != nil {
+		existing.FullyLeased = *input.FullyLeased
+	}
+	if input.LandValuePerHA != nil {
+		existing.LandValuePerHA = *input.LandValuePerHA
+	}
 	if input.TotalAreaHA != nil {
 		existing.TotalAreaHA = *input.TotalAreaHA
 	}
 	if input.PlantedAreaHA != nil {
 		existing.PlantedAreaHA = *input.PlantedAreaHA
 	}
+	if input.DamAreaHA != nil {
+		existing.DamAreaHA = *input.DamAreaHA
+	}
+	if input.ImprovementsAreaHA != nil {
+		existing.ImprovementsAreaHA = *input.ImprovementsAreaHA
+	}
+	if input.RoadsAreaHA != nil {
+		existing.RoadsAreaHA = *input.RoadsAreaHA
+	}
+	if input.APPAreaHA != nil {
+		existing.APPAreaHA = *input.APPAreaHA
+	}
+	if input.LegalReserveAreaHA != nil {
+		existing.LegalReserveAreaHA = *input.LegalReserveAreaHA
+	}
+	if input.NativeVegetationAreaHA != nil {
+		existing.NativeVegetationAreaHA = *input.NativeVegetationAreaHA
+	}
+	if input.LivestockAreaNotCoveredHA != nil {
+		existing.LivestockAreaNotCoveredHA = *input.LivestockAreaNotCoveredHA
+	}
+	if input.AgricultureAreaNotCoveredHA != nil {
+		existing.AgricultureAreaNotCoveredHA = *input.AgricultureAreaNotCoveredHA
+	}
+	if input.NonAgriculturalAreaHA != nil {
+		existing.NonAgriculturalAreaHA = *input.NonAgriculturalAreaHA
+	}
 
 	if err := h.svc.Update(existing); err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
+	}
+
+	if input.Producer != nil {
+		producer, err := input.Producer.toEntity()
+		if err != nil {
+			writeError(w, "invalid producer birth_date, expected YYYY-MM-DD", http.StatusBadRequest)
+			return
+		}
+		saved, err := h.svc.UpsertProducer(existing.ID, producer)
+		if err != nil {
+			writeError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		existing.Producer = saved
 	}
 
 	writeJSON(w, existing, http.StatusOK)

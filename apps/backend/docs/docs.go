@@ -1661,8 +1661,14 @@ const docTemplate = `{
         "entity.Plot": {
             "type": "object",
             "properties": {
+                "activation_date": {
+                    "type": "string"
+                },
                 "altitude": {
                     "type": "integer"
+                },
+                "app_area_ha": {
+                    "type": "number"
                 },
                 "area_ha": {
                     "type": "number"
@@ -1670,22 +1676,137 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
+                "crop_type": {
+                    "type": "string"
+                },
                 "cultivar": {
+                    "type": "string"
+                },
+                "dam_area_ha": {
+                    "type": "number"
+                },
+                "deactivation_date": {
                     "type": "string"
                 },
                 "farm_id": {
                     "type": "string"
                 },
+                "formation_cost_per_ha": {
+                    "type": "number"
+                },
                 "id": {
                     "type": "string"
                 },
+                "improvements_area_ha": {
+                    "type": "number"
+                },
+                "intercropped": {
+                    "type": "boolean"
+                },
+                "irrigation": {
+                    "type": "string"
+                },
+                "leased": {
+                    "type": "boolean"
+                },
+                "legal_reserve_area_ha": {
+                    "type": "number"
+                },
                 "name": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "plant_count": {
+                    "type": "integer"
+                },
+                "plant_spacing_m": {
+                    "type": "number"
+                },
+                "planting_date": {
                     "type": "string"
                 },
                 "planting_year": {
                     "type": "integer"
                 },
+                "roads_area_ha": {
+                    "type": "number"
+                },
+                "row_spacing_m": {
+                    "type": "number"
+                },
+                "secondary_crop": {
+                    "type": "string"
+                },
                 "soil_type": {
+                    "type": "string"
+                },
+                "stage": {
+                    "$ref": "#/definitions/entity.PlotStage"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "useful_life_years": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.PlotStage": {
+            "type": "string",
+            "enum": [
+                "formacao",
+                "producao"
+            ],
+            "x-enum-varnames": [
+                "PlotStageFormacao",
+                "PlotStageProducao"
+            ]
+        },
+        "entity.Producer": {
+            "type": "object",
+            "properties": {
+                "birth_date": {
+                    "type": "string"
+                },
+                "cpf": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "education": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "farm_id": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "issuing_body": {
+                    "type": "string"
+                },
+                "marital_status": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "rg": {
                     "type": "string"
                 },
                 "tenant_id": {
@@ -1870,19 +1991,100 @@ const docTemplate = `{
         "handler.SwaggerFarm": {
             "type": "object",
             "properties": {
+                "activities": {
+                    "type": "string"
+                },
+                "address": {
+                    "type": "string"
+                },
+                "agriculture_area_not_covered_ha": {
+                    "type": "number"
+                },
+                "app_area_ha": {
+                    "type": "number"
+                },
+                "car": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "cnpj": {
+                    "type": "string"
+                },
+                "commercialization_product": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
+                },
+                "dam_area_ha": {
+                    "type": "number"
+                },
+                "dap": {
+                    "type": "string"
+                },
+                "fully_leased": {
+                    "type": "boolean"
+                },
+                "has_no_car": {
+                    "type": "boolean"
+                },
+                "has_no_cnpj": {
+                    "type": "boolean"
+                },
+                "has_no_dap": {
+                    "type": "boolean"
+                },
+                "has_no_incra": {
+                    "type": "boolean"
+                },
+                "has_no_nirf": {
+                    "type": "boolean"
+                },
+                "has_no_state_registration": {
+                    "type": "boolean"
                 },
                 "id": {
                     "type": "string"
                 },
+                "improvements_area_ha": {
+                    "type": "number"
+                },
+                "incra_registration": {
+                    "type": "string"
+                },
+                "land_value_per_ha": {
+                    "type": "number"
+                },
+                "legal_reserve_area_ha": {
+                    "type": "number"
+                },
+                "livestock_area_not_covered_ha": {
+                    "type": "number"
+                },
                 "location": {
+                    "type": "string"
+                },
+                "main_crop": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
                 },
+                "native_vegetation_area_ha": {
+                    "type": "number"
+                },
+                "nirf": {
+                    "type": "string"
+                },
+                "non_agricultural_area_ha": {
+                    "type": "number"
+                },
                 "owner": {
+                    "type": "string"
+                },
+                "phone": {
                     "type": "string"
                 },
                 "planted_area_ha": {
@@ -1893,6 +2095,24 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/entity.Plot"
                     }
+                },
+                "producer": {
+                    "$ref": "#/definitions/entity.Producer"
+                },
+                "production_system": {
+                    "type": "string"
+                },
+                "roads_area_ha": {
+                    "type": "number"
+                },
+                "secondary_crop": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "state_registration": {
+                    "type": "string"
                 },
                 "tenant_id": {
                     "type": "string"
@@ -1914,10 +2134,16 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "end_date": {
+                    "type": "string"
+                },
                 "estimated_production": {
                     "type": "number"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "start_date": {
                     "type": "string"
                 },
                 "status": {
@@ -1966,10 +2192,16 @@ const docTemplate = `{
                 "cost": {
                     "type": "number"
                 },
+                "cost_center_id": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
                 "date": {
+                    "type": "string"
+                },
+                "harvest_id": {
                     "type": "string"
                 },
                 "id": {
@@ -2004,8 +2236,14 @@ const docTemplate = `{
         "handler.SwaggerPlot": {
             "type": "object",
             "properties": {
+                "activation_date": {
+                    "type": "string"
+                },
                 "altitude": {
                     "type": "integer"
+                },
+                "app_area_ha": {
+                    "type": "number"
                 },
                 "area_ha": {
                     "type": "number"
@@ -2013,46 +2251,199 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
+                "crop_type": {
+                    "type": "string"
+                },
                 "cultivar": {
+                    "type": "string"
+                },
+                "dam_area_ha": {
+                    "type": "number"
+                },
+                "deactivation_date": {
                     "type": "string"
                 },
                 "farm_id": {
                     "type": "string"
                 },
+                "formation_cost_per_ha": {
+                    "type": "number"
+                },
                 "id": {
                     "type": "string"
                 },
+                "improvements_area_ha": {
+                    "type": "number"
+                },
+                "intercropped": {
+                    "type": "boolean"
+                },
+                "irrigation": {
+                    "type": "string"
+                },
+                "leased": {
+                    "type": "boolean"
+                },
+                "legal_reserve_area_ha": {
+                    "type": "number"
+                },
                 "name": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "plant_count": {
+                    "type": "integer"
+                },
+                "plant_spacing_m": {
+                    "type": "number"
+                },
+                "planting_date": {
                     "type": "string"
                 },
                 "planting_year": {
                     "type": "integer"
                 },
+                "roads_area_ha": {
+                    "type": "number"
+                },
+                "row_spacing_m": {
+                    "type": "number"
+                },
+                "secondary_crop": {
+                    "type": "string"
+                },
                 "soil_type": {
                     "type": "string"
+                },
+                "stage": {
+                    "$ref": "#/definitions/entity.PlotStage"
                 },
                 "tenant_id": {
                     "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "useful_life_years": {
+                    "type": "integer"
                 }
             }
         },
         "handler.createFarmRequest": {
             "type": "object",
             "properties": {
+                "activities": {
+                    "type": "string"
+                },
+                "address": {
+                    "type": "string"
+                },
+                "agriculture_area_not_covered_ha": {
+                    "type": "number"
+                },
+                "app_area_ha": {
+                    "type": "number"
+                },
+                "car": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "cnpj": {
+                    "type": "string"
+                },
+                "commercialization_product": {
+                    "type": "string"
+                },
+                "dam_area_ha": {
+                    "type": "number"
+                },
+                "dap": {
+                    "type": "string"
+                },
+                "fully_leased": {
+                    "type": "boolean"
+                },
+                "has_no_car": {
+                    "type": "boolean"
+                },
+                "has_no_cnpj": {
+                    "type": "boolean"
+                },
+                "has_no_dap": {
+                    "type": "boolean"
+                },
+                "has_no_incra": {
+                    "type": "boolean"
+                },
+                "has_no_nirf": {
+                    "type": "boolean"
+                },
+                "has_no_state_registration": {
+                    "type": "boolean"
+                },
+                "improvements_area_ha": {
+                    "type": "number"
+                },
+                "incra_registration": {
+                    "type": "string"
+                },
+                "land_value_per_ha": {
+                    "type": "number"
+                },
+                "legal_reserve_area_ha": {
+                    "type": "number"
+                },
+                "livestock_area_not_covered_ha": {
+                    "type": "number"
+                },
                 "location": {
+                    "type": "string"
+                },
+                "main_crop": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
                 },
+                "native_vegetation_area_ha": {
+                    "type": "number"
+                },
+                "nirf": {
+                    "type": "string"
+                },
+                "non_agricultural_area_ha": {
+                    "type": "number"
+                },
                 "owner": {
+                    "type": "string"
+                },
+                "phone": {
                     "type": "string"
                 },
                 "planted_area_ha": {
                     "type": "number"
+                },
+                "producer": {
+                    "$ref": "#/definitions/handler.producerRequest"
+                },
+                "production_system": {
+                    "type": "string"
+                },
+                "roads_area_ha": {
+                    "type": "number"
+                },
+                "secondary_crop": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "state_registration": {
+                    "type": "string"
                 },
                 "total_area_ha": {
                     "type": "number"
@@ -2079,7 +2470,13 @@ const docTemplate = `{
                 "cost": {
                     "type": "number"
                 },
+                "cost_center_id": {
+                    "type": "string"
+                },
                 "date": {
+                    "type": "string"
+                },
+                "harvest_id": {
                     "type": "string"
                 },
                 "notes": {
@@ -2105,26 +2502,86 @@ const docTemplate = `{
         "handler.createPlotRequest": {
             "type": "object",
             "properties": {
+                "activation_date": {
+                    "type": "string"
+                },
                 "altitude": {
                     "type": "integer"
+                },
+                "app_area_ha": {
+                    "type": "number"
                 },
                 "area_ha": {
                     "type": "number"
                 },
+                "crop_type": {
+                    "type": "string"
+                },
                 "cultivar": {
+                    "type": "string"
+                },
+                "dam_area_ha": {
+                    "type": "number"
+                },
+                "deactivation_date": {
                     "type": "string"
                 },
                 "farm_id": {
                     "type": "string"
                 },
+                "formation_cost_per_ha": {
+                    "type": "number"
+                },
+                "improvements_area_ha": {
+                    "type": "number"
+                },
+                "intercropped": {
+                    "type": "boolean"
+                },
+                "irrigation": {
+                    "type": "string"
+                },
+                "leased": {
+                    "type": "boolean"
+                },
+                "legal_reserve_area_ha": {
+                    "type": "number"
+                },
                 "name": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "plant_count": {
+                    "type": "integer"
+                },
+                "plant_spacing_m": {
+                    "type": "number"
+                },
+                "planting_date": {
                     "type": "string"
                 },
                 "planting_year": {
                     "type": "integer"
                 },
+                "roads_area_ha": {
+                    "type": "number"
+                },
+                "row_spacing_m": {
+                    "type": "number"
+                },
+                "secondary_crop": {
+                    "type": "string"
+                },
                 "soil_type": {
                     "type": "string"
+                },
+                "stage": {
+                    "type": "string"
+                },
+                "useful_life_years": {
+                    "type": "integer"
                 }
             }
         },
@@ -2198,6 +2655,41 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
+                }
+            }
+        },
+        "handler.producerRequest": {
+            "type": "object",
+            "properties": {
+                "birth_date": {
+                    "type": "string"
+                },
+                "cpf": {
+                    "type": "string"
+                },
+                "education": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "issuing_body": {
+                    "type": "string"
+                },
+                "marital_status": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "rg": {
+                    "type": "string"
                 }
             }
         },

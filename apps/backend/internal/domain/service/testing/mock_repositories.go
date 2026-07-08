@@ -59,6 +59,51 @@ func (r *InMemoryFarmRepo) Delete(id string) error {
 	return nil
 }
 
+type InMemoryProducerRepo struct {
+	mu        sync.RWMutex
+	producers map[string]*entity.Producer
+}
+
+func NewInMemoryProducerRepo() *InMemoryProducerRepo {
+	return &InMemoryProducerRepo{producers: make(map[string]*entity.Producer)}
+}
+
+func (r *InMemoryProducerRepo) Create(p *entity.Producer) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.producers[p.ID] = p
+	return nil
+}
+
+func (r *InMemoryProducerRepo) GetByFarmID(farmID string) (*entity.Producer, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	for _, p := range r.producers {
+		if p.FarmID == farmID {
+			return p, nil
+		}
+	}
+	return nil, errors.New("producer not found")
+}
+
+func (r *InMemoryProducerRepo) Update(p *entity.Producer) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.producers[p.ID] = p
+	return nil
+}
+
+func (r *InMemoryProducerRepo) DeleteByFarmID(farmID string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	for id, p := range r.producers {
+		if p.FarmID == farmID {
+			delete(r.producers, id)
+		}
+	}
+	return nil
+}
+
 type InMemoryPlotRepo struct {
 	mu    sync.RWMutex
 	plots map[string]*entity.Plot

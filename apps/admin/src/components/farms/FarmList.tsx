@@ -2,15 +2,7 @@ import { Link } from 'react-router-dom'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Pencil, Trash2, ExternalLink } from 'lucide-react'
-
-interface Farm {
-  id: string
-  name: string
-  owner: string
-  total_area_ha: number
-  planted_area_ha: number
-  location: string
-}
+import type { Farm } from '@/pages/Farms'
 
 interface FarmListProps {
   farms: Farm[]

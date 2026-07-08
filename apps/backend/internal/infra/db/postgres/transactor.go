@@ -28,6 +28,10 @@ func (p *txProvider) Farm() repository.FarmRepository {
 	return infraRepo.NewFarmRepository(p.tx)
 }
 
+func (p *txProvider) Producer() repository.ProducerRepository {
+	return infraRepo.NewProducerRepository(p.tx)
+}
+
 func (p *txProvider) Plot() repository.PlotRepository {
 	return infraRepo.NewPlotRepository(p.tx)
 }

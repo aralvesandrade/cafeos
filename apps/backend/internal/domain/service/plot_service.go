@@ -17,27 +17,35 @@ func NewPlotService(repo repository.PlotRepository) *PlotService {
 	return &PlotService{repo: repo}
 }
 
-func (s *PlotService) Create(tenantID, farmID, name, cultivar, soilType string, areaHA float64, plantingYear, altitude int) (*entity.Plot, error) {
-	if name == "" {
-		return nil, errors.New("plot name is required")
+func validatePlot(plot *entity.Plot) error {
+	if plot.Name == "" {
+		return errors.New("plot name is required")
 	}
-	if areaHA <= 0 {
-		return nil, errors.New("area must be greater than zero")
+	if plot.AreaHA <= 0 {
+		return errors.New("area must be greater than zero")
+	}
+	switch plot.Stage {
+	case "", entity.PlotStageFormacao, entity.PlotStageProducao:
+	default:
+		return errors.New("invalid stage: must be 'formacao' or 'producao'")
+	}
+	if plot.ActivationDate != nil && plot.DeactivationDate != nil && plot.DeactivationDate.Before(*plot.ActivationDate) {
+		return errors.New("deactivation date cannot be before activation date")
+	}
+	return nil
+}
+
+func (s *PlotService) Create(plot *entity.Plot) (*entity.Plot, error) {
+	if plot.Stage == "" {
+		plot.Stage = entity.PlotStageFormacao
+	}
+	if err := validatePlot(plot); err != nil {
+		return nil, err
 	}
 
-	plot := &entity.Plot{
-		ID:           uuid.New().String(),
-		TenantID:     tenantID,
-		FarmID:       farmID,
-		Name:         name,
-		AreaHA:       areaHA,
-		Cultivar:     cultivar,
-		PlantingYear: plantingYear,
-		Altitude:     altitude,
-		SoilType:     soilType,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
-	}
+	plot.ID = uuid.New().String()
+	plot.CreatedAt = time.Now()
+	plot.UpdatedAt = time.Now()
 
 	if err := s.repo.Create(plot); err != nil {
 		return nil, err
@@ -58,8 +66,8 @@ func (s *PlotService) ListByTenant(tenantID string) ([]*entity.Plot, error) {
 }
 
 func (s *PlotService) Update(plot *entity.Plot) error {
-	if plot.Name == "" {
-		return errors.New("plot name is required")
+	if err := validatePlot(plot); err != nil {
+		return err
 	}
 	return s.repo.Update(plot)
 }
