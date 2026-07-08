@@ -79,3 +79,7 @@ func (p *txProvider) Financial() repository.FinancialRepository {
 func (p *txProvider) CostAllocation() repository.CostAllocationRepository {
 	return infraRepo.NewCostAllocationRepository(p.tx)
 }
+
+func (p *txProvider) CostCenter() repository.CostCenterRepository {
+	return infraRepo.NewCostCenterRepository(p.tx)
+}

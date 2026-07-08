@@ -17,12 +17,25 @@ func NewCostCenterService(repo repository.CostCenterRepository) *CostCenterServi
 	return &CostCenterService{repo: repo}
 }
 
-func (s *CostCenterService) Create(tenantID, name, code string, ccType entity.CostCenterType, description string) (*entity.CostCenter, error) {
+func validCostGroup(g entity.CostGroup) bool {
+	switch g {
+	case "", entity.CostGroupOperacionalEfetivo, entity.CostGroupMaoDeObraFamiliar,
+		entity.CostGroupCapitalDepreciacao, entity.CostGroupRemuneracaoCapital:
+		return true
+	default:
+		return false
+	}
+}
+
+func (s *CostCenterService) Create(tenantID, name, code string, ccType entity.CostCenterType, costGroup entity.CostGroup, description string) (*entity.CostCenter, error) {
 	if name == "" {
 		return nil, errors.New("cost center name is required")
 	}
 	if code == "" {
 		return nil, errors.New("cost center code is required")
+	}
+	if !validCostGroup(costGroup) {
+		return nil, errors.New("invalid cost_group")
 	}
 
 	cc := &entity.CostCenter{
@@ -31,6 +44,7 @@ func (s *CostCenterService) Create(tenantID, name, code string, ccType entity.Co
 		Name:        name,
 		Code:        code,
 		Type:        ccType,
+		CostGroup:   costGroup,
 		Description: description,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
@@ -40,6 +54,12 @@ func (s *CostCenterService) Create(tenantID, name, code string, ccType entity.Co
 		return nil, err
 	}
 	return cc, nil
+}
+
+// SenarCategories returns the fixed SENAR/CEPEA despesa category catalog
+// used to pre-fill new cost centers with a known CostGroup.
+func (s *CostCenterService) SenarCategories() []entity.SenarCostCategory {
+	return entity.SenarCostCategories
 }
 
 func (s *CostCenterService) GetByID(id string) (*entity.CostCenter, error) {
@@ -53,6 +73,9 @@ func (s *CostCenterService) ListByTenant(tenantID string) ([]*entity.CostCenter,
 func (s *CostCenterService) Update(cc *entity.CostCenter) error {
 	if cc.Name == "" {
 		return errors.New("cost center name is required")
+	}
+	if !validCostGroup(cc.CostGroup) {
+		return errors.New("invalid cost_group")
 	}
 	cc.UpdatedAt = time.Now()
 	return s.repo.Update(cc)

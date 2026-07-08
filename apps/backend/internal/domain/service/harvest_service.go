@@ -11,17 +11,17 @@ import (
 )
 
 type HarvestService struct {
-	harvestRepo    repository.HarvestRepository
-	productionRepo repository.HarvestProductionRepository
-	indicatorRepo  repository.IndicatorRepository
-	plotRepo       repository.PlotRepository
-	operationRepo  repository.OperationRepository
+	harvestRepo     repository.HarvestRepository
+	productionRepo  repository.HarvestProductionRepository
+	indicatorRepo   repository.IndicatorRepository
+	plotRepo        repository.PlotRepository
+	operationRepo   repository.OperationRepository
 	maintenanceRepo repository.MaintenanceRepository
-	shiftRepo      repository.WorkShiftRepository
-	financialRepo  repository.FinancialRepository
-	allocationRepo repository.CostAllocationRepository
-	transactor     repository.Transactor
-	eventBus       event.Bus
+	shiftRepo       repository.WorkShiftRepository
+	financialRepo   repository.FinancialRepository
+	allocationRepo  repository.CostAllocationRepository
+	transactor      repository.Transactor
+	eventBus        event.Bus
 }
 
 func NewHarvestService(
@@ -61,14 +61,14 @@ func (s *HarvestService) Create(tenantID string, year int, description string, e
 	}
 
 	harvest := &entity.Harvest{
-		ID:                 uuid.New().String(),
-		TenantID:           tenantID,
-		Year:               year,
-		Description:        description,
+		ID:                  uuid.New().String(),
+		TenantID:            tenantID,
+		Year:                year,
+		Description:         description,
 		EstimatedProduction: estimatedProduction,
-		Status:             entity.HarvestPlanejada,
-		CreatedAt:          time.Now(),
-		UpdatedAt:          time.Now(),
+		Status:              entity.HarvestPlanejada,
+		CreatedAt:           time.Now(),
+		UpdatedAt:           time.Now(),
 	}
 
 	if err := s.harvestRepo.Create(harvest); err != nil {
@@ -168,7 +168,7 @@ func (s *HarvestService) calculateIndicators(harvest *entity.Harvest) error {
 		s.allocationRepo.ListByHarvest,
 	)
 
-	indicators := s.buildIndicators(harvest, totalProduction, totalPlantedArea, totalCost)
+	indicators := s.buildIndicators(harvest, totalProduction, totalPlantedArea, totalCost, map[entity.CostGroup]float64{})
 
 	for _, ind := range indicators {
 		if err := s.indicatorRepo.Create(ind); err != nil {
@@ -201,8 +201,12 @@ func (s *HarvestService) calculateIndicatorsWithRepos(harvest *entity.Harvest, r
 	}
 
 	totalCost := s.calculateTotalCostWithRepos(harvest, repos)
+	costByGroup, err := s.calculateCostByGroupWithRepos(harvest, repos)
+	if err != nil {
+		return err
+	}
 
-	indicators := s.buildIndicators(harvest, totalProduction, totalPlantedArea, totalCost)
+	indicators := s.buildIndicators(harvest, totalProduction, totalPlantedArea, totalCost, costByGroup)
 
 	for _, ind := range indicators {
 		if err := repos.Indicator().Create(ind); err != nil {
@@ -308,6 +312,73 @@ func (s *HarvestService) calculateTotalCostWithRepos(harvest *entity.Harvest, re
 	return totalCost
 }
 
+// calculateCostByGroupWithRepos mirrors calculateTotalCostWithRepos but
+// buckets each cost item by its CostCenter.CostGroup (SENAR/CEPEA
+// classification), so COE/COT/CT can be computed. Cost items without a
+// CostCenterID, or whose CostCenter has no CostGroup set, are not counted
+// in any bucket (but still count towards the legacy custo_total).
+func (s *HarvestService) calculateCostByGroupWithRepos(harvest *entity.Harvest, repos repository.TransactionProvider) (map[entity.CostGroup]float64, error) {
+	costCenters, err := repos.CostCenter().ListByTenant(harvest.TenantID)
+	if err != nil {
+		return nil, err
+	}
+	groupByCostCenter := make(map[string]entity.CostGroup, len(costCenters))
+	for _, cc := range costCenters {
+		groupByCostCenter[cc.ID] = cc.CostGroup
+	}
+
+	byGroup := map[entity.CostGroup]float64{}
+	add := func(costCenterID *string, amount float64) {
+		if costCenterID == nil {
+			return
+		}
+		group, ok := groupByCostCenter[*costCenterID]
+		if !ok || group == "" {
+			return
+		}
+		byGroup[group] += amount
+	}
+
+	ops, _ := repos.Operation().ListByTenant(harvest.TenantID)
+	for _, op := range ops {
+		if op.HarvestID != nil && *op.HarvestID == harvest.ID {
+			add(op.CostCenterID, op.Cost)
+		}
+	}
+
+	start := harvest.StartDate
+	end := harvest.EndDate
+
+	maints, _ := repos.Maintenance().ListByTenant(harvest.TenantID)
+	for _, m := range maints {
+		if inDateRange(m.Date, start, end) {
+			add(m.CostCenterID, m.Cost)
+		}
+	}
+
+	shifts, _ := repos.WorkShift().ListByTenant(harvest.TenantID)
+	for _, ws := range shifts {
+		if inDateRange(ws.Date, start, end) {
+			add(ws.CostCenterID, ws.Cost)
+		}
+	}
+
+	transactions, _ := repos.Financial().ListByTenant(harvest.TenantID)
+	for _, ft := range transactions {
+		if ft.Type == entity.TranDespesa && inDateRange(ft.Date, start, end) {
+			add(ft.CostCenterID, ft.Amount)
+		}
+	}
+
+	allocs, _ := repos.CostAllocation().ListByHarvest(harvest.ID)
+	for _, a := range allocs {
+		id := a.CostCenterID
+		add(&id, a.TotalAmount)
+	}
+
+	return byGroup, nil
+}
+
 func inDateRange(d time.Time, start, end *time.Time) bool {
 	if start != nil && d.Before(*start) {
 		return false
@@ -318,46 +389,50 @@ func inDateRange(d time.Time, start, end *time.Time) bool {
 	return true
 }
 
-func (s *HarvestService) buildIndicators(harvest *entity.Harvest, totalProduction, totalPlantedArea, totalCost float64) []*entity.Indicator {
-	indicators := []*entity.Indicator{
-		{
+func (s *HarvestService) buildIndicators(harvest *entity.Harvest, totalProduction, totalPlantedArea, totalCost float64, costByGroup map[entity.CostGroup]float64) []*entity.Indicator {
+	now := time.Now()
+	add := func(indicators []*entity.Indicator, t entity.IndicatorType, value float64) []*entity.Indicator {
+		return append(indicators, &entity.Indicator{
 			ID:           uuid.New().String(),
 			TenantID:     harvest.TenantID,
 			HarvestID:    harvest.ID,
-			Type:         entity.IndProducaoTotal,
-			Value:        totalProduction,
-			CalculatedAt: time.Now(),
-		},
-		{
-			ID:           uuid.New().String(),
-			TenantID:     harvest.TenantID,
-			HarvestID:    harvest.ID,
-			Type:         entity.IndCustoTotal,
-			Value:        totalCost,
-			CalculatedAt: time.Now(),
-		},
+			Type:         t,
+			Value:        value,
+			CalculatedAt: now,
+		})
 	}
 
+	var indicators []*entity.Indicator
+	indicators = add(indicators, entity.IndProducaoTotal, totalProduction)
+	indicators = add(indicators, entity.IndCustoTotal, totalCost)
+
 	if totalPlantedArea > 0 {
-		indicators = append(indicators, &entity.Indicator{
-			ID:           uuid.New().String(),
-			TenantID:     harvest.TenantID,
-			HarvestID:    harvest.ID,
-			Type:         entity.IndSacasHA,
-			Value:        totalProduction / totalPlantedArea,
-			CalculatedAt: time.Now(),
-		})
+		indicators = add(indicators, entity.IndAreaProducao, totalPlantedArea)
+		indicators = add(indicators, entity.IndSacasHA, totalProduction/totalPlantedArea)
 	}
 
 	if totalProduction > 0 {
-		indicators = append(indicators, &entity.Indicator{
-			ID:           uuid.New().String(),
-			TenantID:     harvest.TenantID,
-			HarvestID:    harvest.ID,
-			Type:         entity.IndCustoSaca,
-			Value:        totalCost / totalProduction,
-			CalculatedAt: time.Now(),
-		})
+		indicators = add(indicators, entity.IndCustoSaca, totalCost/totalProduction)
+	}
+
+	coe := costByGroup[entity.CostGroupOperacionalEfetivo]
+	cot := coe + costByGroup[entity.CostGroupMaoDeObraFamiliar] + costByGroup[entity.CostGroupCapitalDepreciacao]
+	ct := cot + costByGroup[entity.CostGroupRemuneracaoCapital]
+
+	indicators = add(indicators, entity.IndCOE, coe)
+	indicators = add(indicators, entity.IndCOT, cot)
+	indicators = add(indicators, entity.IndCTProducao, ct)
+
+	if totalPlantedArea > 0 {
+		indicators = add(indicators, entity.IndCOEPorArea, coe/totalPlantedArea)
+		indicators = add(indicators, entity.IndCOTPorArea, cot/totalPlantedArea)
+		indicators = add(indicators, entity.IndCTProducaoPorArea, ct/totalPlantedArea)
+	}
+
+	if totalProduction > 0 {
+		indicators = add(indicators, entity.IndCOEPorSaca, coe/totalProduction)
+		indicators = add(indicators, entity.IndCOTPorSaca, cot/totalProduction)
+		indicators = add(indicators, entity.IndCTProducaoPorSaca, ct/totalProduction)
 	}
 
 	return indicators

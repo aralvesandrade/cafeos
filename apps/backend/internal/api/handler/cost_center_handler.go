@@ -21,6 +21,7 @@ type createCostCenterRequest struct {
 	Name        string `json:"name"`
 	Code        string `json:"code"`
 	Type        string `json:"type"`
+	CostGroup   string `json:"cost_group"`
 	Description string `json:"description"`
 }
 
@@ -33,13 +34,19 @@ func (h *CostCenterHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cc, err := h.svc.Create(tenantID, req.Name, req.Code, entity.CostCenterType(req.Type), req.Description)
+	cc, err := h.svc.Create(tenantID, req.Name, req.Code, entity.CostCenterType(req.Type), entity.CostGroup(req.CostGroup), req.Description)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	writeJSON(w, cc, http.StatusCreated)
+}
+
+// SenarCategories returns the fixed SENAR/CEPEA despesa category catalog,
+// used by clients to pre-fill new cost centers with a known cost_group.
+func (h *CostCenterHandler) SenarCategories(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, h.svc.SenarCategories(), http.StatusOK)
 }
 
 func (h *CostCenterHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -75,6 +82,7 @@ func (h *CostCenterHandler) Update(w http.ResponseWriter, r *http.Request) {
 		Name        *string `json:"name"`
 		Code        *string `json:"code"`
 		Type        *string `json:"type"`
+		CostGroup   *string `json:"cost_group"`
 		Description *string `json:"description"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -90,6 +98,9 @@ func (h *CostCenterHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	if input.Type != nil {
 		existing.Type = entity.CostCenterType(*input.Type)
+	}
+	if input.CostGroup != nil {
+		existing.CostGroup = entity.CostGroup(*input.CostGroup)
 	}
 	if input.Description != nil {
 		existing.Description = *input.Description

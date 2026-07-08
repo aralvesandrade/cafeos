@@ -19,4 +19,5 @@ type TransactionProvider interface {
 	WorkShift() WorkShiftRepository
 	Financial() FinancialRepository
 	CostAllocation() CostAllocationRepository
+	CostCenter() CostCenterRepository
 }

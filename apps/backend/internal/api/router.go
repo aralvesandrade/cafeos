@@ -9,8 +9,8 @@ import (
 	"github.com/aralvesandrade/cafeos/internal/domain/entity"
 	domainSvc "github.com/aralvesandrade/cafeos/internal/domain/service"
 	"github.com/aralvesandrade/cafeos/internal/event"
-	infraRepo "github.com/aralvesandrade/cafeos/internal/infra/db/repository"
 	"github.com/aralvesandrade/cafeos/internal/infra/db/postgres"
+	infraRepo "github.com/aralvesandrade/cafeos/internal/infra/db/repository"
 	"github.com/aralvesandrade/cafeos/internal/infra/messaging"
 	"gorm.io/gorm"
 
@@ -190,6 +190,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	// Cost Centers
 	mux.Handle("POST /api/v1/{tenant_id}/cost-centers", chain(ccH.Create))
 	mux.Handle("GET /api/v1/{tenant_id}/cost-centers", chain(ccH.List))
+	mux.Handle("GET /api/v1/{tenant_id}/cost-centers/senar-categories", chain(ccH.SenarCategories))
 	mux.Handle("GET /api/v1/{tenant_id}/cost-centers/{id}", chain(ccH.GetByID))
 	mux.Handle("PUT /api/v1/{tenant_id}/cost-centers/{id}", chain(ccH.Update))
 	mux.Handle("DELETE /api/v1/{tenant_id}/cost-centers/{id}", chain(ccH.Delete))

@@ -128,3 +128,42 @@ aprovação de migration/schema antes de implementar)
 
 Detalhar a Fase 1 (schema de `Producer`, campos exatos de `Farm`, DTOs de
 request/response, migration) e implementar após revisão desse detalhamento.
+
+## Fase 3 — decisões e execução (2026-07-07)
+
+Decisões confirmadas antes de implementar:
+
+1. **Receita/venda**: `FinancialTransaction` será estendida (não uma entidade
+   nova) com `harvest_id`, `quantity_sacas`, `unit_price` opcionais — ainda
+   **não implementado**, fica para a 2ª rodada (indicadores que dependem de
+   receita).
+2. **Taxonomia de custo**: migração para as 18 categorias fixas do PPTX via
+   novo campo `CostCenter.CostGroup` (`operacional_efetivo` |
+   `mao_de_obra_familiar` | `capital_depreciacao` | `remuneracao_capital`).
+   Centros de custo já existentes **não são alterados nem apagados** — ficam
+   com `cost_group` vazio (não classificado) e são excluídos do cálculo de
+   COE/COT/CT até reclassificação manual. O catálogo fixo
+   (`entity.SenarCostCategories`) é uma constante Go, não uma tabela.
+3. **Escopo**: Fatia 1 apenas (indicadores que não dependem de receita).
+
+**Implementado (fatia 1):**
+- `CostCenter.CostGroup` + catálogo `SenarCostCategories` (19 categorias do
+  slide 10 do PPTX, com sua classificação COE/COT/CT já mapeada)
+- Endpoint `GET /cost-centers/senar-categories` + picker no admin
+  (`CostCenters.tsx`) que pré-preenche nome + classificação
+- `HarvestService.calculateCostByGroupWithRepos`: soma custos (Operation,
+  Maintenance, WorkShift, FinancialTransaction despesa, CostAllocation) por
+  `CostGroup`, olhando o `CostCenterID` de cada um
+- Novos indicadores: `area_producao`, `coe`, `coe_por_area`, `coe_por_saca`,
+  `cot`, `cot_por_area`, `cot_por_saca`, `ct_producao`,
+  `ct_producao_por_area`, `ct_producao_por_saca` — calculados em
+  `HarvestService.Finalize` junto com os indicadores legados (que
+  permanecem inalterados para não quebrar `RuleEngine`/`DashboardHandler`)
+- Testado ponta a ponta via API real (cost center classificado → despesa
+  vinculada → finalize → indicadores corretos no banco)
+
+**Ainda bloqueado (fica para depois, requer nova decisão):**
+- Renda Bruta, Preço Médio de Venda, Margem Bruta/Líquida, Lucro, Relação
+  Benefício/Custo, Taxa de Remuneração do Capital, Estoque de Capital —
+  dependem da extensão de `FinancialTransaction` com dados de venda (item 1
+  acima) ainda não implementada.
