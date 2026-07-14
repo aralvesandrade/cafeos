@@ -22,14 +22,14 @@ type createHarvestRequest struct {
 	EstimatedProduction float64 `json:"estimated_production"`
 }
 
-// Create registers a new harvest season
-// @Summary Create a harvest
-// @Description Register a new harvest (safra) for a year
-// @Tags harvests
+// Create registra uma nova safra
+// @Summary Criar colheita
+// @Description Registra uma nova colheita (safra) para um ano
+// @Tags harvests (Colheitas)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param harvest body createHarvestRequest true "Harvest data"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param harvest body createHarvestRequest true "Dados da colheita"
 // @Success 201 {object} SwaggerHarvest
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
@@ -52,13 +52,13 @@ func (h *HarvestHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, harvest, http.StatusCreated)
 }
 
-// GetByID returns a harvest by its ID
-// @Summary Get harvest by ID
-// @Description Returns a single harvest (safra)
-// @Tags harvests
+// GetByID retorna uma colheita pelo seu ID
+// @Summary Obter colheita por ID
+// @Description Retorna uma única colheita (safra)
+// @Tags harvests (Colheitas)
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param id path string true "Harvest ID"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID da Colheita"
 // @Success 200 {object} SwaggerHarvest
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
@@ -73,12 +73,12 @@ func (h *HarvestHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, harvest, http.StatusOK)
 }
 
-// List returns all harvests for the authenticated tenant
-// @Summary List harvests
-// @Description List all harvests (safras) for the tenant
-// @Tags harvests
+// List retorna todas as colheitas do tenant autenticado
+// @Summary Listar colheitas
+// @Description Lista todas as colheitas (safras) do tenant
+// @Tags harvests (Colheitas)
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
+// @Param tenant_id path string true "ID do Tenant"
 // @Success 200 {array} SwaggerHarvest
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -93,12 +93,12 @@ func (h *HarvestHandler) List(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, harvests, http.StatusOK)
 }
 
-// Finalize marks a harvest as completed and calculates indicators
-// @Summary Finalize a harvest
-// @Description Finalize a harvest (safra), calculating all indicators (sacas/ha, custo/saca, etc.)
-// @Tags harvests
-// @Param tenant_id path string true "Tenant ID"
-// @Param id path string true "Harvest ID"
+// Finalize marca uma colheita como concluída e calcula os indicadores
+// @Summary Finalizar colheita
+// @Description Finaliza uma colheita (safra), calculando todos os indicadores (sacas/ha, custo/saca, etc.)
+// @Tags harvests (Colheitas)
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID da Colheita"
 // @Success 200 "OK"
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
@@ -118,15 +118,15 @@ type recordProductionRequest struct {
 	Notes    string  `json:"notes"`
 }
 
-// RecordProduction records production for a plot in a harvest
-// @Summary Record harvest production
-// @Description Record production quantity for a specific plot in a harvest
-// @Tags harvests
+// RecordProduction registra a produção de um talhão em uma colheita
+// @Summary Registrar produção da colheita
+// @Description Registra a quantidade produzida em um talhão específico dentro de uma colheita
+// @Tags harvests (Colheitas)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param id path string true "Harvest ID"
-// @Param production body recordProductionRequest true "Production data"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID da Colheita"
+// @Param production body recordProductionRequest true "Dados de produção"
 // @Success 201 {object} SwaggerHarvestProduction
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
@@ -150,13 +150,13 @@ func (h *HarvestHandler) RecordProduction(w http.ResponseWriter, r *http.Request
 	writeJSON(w, prod, http.StatusCreated)
 }
 
-// GetProduction returns all production records for a harvest
-// @Summary Get harvest production
-// @Description Get all production records for a given harvest
-// @Tags harvests
+// GetProduction retorna todos os registros de produção de uma colheita
+// @Summary Obter produção da colheita
+// @Description Obtém todos os registros de produção de uma colheita específica
+// @Tags harvests (Colheitas)
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param id path string true "Harvest ID"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID da Colheita"
 // @Success 200 {array} SwaggerHarvestProduction
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth

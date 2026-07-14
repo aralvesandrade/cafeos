@@ -154,14 +154,14 @@ func (req *createFarmRequest) toEntity(tenantID string) *entity.Farm {
 	}
 }
 
-// Create registers a new farm for the authenticated tenant
-// @Summary Create a farm
-// @Description Register a new farm in the tenant
-// @Tags farms
+// Create registra uma nova fazenda para o tenant autenticado
+// @Summary Criar fazenda
+// @Description Registra uma nova fazenda no tenant
+// @Tags farms (Fazendas)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param farm body createFarmRequest true "Farm data"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param farm body createFarmRequest true "Dados da fazenda"
 // @Success 201 {object} SwaggerFarm
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
@@ -194,13 +194,13 @@ func (h *FarmHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, farm, http.StatusCreated)
 }
 
-// GetByID returns a farm by its ID
-// @Summary Get farm by ID
-// @Description Returns a single farm
-// @Tags farms
+// GetByID retorna uma fazenda pelo seu ID
+// @Summary Obter fazenda por ID
+// @Description Retorna uma única fazenda
+// @Tags farms (Fazendas)
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param id path string true "Farm ID"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID da Fazenda"
 // @Success 200 {object} SwaggerFarm
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
@@ -215,12 +215,12 @@ func (h *FarmHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, farm, http.StatusOK)
 }
 
-// List returns all farms for the authenticated tenant
-// @Summary List farms
-// @Description List all farms belonging to the tenant
-// @Tags farms
+// List retorna todas as fazendas do tenant autenticado
+// @Summary Listar fazendas
+// @Description Lista todas as fazendas pertencentes ao tenant
+// @Tags farms (Fazendas)
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
+// @Param tenant_id path string true "ID do Tenant"
 // @Success 200 {array} SwaggerFarm
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -235,15 +235,15 @@ func (h *FarmHandler) List(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, farms, http.StatusOK)
 }
 
-// Update updates an existing farm
-// @Summary Update a farm
-// @Description Update farm data by ID (partial update - only provided fields are changed)
-// @Tags farms
+// Update atualiza uma fazenda existente
+// @Summary Atualizar fazenda
+// @Description Atualiza dados da fazenda por ID (atualização parcial - somente os campos informados são alterados)
+// @Tags farms (Fazendas)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param id path string true "Farm ID"
-// @Param farm body SwaggerFarm true "Updated farm data"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID da Fazenda"
+// @Param farm body SwaggerFarm true "Dados atualizados da fazenda"
 // @Success 200 {object} SwaggerFarm
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
@@ -442,12 +442,12 @@ func (h *FarmHandler) Update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, existing, http.StatusOK)
 }
 
-// Delete removes a farm
-// @Summary Delete a farm
-// @Description Delete a farm by ID
-// @Tags farms
-// @Param tenant_id path string true "Tenant ID"
-// @Param id path string true "Farm ID"
+// Delete remove uma fazenda
+// @Summary Excluir fazenda
+// @Description Exclui uma fazenda por ID
+// @Tags farms (Fazendas)
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID da Fazenda"
 // @Success 204 "No Content"
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth

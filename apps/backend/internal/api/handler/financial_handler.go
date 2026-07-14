@@ -28,6 +28,18 @@ type createFinancialRequest struct {
 	Notes        string  `json:"notes"`
 }
 
+// Create registra uma nova transação financeira para o tenant autenticado
+// @Summary Criar transação financeira
+// @Description Registra uma nova transação financeira (receita/despesa) no tenant
+// @Tags financial (Financeiro)
+// @Accept json
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param financial body createFinancialRequest true "Dados da transação financeira"
+// @Success 201 {object} entity.FinancialTransaction
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/financial [post]
 func (h *FinancialHandler) Create(w http.ResponseWriter, r *http.Request) {
 	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
 	var req createFinancialRequest
@@ -45,6 +57,16 @@ func (h *FinancialHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, tx, http.StatusCreated)
 }
 
+// List retorna todas as transações financeiras do tenant autenticado
+// @Summary Listar transações financeiras
+// @Description Lista todas as transações financeiras pertencentes ao tenant
+// @Tags financial (Financeiro)
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Success 200 {array} entity.FinancialTransaction
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/financial [get]
 func (h *FinancialHandler) List(w http.ResponseWriter, r *http.Request) {
 	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
 	txs, err := h.svc.ListByTenant(tenantID)
@@ -55,6 +77,17 @@ func (h *FinancialHandler) List(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, txs, http.StatusOK)
 }
 
+// GetByID retorna uma transação financeira pelo seu ID
+// @Summary Obter transação financeira por ID
+// @Description Retorna uma única transação financeira
+// @Tags financial (Financeiro)
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID da Transação Financeira"
+// @Success 200 {object} entity.FinancialTransaction
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/financial/{id} [get]
 func (h *FinancialHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	tx, err := h.svc.GetByID(id)
@@ -65,6 +98,19 @@ func (h *FinancialHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, tx, http.StatusOK)
 }
 
+// Update atualiza uma transação financeira existente
+// @Summary Atualizar transação financeira
+// @Description Atualiza dados da transação financeira por ID (atualização parcial - somente os campos informados são alterados)
+// @Tags financial (Financeiro)
+// @Accept json
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID da Transação Financeira"
+// @Param financial body entity.FinancialTransaction true "Dados atualizados da transação financeira"
+// @Success 200 {object} entity.FinancialTransaction
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/financial/{id} [put]
 func (h *FinancialHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	existing, err := h.svc.GetByID(id)
@@ -109,6 +155,16 @@ func (h *FinancialHandler) Update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, existing, http.StatusOK)
 }
 
+// Delete remove uma transação financeira pelo seu ID
+// @Summary Excluir transação financeira
+// @Description Exclui uma transação financeira por ID
+// @Tags financial (Financeiro)
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID da Transação Financeira"
+// @Success 204 "No Content"
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/financial/{id} [delete]
 func (h *FinancialHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.svc.Delete(id); err != nil {

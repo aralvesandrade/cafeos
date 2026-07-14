@@ -22,14 +22,14 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "List all tenants (platform_owner only)",
+                "description": "Lista todos os tenants (somente platform_owner)",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "tenants"
+                    "tenants (Inquilinos)"
                 ],
-                "summary": "List tenants",
+                "summary": "Listar tenants",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -48,7 +48,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new tenant (platform_owner only)",
+                "description": "Cria um novo tenant (somente platform_owner)",
                 "consumes": [
                     "application/json"
                 ],
@@ -56,12 +56,12 @@
                     "application/json"
                 ],
                 "tags": [
-                    "tenants"
+                    "tenants (Inquilinos)"
                 ],
-                "summary": "Create a tenant",
+                "summary": "Criar tenant",
                 "parameters": [
                     {
-                        "description": "Tenant data",
+                        "description": "Dados do tenant",
                         "name": "tenant",
                         "in": "body",
                         "required": true,
@@ -96,18 +96,18 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns a single tenant (platform_owner only)",
+                "description": "Retorna um único tenant (somente platform_owner)",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "tenants"
+                    "tenants (Inquilinos)"
                 ],
-                "summary": "Get tenant by ID",
+                "summary": "Obter tenant por ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -137,7 +137,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update tenant data (platform_owner only)",
+                "description": "Atualiza dados do tenant (somente platform_owner)",
                 "consumes": [
                     "application/json"
                 ],
@@ -145,19 +145,19 @@
                     "application/json"
                 ],
                 "tags": [
-                    "tenants"
+                    "tenants (Inquilinos)"
                 ],
-                "summary": "Update a tenant",
+                "summary": "Atualizar tenant",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Updated tenant data",
+                        "description": "Dados atualizados do tenant",
                         "name": "tenant",
                         "in": "body",
                         "required": true,
@@ -190,15 +190,15 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete a tenant by ID (platform_owner only)",
+                "description": "Exclui um tenant por ID (somente platform_owner)",
                 "tags": [
-                    "tenants"
+                    "tenants (Inquilinos)"
                 ],
-                "summary": "Delete a tenant",
+                "summary": "Excluir tenant",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -218,14 +218,14 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "List all users (platform_owner only)",
+                "description": "Lista todos os usuários (somente platform_owner)",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "users (Usuários)"
                 ],
-                "summary": "List users",
+                "summary": "Listar usuários",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -244,7 +244,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new user (platform_owner only)",
+                "description": "Cria um novo usuário (somente platform_owner)",
                 "consumes": [
                     "application/json"
                 ],
@@ -252,12 +252,12 @@
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "users (Usuários)"
                 ],
-                "summary": "Create a user",
+                "summary": "Criar usuário",
                 "parameters": [
                     {
-                        "description": "User data",
+                        "description": "Dados do usuário",
                         "name": "user",
                         "in": "body",
                         "required": true,
@@ -292,7 +292,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update user data (platform_owner only)",
+                "description": "Atualiza dados do usuário (somente platform_owner)",
                 "consumes": [
                     "application/json"
                 ],
@@ -300,19 +300,19 @@
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "users (Usuários)"
                 ],
-                "summary": "Update a user",
+                "summary": "Atualizar usuário",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
+                        "description": "ID do Usuário",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Updated user data",
+                        "description": "Dados atualizados do usuário",
                         "name": "user",
                         "in": "body",
                         "required": true,
@@ -345,15 +345,15 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete a user by ID (platform_owner only)",
+                "description": "Exclui um usuário por ID (somente platform_owner)",
                 "tags": [
-                    "users"
+                    "users (Usuários)"
                 ],
-                "summary": "Delete a user",
+                "summary": "Excluir usuário",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
+                        "description": "ID do Usuário",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -366,6 +366,694 @@
                 }
             }
         },
+        "/api/v1/{tenant_id}/agricultural-products": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todos os produtos agrícolas pertencentes ao tenant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agricultural-products (Produtos Agrícolas)"
+                ],
+                "summary": "Listar produtos agrícolas",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.AgriculturalProduct"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/budgets": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registra um novo orçamento para uma colheita e centro de custo",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budgets (Orçamentos)"
+                ],
+                "summary": "Criar orçamento",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do orçamento",
+                        "name": "budget",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createBudgetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Budget"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/budgets/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna um único orçamento",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budgets (Orçamentos)"
+                ],
+                "summary": "Obter orçamento por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Orçamento",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Budget"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza dados do orçamento por ID (atualização parcial - somente os campos informados são alterados)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budgets (Orçamentos)"
+                ],
+                "summary": "Atualizar orçamento",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Orçamento",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados do orçamento",
+                        "name": "budget",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Budget"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Budget"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui um orçamento por ID",
+                "tags": [
+                    "budgets (Orçamentos)"
+                ],
+                "summary": "Excluir orçamento",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Orçamento",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/cost-allocations": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registra um novo rateio de custo, distribuindo um valor entre talhões",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cost-allocations (Rateios de Custo)"
+                ],
+                "summary": "Criar rateio de custo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do rateio de custo",
+                        "name": "allocation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createAllocationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.CostAllocation"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/cost-allocations/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna um único rateio de custo",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cost-allocations (Rateios de Custo)"
+                ],
+                "summary": "Obter rateio de custo por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Rateio de Custo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.CostAllocation"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui um rateio de custo por ID",
+                "tags": [
+                    "cost-allocations (Rateios de Custo)"
+                ],
+                "summary": "Excluir rateio de custo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Rateio de Custo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/cost-centers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todos os centros de custo pertencentes ao tenant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cost-centers (Centros de Custo)"
+                ],
+                "summary": "Listar centros de custo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.CostCenter"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registra um novo centro de custo no tenant",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cost-centers (Centros de Custo)"
+                ],
+                "summary": "Criar centro de custo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do centro de custo",
+                        "name": "cost_center",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createCostCenterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.CostCenter"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/cost-centers/senar-categories": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna o catálogo fixo de categorias de despesa SENAR/CEPEA",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cost-centers (Centros de Custo)"
+                ],
+                "summary": "Listar categorias SENAR/CEPEA",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.SenarCostCategory"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/cost-centers/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna um único centro de custo",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cost-centers (Centros de Custo)"
+                ],
+                "summary": "Obter centro de custo por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Centro de Custo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.CostCenter"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza dados do centro de custo por ID (atualização parcial - somente os campos informados são alterados)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cost-centers (Centros de Custo)"
+                ],
+                "summary": "Atualizar centro de custo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Centro de Custo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados do centro de custo",
+                        "name": "cost_center",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.CostCenter"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.CostCenter"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui um centro de custo por ID",
+                "tags": [
+                    "cost-centers (Centros de Custo)"
+                ],
+                "summary": "Excluir centro de custo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Centro de Custo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/{tenant_id}/dashboard": {
             "get": {
                 "security": [
@@ -373,18 +1061,18 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns consolidated production, costs, indicators and recent operations",
+                "description": "Retorna produção, custos, indicadores e operações recentes consolidados",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "dashboard"
+                    "dashboard (Painel)"
                 ],
-                "summary": "Get dashboard",
+                "summary": "Obter painel",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
@@ -407,18 +1095,18 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "List all farms belonging to the tenant",
+                "description": "Lista todas as fazendas pertencentes ao tenant",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "farms"
+                    "farms (Fazendas)"
                 ],
-                "summary": "List farms",
+                "summary": "Listar fazendas",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
@@ -451,7 +1139,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Register a new farm in the tenant",
+                "description": "Registra uma nova fazenda no tenant",
                 "consumes": [
                     "application/json"
                 ],
@@ -459,19 +1147,19 @@
                     "application/json"
                 ],
                 "tags": [
-                    "farms"
+                    "farms (Fazendas)"
                 ],
-                "summary": "Create a farm",
+                "summary": "Criar fazenda",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Farm data",
+                        "description": "Dados da fazenda",
                         "name": "farm",
                         "in": "body",
                         "required": true,
@@ -506,25 +1194,25 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "List all plots (talhões) belonging to a farm",
+                "description": "Lista todos os talhões pertencentes a uma fazenda",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "plots"
+                    "plots (Talhões)"
                 ],
-                "summary": "List plots by farm",
+                "summary": "Listar talhões por fazenda",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Farm ID",
+                        "description": "ID da Fazenda",
                         "name": "farm_id",
                         "in": "path",
                         "required": true
@@ -559,25 +1247,25 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns a single farm",
+                "description": "Retorna uma única fazenda",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "farms"
+                    "farms (Fazendas)"
                 ],
-                "summary": "Get farm by ID",
+                "summary": "Obter fazenda por ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Farm ID",
+                        "description": "ID da Fazenda",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -607,7 +1295,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update farm data by ID (partial update - only provided fields are changed)",
+                "description": "Atualiza dados da fazenda por ID (atualização parcial - somente os campos informados são alterados)",
                 "consumes": [
                     "application/json"
                 ],
@@ -615,26 +1303,26 @@
                     "application/json"
                 ],
                 "tags": [
-                    "farms"
+                    "farms (Fazendas)"
                 ],
-                "summary": "Update a farm",
+                "summary": "Atualizar fazenda",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Farm ID",
+                        "description": "ID da Fazenda",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Updated farm data",
+                        "description": "Dados atualizados da fazenda",
                         "name": "farm",
                         "in": "body",
                         "required": true,
@@ -667,22 +1355,715 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete a farm by ID",
+                "description": "Exclui uma fazenda por ID",
                 "tags": [
-                    "farms"
+                    "farms (Fazendas)"
                 ],
-                "summary": "Delete a farm",
+                "summary": "Excluir fazenda",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Farm ID",
+                        "description": "ID da Fazenda",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/financial": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todas as transações financeiras pertencentes ao tenant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "financial (Financeiro)"
+                ],
+                "summary": "Listar transações financeiras",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.FinancialTransaction"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registra uma nova transação financeira (receita/despesa) no tenant",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "financial (Financeiro)"
+                ],
+                "summary": "Criar transação financeira",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados da transação financeira",
+                        "name": "financial",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createFinancialRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.FinancialTransaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/financial/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna uma única transação financeira",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "financial (Financeiro)"
+                ],
+                "summary": "Obter transação financeira por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID da Transação Financeira",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.FinancialTransaction"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza dados da transação financeira por ID (atualização parcial - somente os campos informados são alterados)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "financial (Financeiro)"
+                ],
+                "summary": "Atualizar transação financeira",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID da Transação Financeira",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados da transação financeira",
+                        "name": "financial",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.FinancialTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.FinancialTransaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui uma transação financeira por ID",
+                "tags": [
+                    "financial (Financeiro)"
+                ],
+                "summary": "Excluir transação financeira",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID da Transação Financeira",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/fleet/maintenance": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todos os registros de manutenção pertencentes à frota do tenant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fleet (Frota)"
+                ],
+                "summary": "Listar registros de manutenção",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Maintenance"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registra um novo registro de manutenção para um veículo",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fleet (Frota)"
+                ],
+                "summary": "Criar registro de manutenção",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados da manutenção",
+                        "name": "maintenance",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createMaintenanceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Maintenance"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/fleet/maintenance/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna um único registro de manutenção",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fleet (Frota)"
+                ],
+                "summary": "Obter registro de manutenção por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID da Manutenção",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Maintenance"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui um registro de manutenção por ID",
+                "tags": [
+                    "fleet (Frota)"
+                ],
+                "summary": "Excluir registro de manutenção",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID da Manutenção",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/fleet/vehicles": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todos os veículos pertencentes à frota do tenant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fleet (Frota)"
+                ],
+                "summary": "Listar veículos",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Vehicle"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registra um novo veículo na frota do tenant",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fleet (Frota)"
+                ],
+                "summary": "Criar veículo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do veículo",
+                        "name": "vehicle",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createVehicleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vehicle"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/fleet/vehicles/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna um único veículo",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fleet (Frota)"
+                ],
+                "summary": "Obter veículo por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Veículo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vehicle"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza dados do veículo por ID (atualização parcial - somente os campos informados são alterados)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fleet (Frota)"
+                ],
+                "summary": "Atualizar veículo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Veículo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados do veículo",
+                        "name": "vehicle",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vehicle"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vehicle"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui um veículo por ID",
+                "tags": [
+                    "fleet (Frota)"
+                ],
+                "summary": "Excluir veículo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Veículo",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -711,18 +2092,18 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "List all harvests (safras) for the tenant",
+                "description": "Lista todas as colheitas (safras) do tenant",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "harvests"
+                    "harvests (Colheitas)"
                 ],
-                "summary": "List harvests",
+                "summary": "Listar colheitas",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
@@ -755,7 +2136,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Register a new harvest (safra) for a year",
+                "description": "Registra uma nova colheita (safra) para um ano",
                 "consumes": [
                     "application/json"
                 ],
@@ -763,19 +2144,19 @@
                     "application/json"
                 ],
                 "tags": [
-                    "harvests"
+                    "harvests (Colheitas)"
                 ],
-                "summary": "Create a harvest",
+                "summary": "Criar colheita",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Harvest data",
+                        "description": "Dados da colheita",
                         "name": "harvest",
                         "in": "body",
                         "required": true,
@@ -803,6 +2184,112 @@
                 }
             }
         },
+        "/api/v1/{tenant_id}/harvests/{harvest_id}/budgets": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todos os orçamentos pertencentes a uma colheita",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budgets (Orçamentos)"
+                ],
+                "summary": "Listar orçamentos por colheita",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID da Colheita",
+                        "name": "harvest_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Budget"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/harvests/{harvest_id}/cost-allocations": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todos os rateios de custo pertencentes a uma colheita",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cost-allocations (Rateios de Custo)"
+                ],
+                "summary": "Listar rateios de custo por colheita",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID da Colheita",
+                        "name": "harvest_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.CostAllocation"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/{tenant_id}/harvests/{id}": {
             "get": {
                 "security": [
@@ -810,25 +2297,25 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns a single harvest (safra)",
+                "description": "Retorna uma única colheita (safra)",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "harvests"
+                    "harvests (Colheitas)"
                 ],
-                "summary": "Get harvest by ID",
+                "summary": "Obter colheita por ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Harvest ID",
+                        "description": "ID da Colheita",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -860,22 +2347,22 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Finalize a harvest (safra), calculating all indicators (sacas/ha, custo/saca, etc.)",
+                "description": "Finaliza uma colheita (safra), calculando todos os indicadores (sacas/ha, custo/saca, etc.)",
                 "tags": [
-                    "harvests"
+                    "harvests (Colheitas)"
                 ],
-                "summary": "Finalize a harvest",
+                "summary": "Finalizar colheita",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Harvest ID",
+                        "description": "ID da Colheita",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -904,25 +2391,25 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get all production records for a given harvest",
+                "description": "Obtém todos os registros de produção de uma colheita específica",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "harvests"
+                    "harvests (Colheitas)"
                 ],
-                "summary": "Get harvest production",
+                "summary": "Obter produção da colheita",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Harvest ID",
+                        "description": "ID da Colheita",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -955,7 +2442,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Record production quantity for a specific plot in a harvest",
+                "description": "Registra a quantidade produzida em um talhão específico dentro de uma colheita",
                 "consumes": [
                     "application/json"
                 ],
@@ -963,26 +2450,26 @@
                     "application/json"
                 ],
                 "tags": [
-                    "harvests"
+                    "harvests (Colheitas)"
                 ],
-                "summary": "Record harvest production",
+                "summary": "Registrar produção da colheita",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Harvest ID",
+                        "description": "ID da Colheita",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Production data",
+                        "description": "Dados de produção",
                         "name": "production",
                         "in": "body",
                         "required": true,
@@ -1010,6 +2497,555 @@
                 }
             }
         },
+        "/api/v1/{tenant_id}/labor/shifts": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todos os turnos de trabalho pertencentes ao tenant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "labor (Mão de Obra)"
+                ],
+                "summary": "Listar turnos de trabalho",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.WorkShift"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registra um novo turno de trabalho de um trabalhador em uma operação",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "labor (Mão de Obra)"
+                ],
+                "summary": "Criar turno de trabalho",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do turno de trabalho",
+                        "name": "shift",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createWorkShiftRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.WorkShift"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/labor/shifts/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui um turno de trabalho por ID",
+                "tags": [
+                    "labor (Mão de Obra)"
+                ],
+                "summary": "Excluir turno de trabalho",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Turno de Trabalho",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/labor/teams": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todas as equipes de trabalho pertencentes ao tenant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "labor (Mão de Obra)"
+                ],
+                "summary": "Listar equipes de trabalho",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Team"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registra uma nova equipe de trabalho no tenant",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "labor (Mão de Obra)"
+                ],
+                "summary": "Criar equipe de trabalho",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados da equipe",
+                        "name": "team",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createTeamRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Team"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/labor/teams/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza dados da equipe de trabalho por ID (atualização parcial - somente os campos informados são alterados)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "labor (Mão de Obra)"
+                ],
+                "summary": "Atualizar equipe de trabalho",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID da Equipe",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados da equipe",
+                        "name": "team",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Team"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Team"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui uma equipe de trabalho por ID",
+                "tags": [
+                    "labor (Mão de Obra)"
+                ],
+                "summary": "Excluir equipe de trabalho",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID da Equipe",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/labor/workers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todos os trabalhadores pertencentes ao tenant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "labor (Mão de Obra)"
+                ],
+                "summary": "Listar trabalhadores",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Worker"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registra um novo trabalhador no tenant",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "labor (Mão de Obra)"
+                ],
+                "summary": "Criar trabalhador",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do trabalhador",
+                        "name": "worker",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createWorkerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Worker"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/labor/workers/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza dados do trabalhador por ID (atualização parcial - somente os campos informados são alterados)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "labor (Mão de Obra)"
+                ],
+                "summary": "Atualizar trabalhador",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Trabalhador",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados do trabalhador",
+                        "name": "worker",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Worker"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Worker"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui um trabalhador por ID",
+                "tags": [
+                    "labor (Mão de Obra)"
+                ],
+                "summary": "Excluir trabalhador",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Trabalhador",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/{tenant_id}/operations": {
             "get": {
                 "security": [
@@ -1017,18 +3053,18 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "List all operations across all plots in the tenant",
+                "description": "Lista todas as operações de todos os talhões do tenant",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "operations"
+                    "operations (Operações)"
                 ],
-                "summary": "List all operations",
+                "summary": "Listar todas as operações",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
@@ -1061,7 +3097,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Register an agricultural operation (adubação, pulverização, irrigação, poda, colheita)",
+                "description": "Registra uma operação agrícola (adubação, pulverização, irrigação, poda, colheita)",
                 "consumes": [
                     "application/json"
                 ],
@@ -1069,19 +3105,19 @@
                     "application/json"
                 ],
                 "tags": [
-                    "operations"
+                    "operations (Operações)"
                 ],
-                "summary": "Register an operation",
+                "summary": "Registrar operação",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Operation data",
+                        "description": "Dados da operação",
                         "name": "operation",
                         "in": "body",
                         "required": true,
@@ -1116,25 +3152,25 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "List the most recent operations, limited by query param",
+                "description": "Lista as operações mais recentes, limitadas por parâmetro de consulta",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "operations"
+                    "operations (Operações)"
                 ],
-                "summary": "List recent operations",
+                "summary": "Listar operações recentes",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "integer",
-                        "description": "Max results (default 10)",
+                        "description": "Máximo de resultados (padrão 10)",
                         "name": "limit",
                         "in": "query"
                     }
@@ -1168,25 +3204,25 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns a single operation",
+                "description": "Retorna uma única operação",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "operations"
+                    "operations (Operações)"
                 ],
-                "summary": "Get operation by ID",
+                "summary": "Obter operação por ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Operation ID",
+                        "description": "ID da Operação",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1216,22 +3252,22 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete an operation by ID",
+                "description": "Exclui uma operação por ID",
                 "tags": [
-                    "operations"
+                    "operations (Operações)"
                 ],
-                "summary": "Delete an operation",
+                "summary": "Excluir operação",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Operation ID",
+                        "description": "ID da Operação",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1260,18 +3296,18 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "List all plots across all farms in the tenant",
+                "description": "Lista todos os talhões de todas as fazendas do tenant",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "plots"
+                    "plots (Talhões)"
                 ],
-                "summary": "List all plots",
+                "summary": "Listar todos os talhões",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
@@ -1304,7 +3340,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Register a new plot (talhão) in a farm",
+                "description": "Registra um novo talhão em uma fazenda",
                 "consumes": [
                     "application/json"
                 ],
@@ -1312,19 +3348,19 @@
                     "application/json"
                 ],
                 "tags": [
-                    "plots"
+                    "plots (Talhões)"
                 ],
-                "summary": "Create a plot",
+                "summary": "Criar talhão",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Plot data",
+                        "description": "Dados do talhão",
                         "name": "plot",
                         "in": "body",
                         "required": true,
@@ -1359,25 +3395,25 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns a single plot (talhão)",
+                "description": "Retorna um único talhão",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "plots"
+                    "plots (Talhões)"
                 ],
-                "summary": "Get plot by ID",
+                "summary": "Obter talhão por ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Plot ID",
+                        "description": "ID do Talhão",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1407,7 +3443,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update plot data by ID (partial update - only provided fields are changed)",
+                "description": "Atualiza dados do talhão por ID (atualização parcial - somente os campos informados são alterados)",
                 "consumes": [
                     "application/json"
                 ],
@@ -1415,26 +3451,26 @@
                     "application/json"
                 ],
                 "tags": [
-                    "plots"
+                    "plots (Talhões)"
                 ],
-                "summary": "Update a plot",
+                "summary": "Atualizar talhão",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Plot ID",
+                        "description": "ID do Talhão",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Updated plot data",
+                        "description": "Dados atualizados do talhão",
                         "name": "plot",
                         "in": "body",
                         "required": true,
@@ -1467,22 +3503,22 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete a plot by ID",
+                "description": "Exclui um talhão por ID",
                 "tags": [
-                    "plots"
+                    "plots (Talhões)"
                 ],
-                "summary": "Delete a plot",
+                "summary": "Excluir talhão",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Plot ID",
+                        "description": "ID do Talhão",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1511,25 +3547,25 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "List all operations for a specific plot (talhão)",
+                "description": "Lista todas as operações de um talhão específico",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "operations"
+                    "operations (Operações)"
                 ],
-                "summary": "List operations by plot",
+                "summary": "Listar operações por talhão",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tenant ID",
+                        "description": "ID do Tenant",
                         "name": "tenant_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Plot ID",
+                        "description": "ID do Talhão",
                         "name": "plot_id",
                         "in": "path",
                         "required": true
@@ -1557,9 +3593,58 @@
                 }
             }
         },
-        "/auth/login": {
+        "/api/v1/{tenant_id}/stock/items": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todos os itens de estoque pertencentes ao tenant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stock (Estoque)"
+                ],
+                "summary": "Listar itens de estoque",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.StockItem"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
-                "description": "Authenticate with email and password",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registra um novo item de estoque no tenant",
                 "consumes": [
                     "application/json"
                 ],
@@ -1567,12 +3652,368 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "stock (Estoque)"
+                ],
+                "summary": "Criar item de estoque",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do item de estoque",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createStockItemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StockItem"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/stock/items/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna um único item de estoque",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stock (Estoque)"
+                ],
+                "summary": "Obter item de estoque por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Item de Estoque",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StockItem"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza dados do item de estoque por ID (atualização parcial - somente os campos informados são alterados)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stock (Estoque)"
+                ],
+                "summary": "Atualizar item de estoque",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Item de Estoque",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados do item de estoque",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.StockItem"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StockItem"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui um item de estoque por ID",
+                "tags": [
+                    "stock (Estoque)"
+                ],
+                "summary": "Excluir item de estoque",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Item de Estoque",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/stock/movements": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todas as movimentações de estoque pertencentes ao tenant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stock (Estoque)"
+                ],
+                "summary": "Listar movimentações de estoque",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.StockMovement"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registra uma movimentação de estoque (entrada/saída) para um item de estoque",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stock (Estoque)"
+                ],
+                "summary": "Registrar movimentação de estoque",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados da movimentação de estoque",
+                        "name": "movement",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.recordMovementRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StockMovement"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{tenant_id}/sync": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Aceita um lote (máximo 50) de eventos mobile offline e publica cada um no RabbitMQ para persistência assíncrona",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sync (Sincronização)"
+                ],
+                "summary": "Sincronizar lote offline",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Tenant",
+                        "name": "tenant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do lote de sincronização",
+                        "name": "batch",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.syncBatchRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "$ref": "#/definitions/handler.syncResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "description": "Autentica com e-mail e senha",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth (Autenticação)"
                 ],
                 "summary": "Login",
                 "parameters": [
                     {
-                        "description": "Credentials",
+                        "description": "Credenciais",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -1602,14 +4043,14 @@
         },
         "/health": {
             "get": {
-                "description": "Returns API health status",
+                "description": "Retorna o status de saúde da API",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "system"
+                    "system (Sistema)"
                 ],
-                "summary": "Health check",
+                "summary": "Verificação de saúde",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1625,6 +4066,232 @@
         }
     },
     "definitions": {
+        "entity.AgriculturalProduct": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.ProductType"
+                },
+                "unit": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.AllocationMethod": {
+            "type": "string",
+            "enum": [
+                "area_proportional",
+                "custom_percentage"
+            ],
+            "x-enum-varnames": [
+                "AllocAreaProportional",
+                "AllocCustomPercentage"
+            ]
+        },
+        "entity.Budget": {
+            "type": "object",
+            "properties": {
+                "cost_center_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "harvest_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "planned_amount": {
+                    "type": "number"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.CostAllocation": {
+            "type": "object",
+            "properties": {
+                "cost_center_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "harvest_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.CostAllocationItem"
+                    }
+                },
+                "method": {
+                    "$ref": "#/definitions/entity.AllocationMethod"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "total_amount": {
+                    "type": "number"
+                }
+            }
+        },
+        "entity.CostAllocationItem": {
+            "type": "object",
+            "properties": {
+                "allocation_id": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "percentage": {
+                    "type": "number"
+                },
+                "plot_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.CostCenter": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "cost_group": {
+                    "$ref": "#/definitions/entity.CostGroup"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.CostCenterType"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.CostCenterType": {
+            "type": "string",
+            "enum": [
+                "receita",
+                "despesa"
+            ],
+            "x-enum-varnames": [
+                "CCReceita",
+                "CCDespesa"
+            ]
+        },
+        "entity.CostGroup": {
+            "type": "string",
+            "enum": [
+                "operacional_efetivo",
+                "mao_de_obra_familiar",
+                "capital_depreciacao",
+                "remuneracao_capital"
+            ],
+            "x-enum-varnames": [
+                "CostGroupOperacionalEfetivo",
+                "CostGroupMaoDeObraFamiliar",
+                "CostGroupCapitalDepreciacao",
+                "CostGroupRemuneracaoCapital"
+            ]
+        },
+        "entity.FinancialTransaction": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "cost_center_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "due_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "payment_date": {
+                    "type": "string"
+                },
+                "payment_method": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.TransactionType"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.HarvestStatus": {
             "type": "string",
             "enum": [
@@ -1637,6 +4304,45 @@
                 "HarvestEmAndamento",
                 "HarvestFinalizada"
             ]
+        },
+        "entity.Maintenance": {
+            "type": "object",
+            "properties": {
+                "cost": {
+                    "type": "number"
+                },
+                "cost_center_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "odometer": {
+                    "type": "number"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "\"preventive\" | \"corrective\"",
+                    "type": "string"
+                },
+                "vehicle_id": {
+                    "type": "string"
+                }
+            }
         },
         "entity.OperationType": {
             "type": "string",
@@ -1814,6 +4520,129 @@
                 }
             }
         },
+        "entity.ProductType": {
+            "type": "string",
+            "enum": [
+                "fertilizante",
+                "defensivo",
+                "combustivel",
+                "outro"
+            ],
+            "x-enum-varnames": [
+                "ProdFertilizante",
+                "ProdDefensivo",
+                "ProdCombustivel",
+                "ProdOutro"
+            ]
+        },
+        "entity.SenarCostCategory": {
+            "type": "object",
+            "properties": {
+                "cost_group": {
+                    "$ref": "#/definitions/entity.CostGroup"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.StockItem": {
+            "type": "object",
+            "properties": {
+                "batch": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "expiry_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "min_stock": {
+                    "type": "number"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "number"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.StockMovement": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "item_id": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "number"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "\"in\" | \"out\"",
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Team": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "leader": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.Tenant": {
             "type": "object",
             "properties": {
@@ -1851,6 +4680,17 @@
                     "type": "string"
                 }
             }
+        },
+        "entity.TransactionType": {
+            "type": "string",
+            "enum": [
+                "receita",
+                "despesa"
+            ],
+            "x-enum-varnames": [
+                "TranReceita",
+                "TranDespesa"
+            ]
         },
         "entity.User": {
             "type": "object",
@@ -1907,6 +4747,131 @@
                 "RoleConsultor",
                 "RoleAuditor"
             ]
+        },
+        "entity.Vehicle": {
+            "type": "object",
+            "properties": {
+                "brand": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "plate": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.VehicleType"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.VehicleType": {
+            "type": "string",
+            "enum": [
+                "trator",
+                "pulverizador",
+                "caminhao",
+                "utilitario",
+                "outro"
+            ],
+            "x-enum-varnames": [
+                "VeicTractor",
+                "VeicPulverizador",
+                "VeicCaminhao",
+                "VeicUtilitario",
+                "VeicOutro"
+            ]
+        },
+        "entity.WorkShift": {
+            "type": "object",
+            "properties": {
+                "cost": {
+                    "type": "number"
+                },
+                "cost_center_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "hours": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "operation_id": {
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "worker_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Worker": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "hourly_rate": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "team_id": {
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
         },
         "handler.CostPerBag": {
             "type": "object",
@@ -2328,6 +5293,73 @@
                 }
             }
         },
+        "handler.createAllocationRequest": {
+            "type": "object",
+            "properties": {
+                "cost_center_id": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "harvest_id": {
+                    "type": "string"
+                },
+                "method": {
+                    "type": "string"
+                },
+                "percentages": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number",
+                        "format": "float64"
+                    }
+                },
+                "total_amount": {
+                    "type": "number"
+                }
+            }
+        },
+        "handler.createBudgetRequest": {
+            "type": "object",
+            "properties": {
+                "cost_center_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "harvest_id": {
+                    "type": "string"
+                },
+                "planned_amount": {
+                    "type": "number"
+                }
+            }
+        },
+        "handler.createCostCenterRequest": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "cost_group": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.createFarmRequest": {
             "type": "object",
             "properties": {
@@ -2447,6 +5479,32 @@
                 }
             }
         },
+        "handler.createFinancialRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "cost_center_id": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "due_date": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.createHarvestRequest": {
             "type": "object",
             "properties": {
@@ -2458,6 +5516,32 @@
                 },
                 "year": {
                     "type": "integer"
+                }
+            }
+        },
+        "handler.createMaintenanceRequest": {
+            "type": "object",
+            "properties": {
+                "cost": {
+                    "type": "number"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "odometer": {
+                    "type": "number"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "vehicle_id": {
+                    "type": "string"
                 }
             }
         },
@@ -2582,6 +5666,49 @@
                 }
             }
         },
+        "handler.createStockItemRequest": {
+            "type": "object",
+            "properties": {
+                "batch": {
+                    "type": "string"
+                },
+                "expiry_date": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "min_stock": {
+                    "type": "number"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "number"
+                },
+                "unit": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.createTeamRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "leader": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.createTenantRequest": {
             "type": "object",
             "properties": {
@@ -2612,6 +5739,72 @@
                     "type": "string"
                 },
                 "tenant_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.createVehicleRequest": {
+            "type": "object",
+            "properties": {
+                "brand": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "plate": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.createWorkShiftRequest": {
+            "type": "object",
+            "properties": {
+                "cost": {
+                    "type": "number"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "hours": {
+                    "type": "number"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "operation_id": {
+                    "type": "string"
+                },
+                "worker_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.createWorkerRequest": {
+            "type": "object",
+            "properties": {
+                "hourly_rate": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "team_id": {
                     "type": "string"
                 }
             }
@@ -2690,6 +5883,29 @@
                 }
             }
         },
+        "handler.recordMovementRequest": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "item_id": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "number"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.recordProductionRequest": {
             "type": "object",
             "properties": {
@@ -2701,6 +5917,57 @@
                 },
                 "quantity": {
                     "type": "number"
+                }
+            }
+        },
+        "handler.syncBatchRequest": {
+            "type": "object",
+            "properties": {
+                "batch": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.syncItemRequest"
+                    }
+                }
+            }
+        },
+        "handler.syncErrorItem": {
+            "type": "object",
+            "properties": {
+                "client_id": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.syncItemRequest": {
+            "type": "object",
+            "properties": {
+                "client_id": {
+                    "type": "string"
+                },
+                "client_timestamp": {
+                    "type": "string"
+                },
+                "event_type": {
+                    "type": "string"
+                },
+                "payload": {}
+            }
+        },
+        "handler.syncResponse": {
+            "type": "object",
+            "properties": {
+                "accepted": {
+                    "type": "integer"
+                },
+                "errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.syncErrorItem"
+                    }
                 }
             }
         },

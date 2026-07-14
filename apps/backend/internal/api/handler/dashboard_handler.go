@@ -61,12 +61,12 @@ type DashboardResponse struct {
 	RecentOperations  []RecentOperationItem `json:"recent_operations"`
 }
 
-// GetDashboard returns consolidated dashboard data
-// @Summary Get dashboard
-// @Description Returns consolidated production, costs, indicators and recent operations
-// @Tags dashboard
+// GetDashboard retorna os dados consolidados do painel
+// @Summary Obter painel
+// @Description Retorna produção, custos, indicadores e operações recentes consolidados
+// @Tags dashboard (Painel)
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
+// @Param tenant_id path string true "ID do Tenant"
 // @Success 200 {object} DashboardResponse
 // @Security BearerAuth
 // @Router /api/v1/{tenant_id}/dashboard [get]

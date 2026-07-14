@@ -111,14 +111,14 @@ func (req *createPlotRequest) toEntity(tenantID string) (*entity.Plot, error) {
 	}, nil
 }
 
-// Create registers a new plot for the authenticated tenant
-// @Summary Create a plot
-// @Description Register a new plot (talhão) in a farm
-// @Tags plots
+// Create registra um novo talhão para o tenant autenticado
+// @Summary Criar talhão
+// @Description Registra um novo talhão em uma fazenda
+// @Tags plots (Talhões)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param plot body createPlotRequest true "Plot data"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param plot body createPlotRequest true "Dados do talhão"
 // @Success 201 {object} SwaggerPlot
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
@@ -147,13 +147,13 @@ func (h *PlotHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, plot, http.StatusCreated)
 }
 
-// GetByID returns a plot by its ID
-// @Summary Get plot by ID
-// @Description Returns a single plot (talhão)
-// @Tags plots
+// GetByID retorna um talhão pelo seu ID
+// @Summary Obter talhão por ID
+// @Description Retorna um único talhão
+// @Tags plots (Talhões)
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param id path string true "Plot ID"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID do Talhão"
 // @Success 200 {object} SwaggerPlot
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
@@ -168,13 +168,13 @@ func (h *PlotHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, plot, http.StatusOK)
 }
 
-// ListByFarm returns all plots for a given farm
-// @Summary List plots by farm
-// @Description List all plots (talhões) belonging to a farm
-// @Tags plots
+// ListByFarm retorna todos os talhões de uma fazenda
+// @Summary Listar talhões por fazenda
+// @Description Lista todos os talhões pertencentes a uma fazenda
+// @Tags plots (Talhões)
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param farm_id path string true "Farm ID"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param farm_id path string true "ID da Fazenda"
 // @Success 200 {array} SwaggerPlot
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -189,12 +189,12 @@ func (h *PlotHandler) ListByFarm(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, plots, http.StatusOK)
 }
 
-// List returns all plots for the authenticated tenant
-// @Summary List all plots
-// @Description List all plots across all farms in the tenant
-// @Tags plots
+// List retorna todos os talhões do tenant autenticado
+// @Summary Listar todos os talhões
+// @Description Lista todos os talhões de todas as fazendas do tenant
+// @Tags plots (Talhões)
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
+// @Param tenant_id path string true "ID do Tenant"
 // @Success 200 {array} SwaggerPlot
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -209,15 +209,15 @@ func (h *PlotHandler) List(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, plots, http.StatusOK)
 }
 
-// Update updates an existing plot
-// @Summary Update a plot
-// @Description Update plot data by ID (partial update - only provided fields are changed)
-// @Tags plots
+// Update atualiza um talhão existente
+// @Summary Atualizar talhão
+// @Description Atualiza dados do talhão por ID (atualização parcial - somente os campos informados são alterados)
+// @Tags plots (Talhões)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param id path string true "Plot ID"
-// @Param plot body SwaggerPlot true "Updated plot data"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID do Talhão"
+// @Param plot body SwaggerPlot true "Dados atualizados do talhão"
 // @Success 200 {object} SwaggerPlot
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
@@ -375,12 +375,12 @@ func (h *PlotHandler) Update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, existing, http.StatusOK)
 }
 
-// Delete removes a plot
-// @Summary Delete a plot
-// @Description Delete a plot by ID
-// @Tags plots
-// @Param tenant_id path string true "Tenant ID"
-// @Param id path string true "Plot ID"
+// Delete remove um talhão
+// @Summary Excluir talhão
+// @Description Exclui um talhão por ID
+// @Tags plots (Talhões)
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID do Talhão"
 // @Success 204 "No Content"
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth

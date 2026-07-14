@@ -1,5 +1,157 @@
 basePath: /api/v1/{tenant_id}
 definitions:
+  entity.AgriculturalProduct:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      tenant_id:
+        type: string
+      type:
+        $ref: '#/definitions/entity.ProductType'
+      unit:
+        type: string
+    type: object
+  entity.AllocationMethod:
+    enum:
+    - area_proportional
+    - custom_percentage
+    type: string
+    x-enum-varnames:
+    - AllocAreaProportional
+    - AllocCustomPercentage
+  entity.Budget:
+    properties:
+      cost_center_id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      harvest_id:
+        type: string
+      id:
+        type: string
+      planned_amount:
+        type: number
+      tenant_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entity.CostAllocation:
+    properties:
+      cost_center_id:
+        type: string
+      created_at:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      harvest_id:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/entity.CostAllocationItem'
+        type: array
+      method:
+        $ref: '#/definitions/entity.AllocationMethod'
+      tenant_id:
+        type: string
+      total_amount:
+        type: number
+    type: object
+  entity.CostAllocationItem:
+    properties:
+      allocation_id:
+        type: string
+      amount:
+        type: number
+      id:
+        type: string
+      percentage:
+        type: number
+      plot_id:
+        type: string
+    type: object
+  entity.CostCenter:
+    properties:
+      code:
+        type: string
+      cost_group:
+        $ref: '#/definitions/entity.CostGroup'
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      tenant_id:
+        type: string
+      type:
+        $ref: '#/definitions/entity.CostCenterType'
+      updated_at:
+        type: string
+    type: object
+  entity.CostCenterType:
+    enum:
+    - receita
+    - despesa
+    type: string
+    x-enum-varnames:
+    - CCReceita
+    - CCDespesa
+  entity.CostGroup:
+    enum:
+    - operacional_efetivo
+    - mao_de_obra_familiar
+    - capital_depreciacao
+    - remuneracao_capital
+    type: string
+    x-enum-varnames:
+    - CostGroupOperacionalEfetivo
+    - CostGroupMaoDeObraFamiliar
+    - CostGroupCapitalDepreciacao
+    - CostGroupRemuneracaoCapital
+  entity.FinancialTransaction:
+    properties:
+      amount:
+        type: number
+      cost_center_id:
+        type: string
+      created_at:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      due_date:
+        type: string
+      id:
+        type: string
+      notes:
+        type: string
+      payment_date:
+        type: string
+      payment_method:
+        type: string
+      status:
+        type: string
+      tenant_id:
+        type: string
+      type:
+        $ref: '#/definitions/entity.TransactionType'
+      updated_at:
+        type: string
+    type: object
   entity.HarvestStatus:
     enum:
     - planejada
@@ -10,6 +162,32 @@ definitions:
     - HarvestPlanejada
     - HarvestEmAndamento
     - HarvestFinalizada
+  entity.Maintenance:
+    properties:
+      cost:
+        type: number
+      cost_center_id:
+        type: string
+      created_at:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      notes:
+        type: string
+      odometer:
+        type: number
+      tenant_id:
+        type: string
+      type:
+        description: '"preventive" | "corrective"'
+        type: string
+      vehicle_id:
+        type: string
+    type: object
   entity.OperationType:
     enum:
     - adubacao
@@ -130,6 +308,89 @@ definitions:
       updated_at:
         type: string
     type: object
+  entity.ProductType:
+    enum:
+    - fertilizante
+    - defensivo
+    - combustivel
+    - outro
+    type: string
+    x-enum-varnames:
+    - ProdFertilizante
+    - ProdDefensivo
+    - ProdCombustivel
+    - ProdOutro
+  entity.SenarCostCategory:
+    properties:
+      cost_group:
+        $ref: '#/definitions/entity.CostGroup'
+      name:
+        type: string
+    type: object
+  entity.StockItem:
+    properties:
+      batch:
+        type: string
+      created_at:
+        type: string
+      expiry_date:
+        type: string
+      id:
+        type: string
+      location:
+        type: string
+      min_stock:
+        type: number
+      notes:
+        type: string
+      product_id:
+        type: string
+      quantity:
+        type: number
+      tenant_id:
+        type: string
+      unit:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entity.StockMovement:
+    properties:
+      created_at:
+        type: string
+      date:
+        type: string
+      id:
+        type: string
+      item_id:
+        type: string
+      notes:
+        type: string
+      quantity:
+        type: number
+      reference:
+        type: string
+      tenant_id:
+        type: string
+      type:
+        description: '"in" | "out"'
+        type: string
+    type: object
+  entity.Team:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      leader:
+        type: string
+      name:
+        type: string
+      tenant_id:
+        type: string
+    type: object
   entity.Tenant:
     properties:
       brand_name:
@@ -155,6 +416,14 @@ definitions:
       updated_at:
         type: string
     type: object
+  entity.TransactionType:
+    enum:
+    - receita
+    - despesa
+    type: string
+    x-enum-varnames:
+    - TranReceita
+    - TranDespesa
   entity.User:
     properties:
       created_at:
@@ -198,6 +467,91 @@ definitions:
     - RoleFinanceiro
     - RoleConsultor
     - RoleAuditor
+  entity.Vehicle:
+    properties:
+      brand:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      model:
+        type: string
+      name:
+        type: string
+      plate:
+        type: string
+      status:
+        type: string
+      tenant_id:
+        type: string
+      type:
+        $ref: '#/definitions/entity.VehicleType'
+      updated_at:
+        type: string
+      year:
+        type: integer
+    type: object
+  entity.VehicleType:
+    enum:
+    - trator
+    - pulverizador
+    - caminhao
+    - utilitario
+    - outro
+    type: string
+    x-enum-varnames:
+    - VeicTractor
+    - VeicPulverizador
+    - VeicCaminhao
+    - VeicUtilitario
+    - VeicOutro
+  entity.WorkShift:
+    properties:
+      cost:
+        type: number
+      cost_center_id:
+        type: string
+      created_at:
+        type: string
+      date:
+        type: string
+      hours:
+        type: number
+      id:
+        type: string
+      notes:
+        type: string
+      operation_id:
+        type: string
+      tenant_id:
+        type: string
+      worker_id:
+        type: string
+    type: object
+  entity.Worker:
+    properties:
+      created_at:
+        type: string
+      hourly_rate:
+        type: number
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+      team_id:
+        type: string
+      tenant_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
   handler.CostPerBag:
     properties:
       cost:
@@ -475,6 +829,50 @@ definitions:
       useful_life_years:
         type: integer
     type: object
+  handler.createAllocationRequest:
+    properties:
+      cost_center_id:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      harvest_id:
+        type: string
+      method:
+        type: string
+      percentages:
+        additionalProperties:
+          format: float64
+          type: number
+        type: object
+      total_amount:
+        type: number
+    type: object
+  handler.createBudgetRequest:
+    properties:
+      cost_center_id:
+        type: string
+      description:
+        type: string
+      harvest_id:
+        type: string
+      planned_amount:
+        type: number
+    type: object
+  handler.createCostCenterRequest:
+    properties:
+      code:
+        type: string
+      cost_group:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      type:
+        type: string
+    type: object
   handler.createFarmRequest:
     properties:
       activities:
@@ -554,6 +952,23 @@ definitions:
       total_area_ha:
         type: number
     type: object
+  handler.createFinancialRequest:
+    properties:
+      amount:
+        type: number
+      cost_center_id:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      due_date:
+        type: string
+      notes:
+        type: string
+      type:
+        type: string
+    type: object
   handler.createHarvestRequest:
     properties:
       description:
@@ -562,6 +977,23 @@ definitions:
         type: number
       year:
         type: integer
+    type: object
+  handler.createMaintenanceRequest:
+    properties:
+      cost:
+        type: number
+      date:
+        type: string
+      description:
+        type: string
+      notes:
+        type: string
+      odometer:
+        type: number
+      type:
+        type: string
+      vehicle_id:
+        type: string
     type: object
   handler.createOperationRequest:
     properties:
@@ -643,6 +1075,34 @@ definitions:
       useful_life_years:
         type: integer
     type: object
+  handler.createStockItemRequest:
+    properties:
+      batch:
+        type: string
+      expiry_date:
+        type: string
+      location:
+        type: string
+      min_stock:
+        type: number
+      notes:
+        type: string
+      product_id:
+        type: string
+      quantity:
+        type: number
+      unit:
+        type: string
+    type: object
+  handler.createTeamRequest:
+    properties:
+      description:
+        type: string
+      leader:
+        type: string
+      name:
+        type: string
+    type: object
   handler.createTenantRequest:
     properties:
       brand_name:
@@ -663,6 +1123,49 @@ definitions:
       role:
         type: string
       tenant_id:
+        type: string
+    type: object
+  handler.createVehicleRequest:
+    properties:
+      brand:
+        type: string
+      model:
+        type: string
+      name:
+        type: string
+      plate:
+        type: string
+      type:
+        type: string
+      year:
+        type: integer
+    type: object
+  handler.createWorkShiftRequest:
+    properties:
+      cost:
+        type: number
+      date:
+        type: string
+      hours:
+        type: number
+      notes:
+        type: string
+      operation_id:
+        type: string
+      worker_id:
+        type: string
+    type: object
+  handler.createWorkerRequest:
+    properties:
+      hourly_rate:
+        type: number
+      name:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+      team_id:
         type: string
     type: object
   handler.loginRequest:
@@ -713,6 +1216,21 @@ definitions:
       rg:
         type: string
     type: object
+  handler.recordMovementRequest:
+    properties:
+      date:
+        type: string
+      item_id:
+        type: string
+      notes:
+        type: string
+      quantity:
+        type: number
+      reference:
+        type: string
+      type:
+        type: string
+    type: object
   handler.recordProductionRequest:
     properties:
       notes:
@@ -721,6 +1239,39 @@ definitions:
         type: string
       quantity:
         type: number
+    type: object
+  handler.syncBatchRequest:
+    properties:
+      batch:
+        items:
+          $ref: '#/definitions/handler.syncItemRequest'
+        type: array
+    type: object
+  handler.syncErrorItem:
+    properties:
+      client_id:
+        type: string
+      error:
+        type: string
+    type: object
+  handler.syncItemRequest:
+    properties:
+      client_id:
+        type: string
+      client_timestamp:
+        type: string
+      event_type:
+        type: string
+      payload: {}
+    type: object
+  handler.syncResponse:
+    properties:
+      accepted:
+        type: integer
+      errors:
+        items:
+          $ref: '#/definitions/handler.syncErrorItem'
+        type: array
     type: object
   handler.updateTenantRequest:
     properties:
@@ -752,11 +1303,453 @@ info:
   title: CafeOS API
   version: 0.1.0
 paths:
+  /api/v1/{tenant_id}/agricultural-products:
+    get:
+      description: Lista todos os produtos agrícolas pertencentes ao tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.AgriculturalProduct'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar produtos agrícolas
+      tags:
+      - agricultural-products (Produtos Agrícolas)
+  /api/v1/{tenant_id}/budgets:
+    post:
+      consumes:
+      - application/json
+      description: Registra um novo orçamento para uma colheita e centro de custo
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Dados do orçamento
+        in: body
+        name: budget
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createBudgetRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Budget'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar orçamento
+      tags:
+      - budgets (Orçamentos)
+  /api/v1/{tenant_id}/budgets/{id}:
+    delete:
+      description: Exclui um orçamento por ID
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Orçamento
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Excluir orçamento
+      tags:
+      - budgets (Orçamentos)
+    get:
+      description: Retorna um único orçamento
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Orçamento
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Budget'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obter orçamento por ID
+      tags:
+      - budgets (Orçamentos)
+    put:
+      consumes:
+      - application/json
+      description: Atualiza dados do orçamento por ID (atualização parcial - somente
+        os campos informados são alterados)
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Orçamento
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados atualizados do orçamento
+        in: body
+        name: budget
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Budget'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Budget'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar orçamento
+      tags:
+      - budgets (Orçamentos)
+  /api/v1/{tenant_id}/cost-allocations:
+    post:
+      consumes:
+      - application/json
+      description: Registra um novo rateio de custo, distribuindo um valor entre talhões
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Dados do rateio de custo
+        in: body
+        name: allocation
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createAllocationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.CostAllocation'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar rateio de custo
+      tags:
+      - cost-allocations (Rateios de Custo)
+  /api/v1/{tenant_id}/cost-allocations/{id}:
+    delete:
+      description: Exclui um rateio de custo por ID
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Rateio de Custo
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Excluir rateio de custo
+      tags:
+      - cost-allocations (Rateios de Custo)
+    get:
+      description: Retorna um único rateio de custo
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Rateio de Custo
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CostAllocation'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obter rateio de custo por ID
+      tags:
+      - cost-allocations (Rateios de Custo)
+  /api/v1/{tenant_id}/cost-centers:
+    get:
+      description: Lista todos os centros de custo pertencentes ao tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.CostCenter'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar centros de custo
+      tags:
+      - cost-centers (Centros de Custo)
+    post:
+      consumes:
+      - application/json
+      description: Registra um novo centro de custo no tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Dados do centro de custo
+        in: body
+        name: cost_center
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createCostCenterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.CostCenter'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar centro de custo
+      tags:
+      - cost-centers (Centros de Custo)
+  /api/v1/{tenant_id}/cost-centers/{id}:
+    delete:
+      description: Exclui um centro de custo por ID
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Centro de Custo
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Excluir centro de custo
+      tags:
+      - cost-centers (Centros de Custo)
+    get:
+      description: Retorna um único centro de custo
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Centro de Custo
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CostCenter'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obter centro de custo por ID
+      tags:
+      - cost-centers (Centros de Custo)
+    put:
+      consumes:
+      - application/json
+      description: Atualiza dados do centro de custo por ID (atualização parcial -
+        somente os campos informados são alterados)
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Centro de Custo
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados atualizados do centro de custo
+        in: body
+        name: cost_center
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CostCenter'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CostCenter'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar centro de custo
+      tags:
+      - cost-centers (Centros de Custo)
+  /api/v1/{tenant_id}/cost-centers/senar-categories:
+    get:
+      description: Retorna o catálogo fixo de categorias de despesa SENAR/CEPEA
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.SenarCostCategory'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Listar categorias SENAR/CEPEA
+      tags:
+      - cost-centers (Centros de Custo)
   /api/v1/{tenant_id}/dashboard:
     get:
-      description: Returns consolidated production, costs, indicators and recent operations
+      description: Retorna produção, custos, indicadores e operações recentes consolidados
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
@@ -770,14 +1763,14 @@ paths:
             $ref: '#/definitions/handler.DashboardResponse'
       security:
       - BearerAuth: []
-      summary: Get dashboard
+      summary: Obter painel
       tags:
-      - dashboard
+      - dashboard (Painel)
   /api/v1/{tenant_id}/farms:
     get:
-      description: List all farms belonging to the tenant
+      description: Lista todas as fazendas pertencentes ao tenant
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
@@ -799,20 +1792,20 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: List farms
+      summary: Listar fazendas
       tags:
-      - farms
+      - farms (Fazendas)
     post:
       consumes:
       - application/json
-      description: Register a new farm in the tenant
+      description: Registra uma nova fazenda no tenant
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Farm data
+      - description: Dados da fazenda
         in: body
         name: farm
         required: true
@@ -833,19 +1826,19 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Create a farm
+      summary: Criar fazenda
       tags:
-      - farms
+      - farms (Fazendas)
   /api/v1/{tenant_id}/farms/{farm_id}/plots:
     get:
-      description: List all plots (talhões) belonging to a farm
+      description: Lista todos os talhões pertencentes a uma fazenda
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Farm ID
+      - description: ID da Fazenda
         in: path
         name: farm_id
         required: true
@@ -867,19 +1860,19 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: List plots by farm
+      summary: Listar talhões por fazenda
       tags:
-      - plots
+      - plots (Talhões)
   /api/v1/{tenant_id}/farms/{id}:
     delete:
-      description: Delete a farm by ID
+      description: Exclui uma fazenda por ID
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Farm ID
+      - description: ID da Fazenda
         in: path
         name: id
         required: true
@@ -895,18 +1888,18 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Delete a farm
+      summary: Excluir fazenda
       tags:
-      - farms
+      - farms (Fazendas)
     get:
-      description: Returns a single farm
+      description: Retorna uma única fazenda
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Farm ID
+      - description: ID da Fazenda
         in: path
         name: id
         required: true
@@ -926,26 +1919,26 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get farm by ID
+      summary: Obter fazenda por ID
       tags:
-      - farms
+      - farms (Fazendas)
     put:
       consumes:
       - application/json
-      description: Update farm data by ID (partial update - only provided fields are
-        changed)
+      description: Atualiza dados da fazenda por ID (atualização parcial - somente
+        os campos informados são alterados)
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Farm ID
+      - description: ID da Fazenda
         in: path
         name: id
         required: true
         type: string
-      - description: Updated farm data
+      - description: Dados atualizados da fazenda
         in: body
         name: farm
         required: true
@@ -966,14 +1959,461 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Update a farm
+      summary: Atualizar fazenda
       tags:
-      - farms
+      - farms (Fazendas)
+  /api/v1/{tenant_id}/financial:
+    get:
+      description: Lista todas as transações financeiras pertencentes ao tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.FinancialTransaction'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar transações financeiras
+      tags:
+      - financial (Financeiro)
+    post:
+      consumes:
+      - application/json
+      description: Registra uma nova transação financeira (receita/despesa) no tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Dados da transação financeira
+        in: body
+        name: financial
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createFinancialRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.FinancialTransaction'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar transação financeira
+      tags:
+      - financial (Financeiro)
+  /api/v1/{tenant_id}/financial/{id}:
+    delete:
+      description: Exclui uma transação financeira por ID
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID da Transação Financeira
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Excluir transação financeira
+      tags:
+      - financial (Financeiro)
+    get:
+      description: Retorna uma única transação financeira
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID da Transação Financeira
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.FinancialTransaction'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obter transação financeira por ID
+      tags:
+      - financial (Financeiro)
+    put:
+      consumes:
+      - application/json
+      description: Atualiza dados da transação financeira por ID (atualização parcial
+        - somente os campos informados são alterados)
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID da Transação Financeira
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados atualizados da transação financeira
+        in: body
+        name: financial
+        required: true
+        schema:
+          $ref: '#/definitions/entity.FinancialTransaction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.FinancialTransaction'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar transação financeira
+      tags:
+      - financial (Financeiro)
+  /api/v1/{tenant_id}/fleet/maintenance:
+    get:
+      description: Lista todos os registros de manutenção pertencentes à frota do
+        tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Maintenance'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar registros de manutenção
+      tags:
+      - fleet (Frota)
+    post:
+      consumes:
+      - application/json
+      description: Registra um novo registro de manutenção para um veículo
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Dados da manutenção
+        in: body
+        name: maintenance
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createMaintenanceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Maintenance'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar registro de manutenção
+      tags:
+      - fleet (Frota)
+  /api/v1/{tenant_id}/fleet/maintenance/{id}:
+    delete:
+      description: Exclui um registro de manutenção por ID
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID da Manutenção
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Excluir registro de manutenção
+      tags:
+      - fleet (Frota)
+    get:
+      description: Retorna um único registro de manutenção
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID da Manutenção
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Maintenance'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obter registro de manutenção por ID
+      tags:
+      - fleet (Frota)
+  /api/v1/{tenant_id}/fleet/vehicles:
+    get:
+      description: Lista todos os veículos pertencentes à frota do tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Vehicle'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar veículos
+      tags:
+      - fleet (Frota)
+    post:
+      consumes:
+      - application/json
+      description: Registra um novo veículo na frota do tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Dados do veículo
+        in: body
+        name: vehicle
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createVehicleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Vehicle'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar veículo
+      tags:
+      - fleet (Frota)
+  /api/v1/{tenant_id}/fleet/vehicles/{id}:
+    delete:
+      description: Exclui um veículo por ID
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Veículo
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Excluir veículo
+      tags:
+      - fleet (Frota)
+    get:
+      description: Retorna um único veículo
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Veículo
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Vehicle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obter veículo por ID
+      tags:
+      - fleet (Frota)
+    put:
+      consumes:
+      - application/json
+      description: Atualiza dados do veículo por ID (atualização parcial - somente
+        os campos informados são alterados)
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Veículo
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados atualizados do veículo
+        in: body
+        name: vehicle
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Vehicle'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Vehicle'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar veículo
+      tags:
+      - fleet (Frota)
   /api/v1/{tenant_id}/harvests:
     get:
-      description: List all harvests (safras) for the tenant
+      description: Lista todas as colheitas (safras) do tenant
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
@@ -995,20 +2435,20 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: List harvests
+      summary: Listar colheitas
       tags:
-      - harvests
+      - harvests (Colheitas)
     post:
       consumes:
       - application/json
-      description: Register a new harvest (safra) for a year
+      description: Registra uma nova colheita (safra) para um ano
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Harvest data
+      - description: Dados da colheita
         in: body
         name: harvest
         required: true
@@ -1029,19 +2469,87 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Create a harvest
+      summary: Criar colheita
       tags:
-      - harvests
-  /api/v1/{tenant_id}/harvests/{id}:
+      - harvests (Colheitas)
+  /api/v1/{tenant_id}/harvests/{harvest_id}/budgets:
     get:
-      description: Returns a single harvest (safra)
+      description: Lista todos os orçamentos pertencentes a uma colheita
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Harvest ID
+      - description: ID da Colheita
+        in: path
+        name: harvest_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Budget'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar orçamentos por colheita
+      tags:
+      - budgets (Orçamentos)
+  /api/v1/{tenant_id}/harvests/{harvest_id}/cost-allocations:
+    get:
+      description: Lista todos os rateios de custo pertencentes a uma colheita
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID da Colheita
+        in: path
+        name: harvest_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.CostAllocation'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar rateios de custo por colheita
+      tags:
+      - cost-allocations (Rateios de Custo)
+  /api/v1/{tenant_id}/harvests/{id}:
+    get:
+      description: Retorna uma única colheita (safra)
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID da Colheita
         in: path
         name: id
         required: true
@@ -1061,20 +2569,20 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get harvest by ID
+      summary: Obter colheita por ID
       tags:
-      - harvests
+      - harvests (Colheitas)
   /api/v1/{tenant_id}/harvests/{id}/finalize:
     put:
-      description: Finalize a harvest (safra), calculating all indicators (sacas/ha,
-        custo/saca, etc.)
+      description: Finaliza uma colheita (safra), calculando todos os indicadores
+        (sacas/ha, custo/saca, etc.)
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Harvest ID
+      - description: ID da Colheita
         in: path
         name: id
         required: true
@@ -1090,19 +2598,19 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Finalize a harvest
+      summary: Finalizar colheita
       tags:
-      - harvests
+      - harvests (Colheitas)
   /api/v1/{tenant_id}/harvests/{id}/production:
     get:
-      description: Get all production records for a given harvest
+      description: Obtém todos os registros de produção de uma colheita específica
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Harvest ID
+      - description: ID da Colheita
         in: path
         name: id
         required: true
@@ -1124,25 +2632,26 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get harvest production
+      summary: Obter produção da colheita
       tags:
-      - harvests
+      - harvests (Colheitas)
     post:
       consumes:
       - application/json
-      description: Record production quantity for a specific plot in a harvest
+      description: Registra a quantidade produzida em um talhão específico dentro
+        de uma colheita
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Harvest ID
+      - description: ID da Colheita
         in: path
         name: id
         required: true
         type: string
-      - description: Production data
+      - description: Dados de produção
         in: body
         name: production
         required: true
@@ -1163,14 +2672,367 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Record harvest production
+      summary: Registrar produção da colheita
       tags:
-      - harvests
+      - harvests (Colheitas)
+  /api/v1/{tenant_id}/labor/shifts:
+    get:
+      description: Lista todos os turnos de trabalho pertencentes ao tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.WorkShift'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar turnos de trabalho
+      tags:
+      - labor (Mão de Obra)
+    post:
+      consumes:
+      - application/json
+      description: Registra um novo turno de trabalho de um trabalhador em uma operação
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Dados do turno de trabalho
+        in: body
+        name: shift
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createWorkShiftRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.WorkShift'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar turno de trabalho
+      tags:
+      - labor (Mão de Obra)
+  /api/v1/{tenant_id}/labor/shifts/{id}:
+    delete:
+      description: Exclui um turno de trabalho por ID
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Turno de Trabalho
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Excluir turno de trabalho
+      tags:
+      - labor (Mão de Obra)
+  /api/v1/{tenant_id}/labor/teams:
+    get:
+      description: Lista todas as equipes de trabalho pertencentes ao tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Team'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar equipes de trabalho
+      tags:
+      - labor (Mão de Obra)
+    post:
+      consumes:
+      - application/json
+      description: Registra uma nova equipe de trabalho no tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Dados da equipe
+        in: body
+        name: team
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Team'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar equipe de trabalho
+      tags:
+      - labor (Mão de Obra)
+  /api/v1/{tenant_id}/labor/teams/{id}:
+    delete:
+      description: Exclui uma equipe de trabalho por ID
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID da Equipe
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Excluir equipe de trabalho
+      tags:
+      - labor (Mão de Obra)
+    put:
+      consumes:
+      - application/json
+      description: Atualiza dados da equipe de trabalho por ID (atualização parcial
+        - somente os campos informados são alterados)
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID da Equipe
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados atualizados da equipe
+        in: body
+        name: team
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Team'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Team'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar equipe de trabalho
+      tags:
+      - labor (Mão de Obra)
+  /api/v1/{tenant_id}/labor/workers:
+    get:
+      description: Lista todos os trabalhadores pertencentes ao tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Worker'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar trabalhadores
+      tags:
+      - labor (Mão de Obra)
+    post:
+      consumes:
+      - application/json
+      description: Registra um novo trabalhador no tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Dados do trabalhador
+        in: body
+        name: worker
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createWorkerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Worker'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar trabalhador
+      tags:
+      - labor (Mão de Obra)
+  /api/v1/{tenant_id}/labor/workers/{id}:
+    delete:
+      description: Exclui um trabalhador por ID
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Trabalhador
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Excluir trabalhador
+      tags:
+      - labor (Mão de Obra)
+    put:
+      consumes:
+      - application/json
+      description: Atualiza dados do trabalhador por ID (atualização parcial - somente
+        os campos informados são alterados)
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Trabalhador
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados atualizados do trabalhador
+        in: body
+        name: worker
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Worker'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Worker'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar trabalhador
+      tags:
+      - labor (Mão de Obra)
   /api/v1/{tenant_id}/operations:
     get:
-      description: List all operations across all plots in the tenant
+      description: Lista todas as operações de todos os talhões do tenant
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
@@ -1192,21 +3054,21 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: List all operations
+      summary: Listar todas as operações
       tags:
-      - operations
+      - operations (Operações)
     post:
       consumes:
       - application/json
-      description: Register an agricultural operation (adubação, pulverização, irrigação,
+      description: Registra uma operação agrícola (adubação, pulverização, irrigação,
         poda, colheita)
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Operation data
+      - description: Dados da operação
         in: body
         name: operation
         required: true
@@ -1227,19 +3089,19 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Register an operation
+      summary: Registrar operação
       tags:
-      - operations
+      - operations (Operações)
   /api/v1/{tenant_id}/operations/{id}:
     delete:
-      description: Delete an operation by ID
+      description: Exclui uma operação por ID
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Operation ID
+      - description: ID da Operação
         in: path
         name: id
         required: true
@@ -1255,18 +3117,18 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Delete an operation
+      summary: Excluir operação
       tags:
-      - operations
+      - operations (Operações)
     get:
-      description: Returns a single operation
+      description: Retorna uma única operação
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Operation ID
+      - description: ID da Operação
         in: path
         name: id
         required: true
@@ -1286,19 +3148,19 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get operation by ID
+      summary: Obter operação por ID
       tags:
-      - operations
+      - operations (Operações)
   /api/v1/{tenant_id}/operations/recent:
     get:
-      description: List the most recent operations, limited by query param
+      description: Lista as operações mais recentes, limitadas por parâmetro de consulta
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Max results (default 10)
+      - description: Máximo de resultados (padrão 10)
         in: query
         name: limit
         type: integer
@@ -1319,14 +3181,14 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: List recent operations
+      summary: Listar operações recentes
       tags:
-      - operations
+      - operations (Operações)
   /api/v1/{tenant_id}/plots:
     get:
-      description: List all plots across all farms in the tenant
+      description: Lista todos os talhões de todas as fazendas do tenant
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
@@ -1348,20 +3210,20 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: List all plots
+      summary: Listar todos os talhões
       tags:
-      - plots
+      - plots (Talhões)
     post:
       consumes:
       - application/json
-      description: Register a new plot (talhão) in a farm
+      description: Registra um novo talhão em uma fazenda
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Plot data
+      - description: Dados do talhão
         in: body
         name: plot
         required: true
@@ -1382,19 +3244,19 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Create a plot
+      summary: Criar talhão
       tags:
-      - plots
+      - plots (Talhões)
   /api/v1/{tenant_id}/plots/{id}:
     delete:
-      description: Delete a plot by ID
+      description: Exclui um talhão por ID
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Plot ID
+      - description: ID do Talhão
         in: path
         name: id
         required: true
@@ -1410,18 +3272,18 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Delete a plot
+      summary: Excluir talhão
       tags:
-      - plots
+      - plots (Talhões)
     get:
-      description: Returns a single plot (talhão)
+      description: Retorna um único talhão
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Plot ID
+      - description: ID do Talhão
         in: path
         name: id
         required: true
@@ -1441,26 +3303,26 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get plot by ID
+      summary: Obter talhão por ID
       tags:
-      - plots
+      - plots (Talhões)
     put:
       consumes:
       - application/json
-      description: Update plot data by ID (partial update - only provided fields are
-        changed)
+      description: Atualiza dados do talhão por ID (atualização parcial - somente
+        os campos informados são alterados)
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Plot ID
+      - description: ID do Talhão
         in: path
         name: id
         required: true
         type: string
-      - description: Updated plot data
+      - description: Dados atualizados do talhão
         in: body
         name: plot
         required: true
@@ -1481,19 +3343,19 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Update a plot
+      summary: Atualizar talhão
       tags:
-      - plots
+      - plots (Talhões)
   /api/v1/{tenant_id}/plots/{plot_id}/operations:
     get:
-      description: List all operations for a specific plot (talhão)
+      description: Lista todas as operações de um talhão específico
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: tenant_id
         required: true
         type: string
-      - description: Plot ID
+      - description: ID do Talhão
         in: path
         name: plot_id
         required: true
@@ -1515,12 +3377,274 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: List operations by plot
+      summary: Listar operações por talhão
       tags:
-      - operations
+      - operations (Operações)
+  /api/v1/{tenant_id}/stock/items:
+    get:
+      description: Lista todos os itens de estoque pertencentes ao tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.StockItem'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar itens de estoque
+      tags:
+      - stock (Estoque)
+    post:
+      consumes:
+      - application/json
+      description: Registra um novo item de estoque no tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Dados do item de estoque
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createStockItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.StockItem'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar item de estoque
+      tags:
+      - stock (Estoque)
+  /api/v1/{tenant_id}/stock/items/{id}:
+    delete:
+      description: Exclui um item de estoque por ID
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Item de Estoque
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Excluir item de estoque
+      tags:
+      - stock (Estoque)
+    get:
+      description: Retorna um único item de estoque
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Item de Estoque
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StockItem'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obter item de estoque por ID
+      tags:
+      - stock (Estoque)
+    put:
+      consumes:
+      - application/json
+      description: Atualiza dados do item de estoque por ID (atualização parcial -
+        somente os campos informados são alterados)
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: ID do Item de Estoque
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados atualizados do item de estoque
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/entity.StockItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StockItem'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar item de estoque
+      tags:
+      - stock (Estoque)
+  /api/v1/{tenant_id}/stock/movements:
+    get:
+      description: Lista todas as movimentações de estoque pertencentes ao tenant
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.StockMovement'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar movimentações de estoque
+      tags:
+      - stock (Estoque)
+    post:
+      consumes:
+      - application/json
+      description: Registra uma movimentação de estoque (entrada/saída) para um item
+        de estoque
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Dados da movimentação de estoque
+        in: body
+        name: movement
+        required: true
+        schema:
+          $ref: '#/definitions/handler.recordMovementRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.StockMovement'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Registrar movimentação de estoque
+      tags:
+      - stock (Estoque)
+  /api/v1/{tenant_id}/sync:
+    post:
+      consumes:
+      - application/json
+      description: Aceita um lote (máximo 50) de eventos mobile offline e publica
+        cada um no RabbitMQ para persistência assíncrona
+      parameters:
+      - description: ID do Tenant
+        in: path
+        name: tenant_id
+        required: true
+        type: string
+      - description: Dados do lote de sincronização
+        in: body
+        name: batch
+        required: true
+        schema:
+          $ref: '#/definitions/handler.syncBatchRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/handler.syncResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Sincronizar lote offline
+      tags:
+      - sync (Sincronização)
   /api/v1/admin/tenants:
     get:
-      description: List all tenants (platform_owner only)
+      description: Lista todos os tenants (somente platform_owner)
       produces:
       - application/json
       responses:
@@ -1532,15 +3656,15 @@ paths:
             type: array
       security:
       - BearerAuth: []
-      summary: List tenants
+      summary: Listar tenants
       tags:
-      - tenants
+      - tenants (Inquilinos)
     post:
       consumes:
       - application/json
-      description: Create a new tenant (platform_owner only)
+      description: Cria um novo tenant (somente platform_owner)
       parameters:
-      - description: Tenant data
+      - description: Dados do tenant
         in: body
         name: tenant
         required: true
@@ -1561,14 +3685,14 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Create a tenant
+      summary: Criar tenant
       tags:
-      - tenants
+      - tenants (Inquilinos)
   /api/v1/admin/tenants/{id}:
     delete:
-      description: Delete a tenant by ID (platform_owner only)
+      description: Exclui um tenant por ID (somente platform_owner)
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: id
         required: true
@@ -1578,13 +3702,13 @@ paths:
           description: No Content
       security:
       - BearerAuth: []
-      summary: Delete a tenant
+      summary: Excluir tenant
       tags:
-      - tenants
+      - tenants (Inquilinos)
     get:
-      description: Returns a single tenant (platform_owner only)
+      description: Retorna um único tenant (somente platform_owner)
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: id
         required: true
@@ -1604,20 +3728,20 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get tenant by ID
+      summary: Obter tenant por ID
       tags:
-      - tenants
+      - tenants (Inquilinos)
     put:
       consumes:
       - application/json
-      description: Update tenant data (platform_owner only)
+      description: Atualiza dados do tenant (somente platform_owner)
       parameters:
-      - description: Tenant ID
+      - description: ID do Tenant
         in: path
         name: id
         required: true
         type: string
-      - description: Updated tenant data
+      - description: Dados atualizados do tenant
         in: body
         name: tenant
         required: true
@@ -1638,12 +3762,12 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Update a tenant
+      summary: Atualizar tenant
       tags:
-      - tenants
+      - tenants (Inquilinos)
   /api/v1/admin/users:
     get:
-      description: List all users (platform_owner only)
+      description: Lista todos os usuários (somente platform_owner)
       produces:
       - application/json
       responses:
@@ -1655,15 +3779,15 @@ paths:
             type: array
       security:
       - BearerAuth: []
-      summary: List users
+      summary: Listar usuários
       tags:
-      - users
+      - users (Usuários)
     post:
       consumes:
       - application/json
-      description: Create a new user (platform_owner only)
+      description: Cria um novo usuário (somente platform_owner)
       parameters:
-      - description: User data
+      - description: Dados do usuário
         in: body
         name: user
         required: true
@@ -1684,14 +3808,14 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Create a user
+      summary: Criar usuário
       tags:
-      - users
+      - users (Usuários)
   /api/v1/admin/users/{id}:
     delete:
-      description: Delete a user by ID (platform_owner only)
+      description: Exclui um usuário por ID (somente platform_owner)
       parameters:
-      - description: User ID
+      - description: ID do Usuário
         in: path
         name: id
         required: true
@@ -1701,20 +3825,20 @@ paths:
           description: No Content
       security:
       - BearerAuth: []
-      summary: Delete a user
+      summary: Excluir usuário
       tags:
-      - users
+      - users (Usuários)
     put:
       consumes:
       - application/json
-      description: Update user data (platform_owner only)
+      description: Atualiza dados do usuário (somente platform_owner)
       parameters:
-      - description: User ID
+      - description: ID do Usuário
         in: path
         name: id
         required: true
         type: string
-      - description: Updated user data
+      - description: Dados atualizados do usuário
         in: body
         name: user
         required: true
@@ -1735,16 +3859,16 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Update a user
+      summary: Atualizar usuário
       tags:
-      - users
+      - users (Usuários)
   /auth/login:
     post:
       consumes:
       - application/json
-      description: Authenticate with email and password
+      description: Autentica com e-mail e senha
       parameters:
-      - description: Credentials
+      - description: Credenciais
         in: body
         name: body
         required: true
@@ -1765,10 +3889,10 @@ paths:
             type: object
       summary: Login
       tags:
-      - auth
+      - auth (Autenticação)
   /health:
     get:
-      description: Returns API health status
+      description: Retorna o status de saúde da API
       produces:
       - application/json
       responses:
@@ -1778,9 +3902,9 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Health check
+      summary: Verificação de saúde
       tags:
-      - system
+      - system (Sistema)
 schemes:
 - http
 securityDefinitions:

@@ -2,10 +2,10 @@ package handler
 
 import "net/http"
 
-// HealthCheck returns the API health status
-// @Summary Health check
-// @Description Returns API health status
-// @Tags system
+// HealthCheck retorna o status de saúde da API
+// @Summary Verificação de saúde
+// @Description Retorna o status de saúde da API
+// @Tags system (Sistema)
 // @Produce json
 // @Success 200 {object} map[string]string
 // @Router /health [get]

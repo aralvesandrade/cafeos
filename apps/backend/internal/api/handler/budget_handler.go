@@ -23,6 +23,18 @@ type createBudgetRequest struct {
 	Description   string  `json:"description"`
 }
 
+// Create registra um novo orçamento para um centro de custo da colheita
+// @Summary Criar orçamento
+// @Description Registra um novo orçamento para uma colheita e centro de custo
+// @Tags budgets (Orçamentos)
+// @Accept json
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param budget body createBudgetRequest true "Dados do orçamento"
+// @Success 201 {object} entity.Budget
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/budgets [post]
 func (h *BudgetHandler) Create(w http.ResponseWriter, r *http.Request) {
 	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
 
@@ -41,6 +53,17 @@ func (h *BudgetHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, b, http.StatusCreated)
 }
 
+// ListByHarvest retorna todos os orçamentos de uma colheita
+// @Summary Listar orçamentos por colheita
+// @Description Lista todos os orçamentos pertencentes a uma colheita
+// @Tags budgets (Orçamentos)
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param harvest_id path string true "ID da Colheita"
+// @Success 200 {array} entity.Budget
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/harvests/{harvest_id}/budgets [get]
 func (h *BudgetHandler) ListByHarvest(w http.ResponseWriter, r *http.Request) {
 	harvestID := r.PathValue("harvest_id")
 	budgets, err := h.svc.ListByHarvest(harvestID)
@@ -51,6 +74,17 @@ func (h *BudgetHandler) ListByHarvest(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, budgets, http.StatusOK)
 }
 
+// GetByID retorna um orçamento pelo seu ID
+// @Summary Obter orçamento por ID
+// @Description Retorna um único orçamento
+// @Tags budgets (Orçamentos)
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID do Orçamento"
+// @Success 200 {object} entity.Budget
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/budgets/{id} [get]
 func (h *BudgetHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	b, err := h.svc.GetByID(id)
@@ -61,6 +95,19 @@ func (h *BudgetHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, b, http.StatusOK)
 }
 
+// Update atualiza um orçamento existente
+// @Summary Atualizar orçamento
+// @Description Atualiza dados do orçamento por ID (atualização parcial - somente os campos informados são alterados)
+// @Tags budgets (Orçamentos)
+// @Accept json
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID do Orçamento"
+// @Param budget body entity.Budget true "Dados atualizados do orçamento"
+// @Success 200 {object} entity.Budget
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/budgets/{id} [put]
 func (h *BudgetHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	existing, err := h.svc.GetByID(id)
@@ -90,6 +137,16 @@ func (h *BudgetHandler) Update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, existing, http.StatusOK)
 }
 
+// Delete remove um orçamento pelo seu ID
+// @Summary Excluir orçamento
+// @Description Exclui um orçamento por ID
+// @Tags budgets (Orçamentos)
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID do Orçamento"
+// @Success 204 "No Content"
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/budgets/{id} [delete]
 func (h *BudgetHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.svc.Delete(id); err != nil {

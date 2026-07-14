@@ -32,10 +32,10 @@ type updateTenantRequest struct {
 	Status    *string `json:"status"`
 }
 
-// List returns all tenants
-// @Summary List tenants
-// @Description List all tenants (platform_owner only)
-// @Tags tenants
+// List retorna todos os tenants
+// @Summary Listar tenants
+// @Description Lista todos os tenants (somente platform_owner)
+// @Tags tenants (Inquilinos)
 // @Produce json
 // @Success 200 {array} entity.Tenant
 // @Security BearerAuth
@@ -49,13 +49,13 @@ func (h *TenantHandler) List(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, tenants, http.StatusOK)
 }
 
-// Create registers a new tenant
-// @Summary Create a tenant
-// @Description Create a new tenant (platform_owner only)
-// @Tags tenants
+// Create registra um novo tenant
+// @Summary Criar tenant
+// @Description Cria um novo tenant (somente platform_owner)
+// @Tags tenants (Inquilinos)
 // @Accept json
 // @Produce json
-// @Param tenant body createTenantRequest true "Tenant data"
+// @Param tenant body createTenantRequest true "Dados do tenant"
 // @Success 201 {object} entity.Tenant
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
@@ -94,12 +94,12 @@ func (h *TenantHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, tenant, http.StatusCreated)
 }
 
-// GetByID returns a tenant by its ID
-// @Summary Get tenant by ID
-// @Description Returns a single tenant (platform_owner only)
-// @Tags tenants
+// GetByID retorna um tenant pelo seu ID
+// @Summary Obter tenant por ID
+// @Description Retorna um único tenant (somente platform_owner)
+// @Tags tenants (Inquilinos)
 // @Produce json
-// @Param id path string true "Tenant ID"
+// @Param id path string true "ID do Tenant"
 // @Success 200 {object} entity.Tenant
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
@@ -114,14 +114,14 @@ func (h *TenantHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, tenant, http.StatusOK)
 }
 
-// Update updates an existing tenant
-// @Summary Update a tenant
-// @Description Update tenant data (platform_owner only)
-// @Tags tenants
+// Update atualiza um tenant existente
+// @Summary Atualizar tenant
+// @Description Atualiza dados do tenant (somente platform_owner)
+// @Tags tenants (Inquilinos)
 // @Accept json
 // @Produce json
-// @Param id path string true "Tenant ID"
-// @Param tenant body updateTenantRequest true "Updated tenant data"
+// @Param id path string true "ID do Tenant"
+// @Param tenant body updateTenantRequest true "Dados atualizados do tenant"
 // @Success 200 {object} entity.Tenant
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
@@ -163,11 +163,11 @@ func (h *TenantHandler) Update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, existing, http.StatusOK)
 }
 
-// Delete removes a tenant
-// @Summary Delete a tenant
-// @Description Delete a tenant by ID (platform_owner only)
-// @Tags tenants
-// @Param id path string true "Tenant ID"
+// Delete remove um tenant
+// @Summary Excluir tenant
+// @Description Exclui um tenant por ID (somente platform_owner)
+// @Tags tenants (Inquilinos)
+// @Param id path string true "ID do Tenant"
 // @Success 204 "No Content"
 // @Security BearerAuth
 // @Router /api/v1/admin/tenants/{id} [delete]

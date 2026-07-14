@@ -15,6 +15,16 @@ func NewProductHandler(repo repository.AgriculturalProductRepository) *ProductHa
 	return &ProductHandler{repo: repo}
 }
 
+// List retorna todos os produtos agrícolas do tenant autenticado
+// @Summary Listar produtos agrícolas
+// @Description Lista todos os produtos agrícolas pertencentes ao tenant
+// @Tags agricultural-products (Produtos Agrícolas)
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Success 200 {array} entity.AgriculturalProduct
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/agricultural-products [get]
 func (h *ProductHandler) List(w http.ResponseWriter, r *http.Request) {
 	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
 	products, err := h.repo.ListByTenant(tenantID)

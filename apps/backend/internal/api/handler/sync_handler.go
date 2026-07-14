@@ -30,8 +30,8 @@ type syncItemRequest struct {
 }
 
 type syncResponse struct {
-	Accepted int              `json:"accepted"`
-	Errors   []syncErrorItem  `json:"errors"`
+	Accepted int             `json:"accepted"`
+	Errors   []syncErrorItem `json:"errors"`
 }
 
 type syncErrorItem struct {
@@ -39,6 +39,18 @@ type syncErrorItem struct {
 	Error    string `json:"error"`
 }
 
+// Sync aceita um lote de eventos criados offline pelos clientes mobile e os publica no RabbitMQ
+// @Summary Sincronizar lote offline
+// @Description Aceita um lote (máximo 50) de eventos mobile offline e publica cada um no RabbitMQ para persistência assíncrona
+// @Tags sync (Sincronização)
+// @Accept json
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param batch body syncBatchRequest true "Dados do lote de sincronização"
+// @Success 202 {object} syncResponse
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/sync [post]
 func (h *SyncHandler) Sync(w http.ResponseWriter, r *http.Request) {
 	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
 

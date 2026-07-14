@@ -25,6 +25,18 @@ type createCostCenterRequest struct {
 	Description string `json:"description"`
 }
 
+// Create registra um novo centro de custo para o tenant autenticado
+// @Summary Criar centro de custo
+// @Description Registra um novo centro de custo no tenant
+// @Tags cost-centers (Centros de Custo)
+// @Accept json
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param cost_center body createCostCenterRequest true "Dados do centro de custo"
+// @Success 201 {object} entity.CostCenter
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/cost-centers [post]
 func (h *CostCenterHandler) Create(w http.ResponseWriter, r *http.Request) {
 	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
 
@@ -43,12 +55,30 @@ func (h *CostCenterHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, cc, http.StatusCreated)
 }
 
-// SenarCategories returns the fixed SENAR/CEPEA despesa category catalog,
-// used by clients to pre-fill new cost centers with a known cost_group.
+// SenarCategories retorna o catálogo fixo de categorias de despesa SENAR/CEPEA,
+// usado pelos clientes para pré-preencher novos centros de custo com um cost_group conhecido.
+// @Summary Listar categorias SENAR/CEPEA
+// @Description Retorna o catálogo fixo de categorias de despesa SENAR/CEPEA
+// @Tags cost-centers (Centros de Custo)
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Success 200 {array} entity.SenarCostCategory
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/cost-centers/senar-categories [get]
 func (h *CostCenterHandler) SenarCategories(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, h.svc.SenarCategories(), http.StatusOK)
 }
 
+// List retorna todos os centros de custo do tenant autenticado
+// @Summary Listar centros de custo
+// @Description Lista todos os centros de custo pertencentes ao tenant
+// @Tags cost-centers (Centros de Custo)
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Success 200 {array} entity.CostCenter
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/cost-centers [get]
 func (h *CostCenterHandler) List(w http.ResponseWriter, r *http.Request) {
 	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
 	ccs, err := h.svc.ListByTenant(tenantID)
@@ -59,6 +89,17 @@ func (h *CostCenterHandler) List(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, ccs, http.StatusOK)
 }
 
+// GetByID retorna um centro de custo pelo seu ID
+// @Summary Obter centro de custo por ID
+// @Description Retorna um único centro de custo
+// @Tags cost-centers (Centros de Custo)
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID do Centro de Custo"
+// @Success 200 {object} entity.CostCenter
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/cost-centers/{id} [get]
 func (h *CostCenterHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	cc, err := h.svc.GetByID(id)
@@ -69,6 +110,19 @@ func (h *CostCenterHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, cc, http.StatusOK)
 }
 
+// Update atualiza um centro de custo existente
+// @Summary Atualizar centro de custo
+// @Description Atualiza dados do centro de custo por ID (atualização parcial - somente os campos informados são alterados)
+// @Tags cost-centers (Centros de Custo)
+// @Accept json
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID do Centro de Custo"
+// @Param cost_center body entity.CostCenter true "Dados atualizados do centro de custo"
+// @Success 200 {object} entity.CostCenter
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/cost-centers/{id} [put]
 func (h *CostCenterHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
@@ -114,6 +168,16 @@ func (h *CostCenterHandler) Update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, existing, http.StatusOK)
 }
 
+// Delete remove um centro de custo pelo seu ID
+// @Summary Excluir centro de custo
+// @Description Exclui um centro de custo por ID
+// @Tags cost-centers (Centros de Custo)
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID do Centro de Custo"
+// @Success 204 "No Content"
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/cost-centers/{id} [delete]
 func (h *CostCenterHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.svc.Delete(id); err != nil {

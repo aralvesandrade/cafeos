@@ -35,6 +35,18 @@ type allocationItemResponse struct {
 	Percentage float64 `json:"percentage"`
 }
 
+// Create registra um novo rateio de custo para um centro de custo da colheita
+// @Summary Criar rateio de custo
+// @Description Registra um novo rateio de custo, distribuindo um valor entre talhões
+// @Tags cost-allocations (Rateios de Custo)
+// @Accept json
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param allocation body createAllocationRequest true "Dados do rateio de custo"
+// @Success 201 {object} entity.CostAllocation
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/cost-allocations [post]
 func (h *CostAllocationHandler) Create(w http.ResponseWriter, r *http.Request) {
 	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
 
@@ -69,6 +81,17 @@ func (h *CostAllocationHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, allocation, http.StatusCreated)
 }
 
+// ListByHarvest retorna todos os rateios de custo de uma colheita
+// @Summary Listar rateios de custo por colheita
+// @Description Lista todos os rateios de custo pertencentes a uma colheita
+// @Tags cost-allocations (Rateios de Custo)
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param harvest_id path string true "ID da Colheita"
+// @Success 200 {array} entity.CostAllocation
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/harvests/{harvest_id}/cost-allocations [get]
 func (h *CostAllocationHandler) ListByHarvest(w http.ResponseWriter, r *http.Request) {
 	harvestID := r.PathValue("harvest_id")
 	allocs, err := h.svc.ListByHarvest(harvestID)
@@ -79,6 +102,17 @@ func (h *CostAllocationHandler) ListByHarvest(w http.ResponseWriter, r *http.Req
 	writeJSON(w, allocs, http.StatusOK)
 }
 
+// GetByID retorna um rateio de custo pelo seu ID
+// @Summary Obter rateio de custo por ID
+// @Description Retorna um único rateio de custo
+// @Tags cost-allocations (Rateios de Custo)
+// @Produce json
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID do Rateio de Custo"
+// @Success 200 {object} entity.CostAllocation
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/cost-allocations/{id} [get]
 func (h *CostAllocationHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	a, err := h.svc.GetByID(id)
@@ -89,6 +123,16 @@ func (h *CostAllocationHandler) GetByID(w http.ResponseWriter, r *http.Request) 
 	writeJSON(w, a, http.StatusOK)
 }
 
+// Delete remove um rateio de custo pelo seu ID
+// @Summary Excluir rateio de custo
+// @Description Exclui um rateio de custo por ID
+// @Tags cost-allocations (Rateios de Custo)
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID do Rateio de Custo"
+// @Success 204 "No Content"
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{tenant_id}/cost-allocations/{id} [delete]
 func (h *CostAllocationHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.svc.Delete(id); err != nil {

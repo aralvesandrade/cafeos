@@ -32,14 +32,14 @@ type createOperationRequest struct {
 	Notes        string   `json:"notes"`
 }
 
-// Create registers a new agricultural operation
-// @Summary Register an operation
-// @Description Register an agricultural operation (adubação, pulverização, irrigação, poda, colheita)
-// @Tags operations
+// Create registra uma nova operação agrícola
+// @Summary Registrar operação
+// @Description Registra uma operação agrícola (adubação, pulverização, irrigação, poda, colheita)
+// @Tags operations (Operações)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param operation body createOperationRequest true "Operation data"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param operation body createOperationRequest true "Dados da operação"
 // @Success 201 {object} SwaggerOperation
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
@@ -67,13 +67,13 @@ func (h *OperationHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, op, http.StatusCreated)
 }
 
-// GetByID returns an operation by its ID
-// @Summary Get operation by ID
-// @Description Returns a single operation
-// @Tags operations
+// GetByID retorna uma operação pelo seu ID
+// @Summary Obter operação por ID
+// @Description Retorna uma única operação
+// @Tags operations (Operações)
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param id path string true "Operation ID"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID da Operação"
 // @Success 200 {object} SwaggerOperation
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
@@ -88,13 +88,13 @@ func (h *OperationHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, op, http.StatusOK)
 }
 
-// ListByPlot returns all operations for a given plot
-// @Summary List operations by plot
-// @Description List all operations for a specific plot (talhão)
-// @Tags operations
+// ListByPlot retorna todas as operações de um talhão
+// @Summary Listar operações por talhão
+// @Description Lista todas as operações de um talhão específico
+// @Tags operations (Operações)
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param plot_id path string true "Plot ID"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param plot_id path string true "ID do Talhão"
 // @Success 200 {array} SwaggerOperation
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -109,12 +109,12 @@ func (h *OperationHandler) ListByPlot(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, ops, http.StatusOK)
 }
 
-// List returns all operations for the authenticated tenant
-// @Summary List all operations
-// @Description List all operations across all plots in the tenant
-// @Tags operations
+// List retorna todas as operações do tenant autenticado
+// @Summary Listar todas as operações
+// @Description Lista todas as operações de todos os talhões do tenant
+// @Tags operations (Operações)
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
+// @Param tenant_id path string true "ID do Tenant"
 // @Success 200 {array} SwaggerOperation
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -129,13 +129,13 @@ func (h *OperationHandler) List(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, ops, http.StatusOK)
 }
 
-// ListRecent returns the most recent operations
-// @Summary List recent operations
-// @Description List the most recent operations, limited by query param
-// @Tags operations
+// ListRecent retorna as operações mais recentes
+// @Summary Listar operações recentes
+// @Description Lista as operações mais recentes, limitadas por parâmetro de consulta
+// @Tags operations (Operações)
 // @Produce json
-// @Param tenant_id path string true "Tenant ID"
-// @Param limit query int false "Max results (default 10)"
+// @Param tenant_id path string true "ID do Tenant"
+// @Param limit query int false "Máximo de resultados (padrão 10)"
 // @Success 200 {array} SwaggerOperation
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -156,12 +156,12 @@ func (h *OperationHandler) ListRecent(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, ops, http.StatusOK)
 }
 
-// Delete removes an operation
-// @Summary Delete an operation
-// @Description Delete an operation by ID
-// @Tags operations
-// @Param tenant_id path string true "Tenant ID"
-// @Param id path string true "Operation ID"
+// Delete remove uma operação
+// @Summary Excluir operação
+// @Description Exclui uma operação por ID
+// @Tags operations (Operações)
+// @Param tenant_id path string true "ID do Tenant"
+// @Param id path string true "ID da Operação"
 // @Success 204 "No Content"
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth

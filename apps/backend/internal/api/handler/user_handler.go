@@ -33,10 +33,10 @@ type updateUserRequest struct {
 	Role  *string `json:"role"`
 }
 
-// List returns all users
-// @Summary List users
-// @Description List all users (platform_owner only)
-// @Tags users
+// List retorna todos os usuários
+// @Summary Listar usuários
+// @Description Lista todos os usuários (somente platform_owner)
+// @Tags users (Usuários)
 // @Produce json
 // @Success 200 {array} entity.User
 // @Security BearerAuth
@@ -76,13 +76,13 @@ func (h *UserHandler) List(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, resp, http.StatusOK)
 }
 
-// Create registers a new user
-// @Summary Create a user
-// @Description Create a new user (platform_owner only)
-// @Tags users
+// Create registra um novo usuário
+// @Summary Criar usuário
+// @Description Cria um novo usuário (somente platform_owner)
+// @Tags users (Usuários)
 // @Accept json
 // @Produce json
-// @Param user body createUserRequest true "User data"
+// @Param user body createUserRequest true "Dados do usuário"
 // @Success 201 {object} entity.User
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
@@ -130,14 +130,14 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, user, http.StatusCreated)
 }
 
-// Update updates an existing user
-// @Summary Update a user
-// @Description Update user data (platform_owner only)
-// @Tags users
+// Update atualiza um usuário existente
+// @Summary Atualizar usuário
+// @Description Atualiza dados do usuário (somente platform_owner)
+// @Tags users (Usuários)
 // @Accept json
 // @Produce json
-// @Param id path string true "User ID"
-// @Param user body updateUserRequest true "Updated user data"
+// @Param id path string true "ID do Usuário"
+// @Param user body updateUserRequest true "Dados atualizados do usuário"
 // @Success 200 {object} entity.User
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
@@ -176,11 +176,11 @@ func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, existing, http.StatusOK)
 }
 
-// Delete removes a user
-// @Summary Delete a user
-// @Description Delete a user by ID (platform_owner only)
-// @Tags users
-// @Param id path string true "User ID"
+// Delete remove um usuário
+// @Summary Excluir usuário
+// @Description Exclui um usuário por ID (somente platform_owner)
+// @Tags users (Usuários)
+// @Param id path string true "ID do Usuário"
 // @Success 204 "No Content"
 // @Security BearerAuth
 // @Router /api/v1/admin/users/{id} [delete]

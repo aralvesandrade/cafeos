@@ -36,13 +36,13 @@ type loginResponse struct {
 	} `json:"user"`
 }
 
-// Login authenticates a user and returns a JWT token
+// Login autentica um usuário e retorna um token JWT
 // @Summary Login
-// @Description Authenticate with email and password
-// @Tags auth
+// @Description Autentica com e-mail e senha
+// @Tags auth (Autenticação)
 // @Accept json
 // @Produce json
-// @Param body body loginRequest true "Credentials"
+// @Param body body loginRequest true "Credenciais"
 // @Success 200 {object} loginResponse
 // @Failure 401 {object} map[string]string
 // @Router /auth/login [post]
