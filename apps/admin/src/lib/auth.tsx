@@ -12,7 +12,7 @@ interface AuthContextType {
   user: User | null
   token: string | null
   isAuthenticated: boolean
-  login: (token: string, tenantId: string, user: User) => void
+  login: (token: string, organizationId: string, user: User) => void
   logout: () => void
 }
 
@@ -22,8 +22,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
 
-  const login = useCallback((token: string, tenantId: string, user: User) => {
-    setAuthData(token, tenantId)
+  const login = useCallback((token: string, organizationId: string, user: User) => {
+    setAuthData(token, organizationId)
     setToken(token)
     setUser(user)
   }, [])

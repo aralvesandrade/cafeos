@@ -27,9 +27,9 @@ func (r *StockItemRepository) GetByID(id string) (*entity.StockItem, error) {
 	return &item, err
 }
 
-func (r *StockItemRepository) ListByTenant(tenantID string) ([]*entity.StockItem, error) {
+func (r *StockItemRepository) ListByOrganization(organizationID string) ([]*entity.StockItem, error) {
 	var items []*entity.StockItem
-	err := r.db.Preload("Product").Where("tenant_id = ?", tenantID).Order("product_id").Find(&items).Error
+	err := r.db.Preload("Product").Where("organization_id = ?", organizationID).Order("product_id").Find(&items).Error
 	return items, err
 }
 
@@ -57,9 +57,9 @@ func (r *StockMovementRepository) Create(mov *entity.StockMovement) error {
 	return r.db.Create(mov).Error
 }
 
-func (r *StockMovementRepository) ListByTenant(tenantID string) ([]*entity.StockMovement, error) {
+func (r *StockMovementRepository) ListByOrganization(organizationID string) ([]*entity.StockMovement, error) {
 	var movs []*entity.StockMovement
-	err := r.db.Where("tenant_id = ?", tenantID).Order("date DESC").Find(&movs).Error
+	err := r.db.Where("organization_id = ?", organizationID).Order("date DESC").Find(&movs).Error
 	return movs, err
 }
 

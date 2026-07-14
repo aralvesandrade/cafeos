@@ -19,14 +19,14 @@ func NewCostAllocationService(repo repository.CostAllocationRepository, plotRepo
 }
 
 type CreateAllocationInput struct {
-	TenantID     string
-	HarvestID    string
-	CostCenterID string
-	Description  string
-	TotalAmount  float64
-	Method       entity.AllocationMethod
-	Date         time.Time
-	Percentages  map[string]float64 // plotID -> percentage (for custom_percentage)
+	OrganizationID string
+	HarvestID      string
+	CostCenterID   string
+	Description    string
+	TotalAmount    float64
+	Method         entity.AllocationMethod
+	Date           time.Time
+	Percentages    map[string]float64 // plotID -> percentage (for custom_percentage)
 }
 
 func (s *CostAllocationService) Create(input CreateAllocationInput) (*entity.CostAllocation, error) {
@@ -38,20 +38,20 @@ func (s *CostAllocationService) Create(input CreateAllocationInput) (*entity.Cos
 	}
 
 	allocation := &entity.CostAllocation{
-		ID:           uuid.New().String(),
-		TenantID:     input.TenantID,
-		HarvestID:    input.HarvestID,
-		CostCenterID: input.CostCenterID,
-		Description:  input.Description,
-		TotalAmount:  input.TotalAmount,
-		Method:       input.Method,
-		Date:         input.Date,
-		CreatedAt:    time.Now(),
+		ID:             uuid.New().String(),
+		OrganizationID: input.OrganizationID,
+		HarvestID:      input.HarvestID,
+		CostCenterID:   input.CostCenterID,
+		Description:    input.Description,
+		TotalAmount:    input.TotalAmount,
+		Method:         input.Method,
+		Date:           input.Date,
+		CreatedAt:      time.Now(),
 	}
 
 	switch input.Method {
 	case entity.AllocAreaProportional:
-		plots, err := s.plotRepo.ListByTenant(input.TenantID)
+		plots, err := s.plotRepo.ListByOrganization(input.OrganizationID)
 		if err != nil {
 			return nil, err
 		}

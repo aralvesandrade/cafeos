@@ -3,9 +3,9 @@ package entity
 import "time"
 
 type Producer struct {
-	ID       string `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	TenantID string `json:"tenant_id" gorm:"type:uuid;not null;index"`
-	FarmID   string `json:"farm_id" gorm:"type:uuid;not null;uniqueIndex"`
+	ID             string `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	OrganizationID string `json:"organization_id" gorm:"type:uuid;not null;index"`
+	FarmID         string `json:"farm_id" gorm:"type:uuid;not null;uniqueIndex"`
 
 	CPF           string     `json:"cpf" gorm:"default:''"`
 	Name          string     `json:"name" gorm:"not null"`
@@ -18,8 +18,8 @@ type Producer struct {
 	Email         string     `json:"email" gorm:"default:''"`
 	Education     string     `json:"education" gorm:"default:''"`
 
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Tenant    Tenant    `json:"-" gorm:"foreignKey:TenantID"`
-	Farm      Farm      `json:"-" gorm:"foreignKey:FarmID"`
+	CreatedAt    time.Time    `json:"created_at"`
+	UpdatedAt    time.Time    `json:"updated_at"`
+	Organization Organization `json:"-" gorm:"foreignKey:OrganizationID"`
+	Farm         Farm         `json:"-" gorm:"foreignKey:FarmID"`
 }

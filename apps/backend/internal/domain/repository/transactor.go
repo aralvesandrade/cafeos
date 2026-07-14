@@ -13,7 +13,7 @@ type TransactionProvider interface {
 	HarvestProduction() HarvestProductionRepository
 	Indicator() IndicatorRepository
 	User() UserRepository
-	Tenant() TenantRepository
+	Organization() OrganizationRepository
 	AgriculturalProduct() AgriculturalProductRepository
 	Maintenance() MaintenanceRepository
 	WorkShift() WorkShiftRepository

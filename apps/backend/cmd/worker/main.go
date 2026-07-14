@@ -77,7 +77,7 @@ func main() {
 }
 
 func processMessage(msg messaging.SyncMessage) error {
-	slog.Info("processing message", "event", msg.EventType, "client", msg.ClientID, "tenant", msg.TenantID)
+	slog.Info("processing message", "event", msg.EventType, "client", msg.ClientID, "organization", msg.OrganizationID)
 
 	payload, err := json.Marshal(msg.Payload)
 	if err != nil {
@@ -86,15 +86,15 @@ func processMessage(msg messaging.SyncMessage) error {
 
 	switch msg.EventType {
 	case "operation.created":
-		return processOperationCreated(msg.TenantID, payload)
+		return processOperationCreated(msg.OrganizationID, payload)
 	case "stock.moved":
-		return processStockMovement(msg.TenantID, payload)
+		return processStockMovement(msg.OrganizationID, payload)
 	case "financial.created":
-		return processFinancialTransaction(msg.TenantID, payload)
+		return processFinancialTransaction(msg.OrganizationID, payload)
 	case "harvest.production":
-		return processHarvestProduction(msg.TenantID, payload)
+		return processHarvestProduction(msg.OrganizationID, payload)
 	case "labor.shift":
-		return processLaborShift(msg.TenantID, payload)
+		return processLaborShift(msg.OrganizationID, payload)
 	default:
 		slog.Warn("unknown event type", "event", msg.EventType)
 		return nil
@@ -112,23 +112,23 @@ type operationPayload struct {
 	Notes       string  `json:"notes"`
 }
 
-func processOperationCreated(tenantID string, payload []byte) error {
+func processOperationCreated(organizationID string, payload []byte) error {
 	var p operationPayload
 	if err := json.Unmarshal(payload, &p); err != nil {
 		return err
 	}
 	repo := infraRepo.NewOperationRepository(db)
 	op := &entity.Operation{
-		ID:          uuid.New().String(),
-		TenantID:    tenantID,
-		PlotID:      p.PlotID,
-		Type:        entity.OperationType(p.Type),
-		Date:        parseTime(p.Date),
-		Responsible: p.Responsible,
-		ProductUsed: p.ProductUsed,
-		Quantity:    p.Quantity,
-		Cost:        p.Cost,
-		Notes:       p.Notes,
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		PlotID:         p.PlotID,
+		Type:           entity.OperationType(p.Type),
+		Date:           parseTime(p.Date),
+		Responsible:    p.Responsible,
+		ProductUsed:    p.ProductUsed,
+		Quantity:       p.Quantity,
+		Cost:           p.Cost,
+		Notes:          p.Notes,
 	}
 	return repo.Create(op)
 }
@@ -141,20 +141,20 @@ type stockPayload struct {
 	Notes     string  `json:"notes"`
 }
 
-func processStockMovement(tenantID string, payload []byte) error {
+func processStockMovement(organizationID string, payload []byte) error {
 	var p stockPayload
 	if err := json.Unmarshal(payload, &p); err != nil {
 		return err
 	}
 	repo := infraRepo.NewStockMovementRepository(db)
 	mov := &entity.StockMovement{
-		ID:        uuid.New().String(),
-		TenantID:  tenantID,
-		ItemID:    p.ProductID,
-		Type:      p.Type,
-		Quantity:  p.Quantity,
-		Reference: p.Reference,
-		Notes:     p.Notes,
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		ItemID:         p.ProductID,
+		Type:           p.Type,
+		Quantity:       p.Quantity,
+		Reference:      p.Reference,
+		Notes:          p.Notes,
 	}
 	return repo.Create(mov)
 }
@@ -168,21 +168,21 @@ type financialPayload struct {
 	Notes        string  `json:"notes"`
 }
 
-func processFinancialTransaction(tenantID string, payload []byte) error {
+func processFinancialTransaction(organizationID string, payload []byte) error {
 	var p financialPayload
 	if err := json.Unmarshal(payload, &p); err != nil {
 		return err
 	}
 	repo := infraRepo.NewFinancialRepository(db)
 	tx := &entity.FinancialTransaction{
-		ID:           uuid.New().String(),
-		TenantID:     tenantID,
-		Type:         entity.TransactionType(p.Type),
-		CostCenterID: p.CostCenterID,
-		Description:  p.Description,
-		Amount:       p.Amount,
-		Date:         parseTime(p.Date),
-		Status:       "pending",
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		Type:           entity.TransactionType(p.Type),
+		CostCenterID:   p.CostCenterID,
+		Description:    p.Description,
+		Amount:         p.Amount,
+		Date:           parseTime(p.Date),
+		Status:         "pending",
 	}
 	return repo.Create(tx)
 }
@@ -194,19 +194,19 @@ type harvestPayload struct {
 	Notes     string  `json:"notes"`
 }
 
-func processHarvestProduction(tenantID string, payload []byte) error {
+func processHarvestProduction(organizationID string, payload []byte) error {
 	var p harvestPayload
 	if err := json.Unmarshal(payload, &p); err != nil {
 		return err
 	}
 	repo := infraRepo.NewHarvestProductionRepository(db)
 	prod := &entity.HarvestProduction{
-		ID:        uuid.New().String(),
-		TenantID:  tenantID,
-		HarvestID: p.HarvestID,
-		PlotID:    p.PlotID,
-		Quantity:  p.Quantity,
-		Notes:     p.Notes,
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		HarvestID:      p.HarvestID,
+		PlotID:         p.PlotID,
+		Quantity:       p.Quantity,
+		Notes:          p.Notes,
 	}
 	return repo.Create(prod)
 }
@@ -220,7 +220,7 @@ type laborPayload struct {
 	Notes       string  `json:"notes"`
 }
 
-func processLaborShift(tenantID string, payload []byte) error {
+func processLaborShift(organizationID string, payload []byte) error {
 	var p laborPayload
 	if err := json.Unmarshal(payload, &p); err != nil {
 		return err
@@ -231,14 +231,14 @@ func processLaborShift(tenantID string, payload []byte) error {
 		opRef = &p.OperationID
 	}
 	shift := &entity.WorkShift{
-		ID:          uuid.New().String(),
-		TenantID:    tenantID,
-		WorkerID:    p.WorkerID,
-		OperationID: opRef,
-		Hours:       p.Hours,
-		Cost:        p.Cost,
-		Date:        parseTime(p.Date),
-		Notes:       p.Notes,
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		WorkerID:       p.WorkerID,
+		OperationID:    opRef,
+		Hours:          p.Hours,
+		Cost:           p.Cost,
+		Date:           parseTime(p.Date),
+		Notes:          p.Notes,
 	}
 	return repo.Create(shift)
 }

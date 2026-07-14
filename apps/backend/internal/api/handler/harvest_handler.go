@@ -28,14 +28,14 @@ type createHarvestRequest struct {
 // @Tags harvests (Colheitas)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param harvest body createHarvestRequest true "Dados da colheita"
 // @Success 201 {object} SwaggerHarvest
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/harvests [post]
+// @Router /api/v1/{organization_id}/harvests [post]
 func (h *HarvestHandler) Create(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 
 	var req createHarvestRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -43,7 +43,7 @@ func (h *HarvestHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	harvest, err := h.svc.Create(tenantID, req.Year, req.Description, req.EstimatedProduction)
+	harvest, err := h.svc.Create(organizationID, req.Year, req.Description, req.EstimatedProduction)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -57,12 +57,12 @@ func (h *HarvestHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Description Retorna uma única colheita (safra)
 // @Tags harvests (Colheitas)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID da Colheita"
 // @Success 200 {object} SwaggerHarvest
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/harvests/{id} [get]
+// @Router /api/v1/{organization_id}/harvests/{id} [get]
 func (h *HarvestHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	harvest, err := h.svc.GetByID(id)
@@ -73,19 +73,19 @@ func (h *HarvestHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, harvest, http.StatusOK)
 }
 
-// List retorna todas as colheitas do tenant autenticado
+// List retorna todas as colheitas da organização autenticada
 // @Summary Listar colheitas
-// @Description Lista todas as colheitas (safras) do tenant
+// @Description Lista todas as colheitas (safras) da organização
 // @Tags harvests (Colheitas)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Success 200 {array} SwaggerHarvest
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/harvests [get]
+// @Router /api/v1/{organization_id}/harvests [get]
 func (h *HarvestHandler) List(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
-	harvests, err := h.svc.ListByTenant(tenantID)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	harvests, err := h.svc.ListByOrganization(organizationID)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -97,12 +97,12 @@ func (h *HarvestHandler) List(w http.ResponseWriter, r *http.Request) {
 // @Summary Finalizar colheita
 // @Description Finaliza uma colheita (safra), calculando todos os indicadores (sacas/ha, custo/saca, etc.)
 // @Tags harvests (Colheitas)
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID da Colheita"
 // @Success 200 "OK"
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/harvests/{id}/finalize [put]
+// @Router /api/v1/{organization_id}/harvests/{id}/finalize [put]
 func (h *HarvestHandler) Finalize(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.svc.Finalize(id); err != nil {
@@ -124,15 +124,15 @@ type recordProductionRequest struct {
 // @Tags harvests (Colheitas)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID da Colheita"
 // @Param production body recordProductionRequest true "Dados de produção"
 // @Success 201 {object} SwaggerHarvestProduction
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/harvests/{id}/production [post]
+// @Router /api/v1/{organization_id}/harvests/{id}/production [post]
 func (h *HarvestHandler) RecordProduction(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	harvestID := r.PathValue("id")
 
 	var req recordProductionRequest
@@ -141,7 +141,7 @@ func (h *HarvestHandler) RecordProduction(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	prod, err := h.svc.RecordProduction(tenantID, harvestID, req.PlotID, req.Quantity, req.Notes)
+	prod, err := h.svc.RecordProduction(organizationID, harvestID, req.PlotID, req.Quantity, req.Notes)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -155,12 +155,12 @@ func (h *HarvestHandler) RecordProduction(w http.ResponseWriter, r *http.Request
 // @Description Obtém todos os registros de produção de uma colheita específica
 // @Tags harvests (Colheitas)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID da Colheita"
 // @Success 200 {array} SwaggerHarvestProduction
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/harvests/{id}/production [get]
+// @Router /api/v1/{organization_id}/harvests/{id}/production [get]
 func (h *HarvestHandler) GetProduction(w http.ResponseWriter, r *http.Request) {
 	harvestID := r.PathValue("id")
 	productions, err := h.svc.GetProductionByHarvest(harvestID)

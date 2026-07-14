@@ -27,9 +27,9 @@ func (r *FinancialRepository) GetByID(id string) (*entity.FinancialTransaction, 
 	return &t, err
 }
 
-func (r *FinancialRepository) ListByTenant(tenantID string) ([]*entity.FinancialTransaction, error) {
+func (r *FinancialRepository) ListByOrganization(organizationID string) ([]*entity.FinancialTransaction, error) {
 	var items []*entity.FinancialTransaction
-	err := r.db.Where("tenant_id = ?", tenantID).Order("date DESC").Find(&items).Error
+	err := r.db.Where("organization_id = ?", organizationID).Order("date DESC").Find(&items).Error
 	return items, err
 }
 

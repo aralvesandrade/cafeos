@@ -33,10 +33,10 @@ func TestOperationService_Validation(t *testing.T) {
 	svc := NewOperationService(repo, bus)
 
 	tests := []struct {
-		name  string
+		name   string
 		plotID string
 		opType entity.OperationType
-		cost  float64
+		cost   float64
 	}{
 		{"empty plot", "", entity.OpAdubacao, 100},
 		{"empty type", "p1", "", 100},

@@ -27,26 +27,26 @@ type createVehicleRequest struct {
 	Year  int    `json:"year"`
 }
 
-// CreateVehicle registra um novo veículo para o tenant autenticado
+// CreateVehicle registra um novo veículo para a organização autenticada
 // @Summary Criar veículo
-// @Description Registra um novo veículo na frota do tenant
+// @Description Registra um novo veículo na frota da organização
 // @Tags fleet (Frota)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param vehicle body createVehicleRequest true "Dados do veículo"
 // @Success 201 {object} entity.Vehicle
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/fleet/vehicles [post]
+// @Router /api/v1/{organization_id}/fleet/vehicles [post]
 func (h *FleetHandler) CreateVehicle(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	var req createVehicleRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
-	v, err := h.svc.CreateVehicle(tenantID, req.Name, req.Type, req.Plate, req.Brand, req.Model, req.Year)
+	v, err := h.svc.CreateVehicle(organizationID, req.Name, req.Type, req.Plate, req.Brand, req.Model, req.Year)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -54,19 +54,19 @@ func (h *FleetHandler) CreateVehicle(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, v, http.StatusCreated)
 }
 
-// ListVehicles retorna todos os veículos do tenant autenticado
+// ListVehicles retorna todos os veículos da organização autenticada
 // @Summary Listar veículos
-// @Description Lista todos os veículos pertencentes à frota do tenant
+// @Description Lista todos os veículos pertencentes à frota da organização
 // @Tags fleet (Frota)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Success 200 {array} entity.Vehicle
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/fleet/vehicles [get]
+// @Router /api/v1/{organization_id}/fleet/vehicles [get]
 func (h *FleetHandler) ListVehicles(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
-	vehicles, err := h.svc.ListVehicles(tenantID)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	vehicles, err := h.svc.ListVehicles(organizationID)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -79,12 +79,12 @@ func (h *FleetHandler) ListVehicles(w http.ResponseWriter, r *http.Request) {
 // @Description Retorna um único veículo
 // @Tags fleet (Frota)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID do Veículo"
 // @Success 200 {object} entity.Vehicle
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/fleet/vehicles/{id} [get]
+// @Router /api/v1/{organization_id}/fleet/vehicles/{id} [get]
 func (h *FleetHandler) GetVehicleByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	v, err := h.svc.GetVehicleByID(id)
@@ -101,13 +101,13 @@ func (h *FleetHandler) GetVehicleByID(w http.ResponseWriter, r *http.Request) {
 // @Tags fleet (Frota)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID do Veículo"
 // @Param vehicle body entity.Vehicle true "Dados atualizados do veículo"
 // @Success 200 {object} entity.Vehicle
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/fleet/vehicles/{id} [put]
+// @Router /api/v1/{organization_id}/fleet/vehicles/{id} [put]
 func (h *FleetHandler) UpdateVehicle(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	existing, err := h.svc.GetVehicleByID(id)
@@ -160,12 +160,12 @@ func (h *FleetHandler) UpdateVehicle(w http.ResponseWriter, r *http.Request) {
 // @Summary Excluir veículo
 // @Description Exclui um veículo por ID
 // @Tags fleet (Frota)
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID do Veículo"
 // @Success 204 "No Content"
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/fleet/vehicles/{id} [delete]
+// @Router /api/v1/{organization_id}/fleet/vehicles/{id} [delete]
 func (h *FleetHandler) DeleteVehicle(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.svc.DeleteVehicle(id); err != nil {
@@ -191,21 +191,21 @@ type createMaintenanceRequest struct {
 // @Tags fleet (Frota)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param maintenance body createMaintenanceRequest true "Dados da manutenção"
 // @Success 201 {object} entity.Maintenance
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/fleet/maintenance [post]
+// @Router /api/v1/{organization_id}/fleet/maintenance [post]
 func (h *FleetHandler) CreateMaintenance(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	var req createMaintenanceRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
 	date, _ := time.Parse("2006-01-02", req.Date)
-	m, err := h.svc.CreateMaintenance(tenantID, req.VehicleID, req.Type, req.Description, req.Notes, req.Cost, req.Odometer, date)
+	m, err := h.svc.CreateMaintenance(organizationID, req.VehicleID, req.Type, req.Description, req.Notes, req.Cost, req.Odometer, date)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -213,19 +213,19 @@ func (h *FleetHandler) CreateMaintenance(w http.ResponseWriter, r *http.Request)
 	writeJSON(w, m, http.StatusCreated)
 }
 
-// ListMaintenance retorna todos os registros de manutenção do tenant autenticado
+// ListMaintenance retorna todos os registros de manutenção da organização autenticada
 // @Summary Listar registros de manutenção
-// @Description Lista todos os registros de manutenção pertencentes à frota do tenant
+// @Description Lista todos os registros de manutenção pertencentes à frota da organização
 // @Tags fleet (Frota)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Success 200 {array} entity.Maintenance
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/fleet/maintenance [get]
+// @Router /api/v1/{organization_id}/fleet/maintenance [get]
 func (h *FleetHandler) ListMaintenance(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
-	items, err := h.svc.ListMaintenance(tenantID)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	items, err := h.svc.ListMaintenance(organizationID)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -238,12 +238,12 @@ func (h *FleetHandler) ListMaintenance(w http.ResponseWriter, r *http.Request) {
 // @Description Retorna um único registro de manutenção
 // @Tags fleet (Frota)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID da Manutenção"
 // @Success 200 {object} entity.Maintenance
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/fleet/maintenance/{id} [get]
+// @Router /api/v1/{organization_id}/fleet/maintenance/{id} [get]
 func (h *FleetHandler) GetMaintenanceByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	m, err := h.svc.GetMaintenanceByID(id)
@@ -258,12 +258,12 @@ func (h *FleetHandler) GetMaintenanceByID(w http.ResponseWriter, r *http.Request
 // @Summary Excluir registro de manutenção
 // @Description Exclui um registro de manutenção por ID
 // @Tags fleet (Frota)
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID da Manutenção"
 // @Success 204 "No Content"
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/fleet/maintenance/{id} [delete]
+// @Router /api/v1/{organization_id}/fleet/maintenance/{id} [delete]
 func (h *FleetHandler) DeleteMaintenance(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.svc.DeleteMaintenance(id); err != nil {

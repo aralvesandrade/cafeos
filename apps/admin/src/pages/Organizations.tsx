@@ -7,7 +7,7 @@ import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@
 import { Badge } from '@/components/ui/badge'
 import { Plus, Pencil, Building2 } from 'lucide-react'
 
-interface Tenant {
+interface Organization {
   id: string
   name: string
   brand_name: string
@@ -17,18 +17,18 @@ interface Tenant {
   created_at: string
 }
 
-export function Tenants() {
-  const [tenants, setTenants] = useState<Tenant[]>([])
+export function Organizations() {
+  const [organizations, setOrganizations] = useState<Organization[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editing, setEditing] = useState<Tenant | null>(null)
+  const [editing, setEditing] = useState<Organization | null>(null)
   const [form, setForm] = useState({ name: '', plan: 'free' })
   const [saving, setSaving] = useState(false)
 
   const load = useCallback(async () => {
     try {
-      const data = await apiRequest<Tenant[]>('/admin/tenants', { admin: true })
-      setTenants(data)
+      const data = await apiRequest<Organization[]>('/admin/organizations', { admin: true })
+      setOrganizations(data)
     } catch (err) {
       console.error(err)
     } finally {
@@ -42,9 +42,9 @@ export function Tenants() {
     setSaving(true)
     try {
       if (editing) {
-        await apiRequest(`/admin/tenants/${editing.id}`, { method: 'PUT', body: form, admin: true })
+        await apiRequest(`/admin/organizations/${editing.id}`, { method: 'PUT', body: form, admin: true })
       } else {
-        await apiRequest('/admin/tenants', { method: 'POST', body: form, admin: true })
+        await apiRequest('/admin/organizations', { method: 'POST', body: form, admin: true })
       }
       setDialogOpen(false); setEditing(null)
       await load()
@@ -61,11 +61,11 @@ export function Tenants() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Tenants</h1>
+          <h1 className="text-2xl font-bold text-primary">Organizações</h1>
           <p className="text-sm text-muted-foreground">Gerenciar clientes da plataforma</p>
         </div>
         <Button onClick={() => { setEditing(null); setForm({ name: '', plan: 'free' }); setDialogOpen(true) }}>
-          <Plus className="h-4 w-4" /> Novo Tenant
+          <Plus className="h-4 w-4" /> Nova Organização
         </Button>
       </div>
 
@@ -80,35 +80,35 @@ export function Tenants() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {tenants.map((t) => (
-            <TableRow key={t.id}>
+          {organizations.map((o) => (
+            <TableRow key={o.id}>
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4 text-primary" />
-                  {t.name}
+                  {o.name}
                 </div>
               </TableCell>
-              <TableCell className="text-muted-foreground text-sm">{t.slug}</TableCell>
-              <TableCell><Badge>{t.plan}</Badge></TableCell>
+              <TableCell className="text-muted-foreground text-sm">{o.slug}</TableCell>
+              <TableCell><Badge>{o.plan}</Badge></TableCell>
               <TableCell>
-                <Badge variant={t.status === 'active' ? 'success' : 'default'}>
-                  {t.status === 'active' ? 'Ativo' : 'Inativo'}
+                <Badge variant={o.status === 'active' ? 'success' : 'default'}>
+                  {o.status === 'active' ? 'Ativo' : 'Inativo'}
                 </Badge>
               </TableCell>
               <TableCell className="text-right">
-                <Button variant="ghost" size="sm" onClick={() => { setEditing(t); setForm({ name: t.name, plan: t.plan }); setDialogOpen(true) }}>
+                <Button variant="ghost" size="sm" onClick={() => { setEditing(o); setForm({ name: o.name, plan: o.plan }); setDialogOpen(true) }}>
                   <Pencil className="h-4 w-4" />
                 </Button>
               </TableCell>
             </TableRow>
           ))}
-          {tenants.length === 0 && (
-            <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhum tenant cadastrado.</TableCell></TableRow>
+          {organizations.length === 0 && (
+            <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhuma organização cadastrada.</TableCell></TableRow>
           )}
         </TableBody>
       </Table>
 
-      <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Tenant' : 'Novo Tenant'}>
+      <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Organização' : 'Nova Organização'}>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-1">Nome</label>

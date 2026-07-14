@@ -65,7 +65,7 @@ type createPlotRequest struct {
 	LegalReserveAreaHA float64 `json:"legal_reserve_area_ha"`
 }
 
-func (req *createPlotRequest) toEntity(tenantID string) (*entity.Plot, error) {
+func (req *createPlotRequest) toEntity(organizationID string) (*entity.Plot, error) {
 	activation, err := parseDateField(req.ActivationDate)
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (req *createPlotRequest) toEntity(tenantID string) (*entity.Plot, error) {
 	}
 
 	return &entity.Plot{
-		TenantID:           tenantID,
+		OrganizationID:     organizationID,
 		FarmID:             req.FarmID,
 		Name:               req.Name,
 		AreaHA:             req.AreaHA,
@@ -111,20 +111,20 @@ func (req *createPlotRequest) toEntity(tenantID string) (*entity.Plot, error) {
 	}, nil
 }
 
-// Create registra um novo talhão para o tenant autenticado
+// Create registra um novo talhão para a organização autenticada
 // @Summary Criar talhão
 // @Description Registra um novo talhão em uma fazenda
 // @Tags plots (Talhões)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param plot body createPlotRequest true "Dados do talhão"
 // @Success 201 {object} SwaggerPlot
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/plots [post]
+// @Router /api/v1/{organization_id}/plots [post]
 func (h *PlotHandler) Create(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 
 	var req createPlotRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -132,7 +132,7 @@ func (h *PlotHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	plotEntity, err := req.toEntity(tenantID)
+	plotEntity, err := req.toEntity(organizationID)
 	if err != nil {
 		writeError(w, "invalid date, expected YYYY-MM-DD", http.StatusBadRequest)
 		return
@@ -152,12 +152,12 @@ func (h *PlotHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Description Retorna um único talhão
 // @Tags plots (Talhões)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID do Talhão"
 // @Success 200 {object} SwaggerPlot
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/plots/{id} [get]
+// @Router /api/v1/{organization_id}/plots/{id} [get]
 func (h *PlotHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	plot, err := h.svc.GetByID(id)
@@ -173,12 +173,12 @@ func (h *PlotHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 // @Description Lista todos os talhões pertencentes a uma fazenda
 // @Tags plots (Talhões)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param farm_id path string true "ID da Fazenda"
 // @Success 200 {array} SwaggerPlot
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/farms/{farm_id}/plots [get]
+// @Router /api/v1/{organization_id}/farms/{farm_id}/plots [get]
 func (h *PlotHandler) ListByFarm(w http.ResponseWriter, r *http.Request) {
 	farmID := r.PathValue("farm_id")
 	plots, err := h.svc.ListByFarm(farmID)
@@ -189,19 +189,19 @@ func (h *PlotHandler) ListByFarm(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, plots, http.StatusOK)
 }
 
-// List retorna todos os talhões do tenant autenticado
+// List retorna todos os talhões da organização autenticada
 // @Summary Listar todos os talhões
-// @Description Lista todos os talhões de todas as fazendas do tenant
+// @Description Lista todos os talhões de todas as fazendas da organização
 // @Tags plots (Talhões)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Success 200 {array} SwaggerPlot
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/plots [get]
+// @Router /api/v1/{organization_id}/plots [get]
 func (h *PlotHandler) List(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
-	plots, err := h.svc.ListByTenant(tenantID)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	plots, err := h.svc.ListByOrganization(organizationID)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -215,13 +215,13 @@ func (h *PlotHandler) List(w http.ResponseWriter, r *http.Request) {
 // @Tags plots (Talhões)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID do Talhão"
 // @Param plot body SwaggerPlot true "Dados atualizados do talhão"
 // @Success 200 {object} SwaggerPlot
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/plots/{id} [put]
+// @Router /api/v1/{organization_id}/plots/{id} [put]
 func (h *PlotHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
@@ -379,12 +379,12 @@ func (h *PlotHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Summary Excluir talhão
 // @Description Exclui um talhão por ID
 // @Tags plots (Talhões)
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID do Talhão"
 // @Success 204 "No Content"
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/plots/{id} [delete]
+// @Router /api/v1/{organization_id}/plots/{id} [delete]
 func (h *PlotHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.svc.Delete(id); err != nil {

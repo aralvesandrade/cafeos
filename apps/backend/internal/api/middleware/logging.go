@@ -45,8 +45,8 @@ func RequestLogging(log *slog.Logger) func(http.Handler) http.Handler {
 				slog.String("user_agent", r.UserAgent()),
 			}
 
-			if tenantID, ok := r.Context().Value(TenantIDKey).(string); ok && tenantID != "" {
-				attrs = append(attrs, slog.String("tenant_id", tenantID))
+			if organizationID, ok := r.Context().Value(OrganizationIDKey).(string); ok && organizationID != "" {
+				attrs = append(attrs, slog.String("organization_id", organizationID))
 			}
 			if userID, ok := r.Context().Value(UserIDKey).(string); ok && userID != "" {
 				attrs = append(attrs, slog.String("user_id", userID))

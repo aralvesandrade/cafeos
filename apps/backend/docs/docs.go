@@ -18,28 +18,28 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/admin/tenants": {
+        "/api/v1/admin/organizations": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todos os tenants (somente platform_owner)",
+                "description": "Lista todas as organizações (somente platform_owner)",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "tenants (Inquilinos)"
+                    "organizations (Organizações)"
                 ],
-                "summary": "Listar tenants",
+                "summary": "Listar organizações",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entity.Tenant"
+                                "$ref": "#/definitions/entity.Organization"
                             }
                         }
                     }
@@ -51,7 +51,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Cria um novo tenant (somente platform_owner)",
+                "description": "Cria uma nova organização (somente platform_owner)",
                 "consumes": [
                     "application/json"
                 ],
@@ -59,17 +59,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "tenants (Inquilinos)"
+                    "organizations (Organizações)"
                 ],
-                "summary": "Criar tenant",
+                "summary": "Criar organização",
                 "parameters": [
                     {
-                        "description": "Dados do tenant",
-                        "name": "tenant",
+                        "description": "Dados da organização",
+                        "name": "organization",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.createTenantRequest"
+                            "$ref": "#/definitions/handler.createOrganizationRequest"
                         }
                     }
                 ],
@@ -77,7 +77,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/entity.Tenant"
+                            "$ref": "#/definitions/entity.Organization"
                         }
                     },
                     "400": {
@@ -92,25 +92,25 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/admin/tenants/{id}": {
+        "/api/v1/admin/organizations/{id}": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Retorna um único tenant (somente platform_owner)",
+                "description": "Retorna uma única organização (somente platform_owner)",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "tenants (Inquilinos)"
+                    "organizations (Organizações)"
                 ],
-                "summary": "Obter tenant por ID",
+                "summary": "Obter organização por ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
+                        "description": "ID da Organização",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -120,7 +120,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Tenant"
+                            "$ref": "#/definitions/entity.Organization"
                         }
                     },
                     "404": {
@@ -140,7 +140,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Atualiza dados do tenant (somente platform_owner)",
+                "description": "Atualiza dados da organização (somente platform_owner)",
                 "consumes": [
                     "application/json"
                 ],
@@ -148,24 +148,24 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "tenants (Inquilinos)"
+                    "organizations (Organizações)"
                 ],
-                "summary": "Atualizar tenant",
+                "summary": "Atualizar organização",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
+                        "description": "ID da Organização",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Dados atualizados do tenant",
-                        "name": "tenant",
+                        "description": "Dados atualizados da organização",
+                        "name": "organization",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.updateTenantRequest"
+                            "$ref": "#/definitions/handler.updateOrganizationRequest"
                         }
                     }
                 ],
@@ -173,7 +173,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Tenant"
+                            "$ref": "#/definitions/entity.Organization"
                         }
                     },
                     "400": {
@@ -193,15 +193,15 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Exclui um tenant por ID (somente platform_owner)",
+                "description": "Exclui uma organização por ID (somente platform_owner)",
                 "tags": [
-                    "tenants (Inquilinos)"
+                    "organizations (Organizações)"
                 ],
-                "summary": "Excluir tenant",
+                "summary": "Excluir organização",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
+                        "description": "ID da Organização",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -369,14 +369,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/agricultural-products": {
+        "/api/v1/{organization_id}/agricultural-products": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todos os produtos agrícolas pertencentes ao tenant",
+                "description": "Lista todos os produtos agrícolas pertencentes à organização",
                 "produces": [
                     "application/json"
                 ],
@@ -387,8 +387,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -415,7 +415,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/budgets": {
+        "/api/v1/{organization_id}/budgets": {
             "post": {
                 "security": [
                     {
@@ -436,8 +436,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -470,7 +470,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/budgets/{id}": {
+        "/api/v1/{organization_id}/budgets/{id}": {
             "get": {
                 "security": [
                     {
@@ -488,8 +488,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -539,8 +539,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -593,8 +593,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -622,7 +622,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/cost-allocations": {
+        "/api/v1/{organization_id}/cost-allocations": {
             "post": {
                 "security": [
                     {
@@ -643,8 +643,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -677,7 +677,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/cost-allocations/{id}": {
+        "/api/v1/{organization_id}/cost-allocations/{id}": {
             "get": {
                 "security": [
                     {
@@ -695,8 +695,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -740,8 +740,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -769,14 +769,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/cost-centers": {
+        "/api/v1/{organization_id}/cost-centers": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todos os centros de custo pertencentes ao tenant",
+                "description": "Lista todos os centros de custo pertencentes à organização",
                 "produces": [
                     "application/json"
                 ],
@@ -787,8 +787,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -820,7 +820,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Registra um novo centro de custo no tenant",
+                "description": "Registra um novo centro de custo na organização",
                 "consumes": [
                     "application/json"
                 ],
@@ -834,8 +834,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -868,7 +868,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/cost-centers/senar-categories": {
+        "/api/v1/{organization_id}/cost-centers/senar-categories": {
             "get": {
                 "security": [
                     {
@@ -886,8 +886,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -905,7 +905,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/cost-centers/{id}": {
+        "/api/v1/{organization_id}/cost-centers/{id}": {
             "get": {
                 "security": [
                     {
@@ -923,8 +923,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -974,8 +974,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1028,8 +1028,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1057,7 +1057,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/dashboard": {
+        "/api/v1/{organization_id}/dashboard": {
             "get": {
                 "security": [
                     {
@@ -1075,8 +1075,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -1091,14 +1091,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/farms": {
+        "/api/v1/{organization_id}/farms": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todas as fazendas pertencentes ao tenant",
+                "description": "Lista todas as fazendas pertencentes à organização",
                 "produces": [
                     "application/json"
                 ],
@@ -1109,8 +1109,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -1142,7 +1142,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Registra uma nova fazenda no tenant",
+                "description": "Registra uma nova fazenda na organização",
                 "consumes": [
                     "application/json"
                 ],
@@ -1156,8 +1156,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1190,7 +1190,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/farms/{farm_id}/plots": {
+        "/api/v1/{organization_id}/farms/{farm_id}/plots": {
             "get": {
                 "security": [
                     {
@@ -1208,8 +1208,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1243,7 +1243,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/farms/{id}": {
+        "/api/v1/{organization_id}/farms/{id}": {
             "get": {
                 "security": [
                     {
@@ -1261,8 +1261,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1312,8 +1312,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1366,8 +1366,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1395,14 +1395,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/financial": {
+        "/api/v1/{organization_id}/financial": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todas as transações financeiras pertencentes ao tenant",
+                "description": "Lista todas as transações financeiras pertencentes à organização",
                 "produces": [
                     "application/json"
                 ],
@@ -1413,8 +1413,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -1446,7 +1446,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Registra uma nova transação financeira (receita/despesa) no tenant",
+                "description": "Registra uma nova transação financeira (receita/despesa) na organização",
                 "consumes": [
                     "application/json"
                 ],
@@ -1460,8 +1460,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1494,7 +1494,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/financial/{id}": {
+        "/api/v1/{organization_id}/financial/{id}": {
             "get": {
                 "security": [
                     {
@@ -1512,8 +1512,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1563,8 +1563,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1617,8 +1617,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1646,14 +1646,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/fleet/maintenance": {
+        "/api/v1/{organization_id}/fleet/maintenance": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todos os registros de manutenção pertencentes à frota do tenant",
+                "description": "Lista todos os registros de manutenção pertencentes à frota da organização",
                 "produces": [
                     "application/json"
                 ],
@@ -1664,8 +1664,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -1711,8 +1711,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1745,7 +1745,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/fleet/maintenance/{id}": {
+        "/api/v1/{organization_id}/fleet/maintenance/{id}": {
             "get": {
                 "security": [
                     {
@@ -1763,8 +1763,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1808,8 +1808,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1837,14 +1837,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/fleet/vehicles": {
+        "/api/v1/{organization_id}/fleet/vehicles": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todos os veículos pertencentes à frota do tenant",
+                "description": "Lista todos os veículos pertencentes à frota da organização",
                 "produces": [
                     "application/json"
                 ],
@@ -1855,8 +1855,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -1888,7 +1888,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Registra um novo veículo na frota do tenant",
+                "description": "Registra um novo veículo na frota da organização",
                 "consumes": [
                     "application/json"
                 ],
@@ -1902,8 +1902,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -1936,7 +1936,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/fleet/vehicles/{id}": {
+        "/api/v1/{organization_id}/fleet/vehicles/{id}": {
             "get": {
                 "security": [
                     {
@@ -1954,8 +1954,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2005,8 +2005,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2059,8 +2059,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2088,14 +2088,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/harvests": {
+        "/api/v1/{organization_id}/harvests": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todas as colheitas (safras) do tenant",
+                "description": "Lista todas as colheitas (safras) da organização",
                 "produces": [
                     "application/json"
                 ],
@@ -2106,8 +2106,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -2153,8 +2153,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2187,7 +2187,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/harvests/{harvest_id}/budgets": {
+        "/api/v1/{organization_id}/harvests/{harvest_id}/budgets": {
             "get": {
                 "security": [
                     {
@@ -2205,8 +2205,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2240,7 +2240,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/harvests/{harvest_id}/cost-allocations": {
+        "/api/v1/{organization_id}/harvests/{harvest_id}/cost-allocations": {
             "get": {
                 "security": [
                     {
@@ -2258,8 +2258,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2293,7 +2293,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/harvests/{id}": {
+        "/api/v1/{organization_id}/harvests/{id}": {
             "get": {
                 "security": [
                     {
@@ -2311,8 +2311,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2343,7 +2343,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/harvests/{id}/finalize": {
+        "/api/v1/{organization_id}/harvests/{id}/finalize": {
             "put": {
                 "security": [
                     {
@@ -2358,8 +2358,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2387,7 +2387,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/harvests/{id}/production": {
+        "/api/v1/{organization_id}/harvests/{id}/production": {
             "get": {
                 "security": [
                     {
@@ -2405,8 +2405,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2459,8 +2459,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2500,14 +2500,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/labor/shifts": {
+        "/api/v1/{organization_id}/labor/shifts": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todos os turnos de trabalho pertencentes ao tenant",
+                "description": "Lista todos os turnos de trabalho pertencentes à organização",
                 "produces": [
                     "application/json"
                 ],
@@ -2518,8 +2518,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -2565,8 +2565,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2599,7 +2599,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/labor/shifts/{id}": {
+        "/api/v1/{organization_id}/labor/shifts/{id}": {
             "delete": {
                 "security": [
                     {
@@ -2614,8 +2614,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2643,14 +2643,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/labor/teams": {
+        "/api/v1/{organization_id}/labor/teams": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todas as equipes de trabalho pertencentes ao tenant",
+                "description": "Lista todas as equipes de trabalho pertencentes à organização",
                 "produces": [
                     "application/json"
                 ],
@@ -2661,8 +2661,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -2694,7 +2694,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Registra uma nova equipe de trabalho no tenant",
+                "description": "Registra uma nova equipe de trabalho na organização",
                 "consumes": [
                     "application/json"
                 ],
@@ -2708,8 +2708,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2742,7 +2742,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/labor/teams/{id}": {
+        "/api/v1/{organization_id}/labor/teams/{id}": {
             "put": {
                 "security": [
                     {
@@ -2763,8 +2763,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2817,8 +2817,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2846,14 +2846,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/labor/workers": {
+        "/api/v1/{organization_id}/labor/workers": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todos os trabalhadores pertencentes ao tenant",
+                "description": "Lista todos os trabalhadores pertencentes à organização",
                 "produces": [
                     "application/json"
                 ],
@@ -2864,8 +2864,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -2897,7 +2897,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Registra um novo trabalhador no tenant",
+                "description": "Registra um novo trabalhador na organização",
                 "consumes": [
                     "application/json"
                 ],
@@ -2911,8 +2911,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -2945,7 +2945,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/labor/workers/{id}": {
+        "/api/v1/{organization_id}/labor/workers/{id}": {
             "put": {
                 "security": [
                     {
@@ -2966,8 +2966,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3020,8 +3020,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3049,14 +3049,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/operations": {
+        "/api/v1/{organization_id}/operations": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todas as operações de todos os talhões do tenant",
+                "description": "Lista todas as operações de todos os talhões da organização",
                 "produces": [
                     "application/json"
                 ],
@@ -3067,8 +3067,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -3114,8 +3114,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3148,7 +3148,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/operations/recent": {
+        "/api/v1/{organization_id}/operations/recent": {
             "get": {
                 "security": [
                     {
@@ -3166,8 +3166,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3200,7 +3200,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/operations/{id}": {
+        "/api/v1/{organization_id}/operations/{id}": {
             "get": {
                 "security": [
                     {
@@ -3218,8 +3218,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3263,8 +3263,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3292,14 +3292,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/plots": {
+        "/api/v1/{organization_id}/plots": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todos os talhões de todas as fazendas do tenant",
+                "description": "Lista todos os talhões de todas as fazendas da organização",
                 "produces": [
                     "application/json"
                 ],
@@ -3310,8 +3310,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -3357,8 +3357,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3391,7 +3391,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/plots/{id}": {
+        "/api/v1/{organization_id}/plots/{id}": {
             "get": {
                 "security": [
                     {
@@ -3409,8 +3409,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3460,8 +3460,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3514,8 +3514,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3543,7 +3543,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/plots/{plot_id}/operations": {
+        "/api/v1/{organization_id}/plots/{plot_id}/operations": {
             "get": {
                 "security": [
                     {
@@ -3561,8 +3561,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3596,14 +3596,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/stock/items": {
+        "/api/v1/{organization_id}/stock/items": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todos os itens de estoque pertencentes ao tenant",
+                "description": "Lista todos os itens de estoque pertencentes à organização",
                 "produces": [
                     "application/json"
                 ],
@@ -3614,8 +3614,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -3647,7 +3647,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Registra um novo item de estoque no tenant",
+                "description": "Registra um novo item de estoque na organização",
                 "consumes": [
                     "application/json"
                 ],
@@ -3661,8 +3661,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3695,7 +3695,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/stock/items/{id}": {
+        "/api/v1/{organization_id}/stock/items/{id}": {
             "get": {
                 "security": [
                     {
@@ -3713,8 +3713,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3764,8 +3764,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3818,8 +3818,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3847,14 +3847,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/stock/movements": {
+        "/api/v1/{organization_id}/stock/movements": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista todas as movimentações de estoque pertencentes ao tenant",
+                "description": "Lista todas as movimentações de estoque pertencentes à organização",
                 "produces": [
                     "application/json"
                 ],
@@ -3865,8 +3865,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     }
@@ -3912,8 +3912,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -3946,7 +3946,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/{tenant_id}/sync": {
+        "/api/v1/{organization_id}/sync": {
             "post": {
                 "security": [
                     {
@@ -3967,8 +3967,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do Tenant",
-                        "name": "tenant_id",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
                         "in": "path",
                         "required": true
                     },
@@ -4081,7 +4081,7 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "tenant_id": {
+                "organization_id": {
                     "type": "string"
                 },
                 "type": {
@@ -4121,11 +4121,11 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "planned_amount": {
                     "type": "number"
-                },
-                "tenant_id": {
-                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
@@ -4162,7 +4162,7 @@ const docTemplate = `{
                 "method": {
                     "$ref": "#/definitions/entity.AllocationMethod"
                 },
-                "tenant_id": {
+                "organization_id": {
                     "type": "string"
                 },
                 "total_amount": {
@@ -4211,7 +4211,7 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "tenant_id": {
+                "organization_id": {
                     "type": "string"
                 },
                 "type": {
@@ -4275,6 +4275,9 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "payment_date": {
                     "type": "string"
                 },
@@ -4282,9 +4285,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
-                },
-                "tenant_id": {
                     "type": "string"
                 },
                 "type": {
@@ -4335,7 +4335,7 @@ const docTemplate = `{
                 "odometer": {
                     "type": "number"
                 },
-                "tenant_id": {
+                "organization_id": {
                     "type": "string"
                 },
                 "type": {
@@ -4363,6 +4363,44 @@ const docTemplate = `{
                 "OpPoda",
                 "OpColheita"
             ]
+        },
+        "entity.Organization": {
+            "type": "object",
+            "properties": {
+                "brand_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "logo_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "plan": {
+                    "type": "string"
+                },
+                "primary_color": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
         },
         "entity.Plot": {
             "type": "object",
@@ -4424,6 +4462,9 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "plant_count": {
                     "type": "integer"
                 },
@@ -4450,9 +4491,6 @@ const docTemplate = `{
                 },
                 "stage": {
                     "$ref": "#/definitions/entity.PlotStage"
-                },
-                "tenant_id": {
-                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
@@ -4509,13 +4547,13 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "phone": {
                     "type": "string"
                 },
                 "rg": {
-                    "type": "string"
-                },
-                "tenant_id": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -4573,14 +4611,14 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "product_id": {
                     "type": "string"
                 },
                 "quantity": {
                     "type": "number"
-                },
-                "tenant_id": {
-                    "type": "string"
                 },
                 "unit": {
                     "type": "string"
@@ -4608,13 +4646,13 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "quantity": {
                     "type": "number"
                 },
                 "reference": {
-                    "type": "string"
-                },
-                "tenant_id": {
                     "type": "string"
                 },
                 "type": {
@@ -4641,45 +4679,7 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "tenant_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.Tenant": {
-            "type": "object",
-            "properties": {
-                "brand_name": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "domain": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "logo_url": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "plan": {
-                    "type": "string"
-                },
-                "primary_color": {
-                    "type": "string"
-                },
-                "slug": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "updated_at": {
+                "organization_id": {
                     "type": "string"
                 }
             }
@@ -4713,11 +4713,11 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "role": {
                     "$ref": "#/definitions/entity.UserRole"
-                },
-                "tenant_id": {
-                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
@@ -4728,7 +4728,7 @@ const docTemplate = `{
             "type": "string",
             "enum": [
                 "platform_owner",
-                "tenant_admin",
+                "organization_admin",
                 "proprietario",
                 "gerente_agricola",
                 "engenheiro_agronomo",
@@ -4740,7 +4740,7 @@ const docTemplate = `{
             ],
             "x-enum-varnames": [
                 "RolePlatformOwner",
-                "RoleTenantAdmin",
+                "RoleOrganizationAdmin",
                 "RoleProprietario",
                 "RoleGerente",
                 "RoleEngenheiro",
@@ -4769,13 +4769,13 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "plate": {
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
-                },
-                "tenant_id": {
                     "type": "string"
                 },
                 "type": {
@@ -4833,7 +4833,7 @@ const docTemplate = `{
                 "operation_id": {
                     "type": "string"
                 },
-                "tenant_id": {
+                "organization_id": {
                     "type": "string"
                 },
                 "worker_id": {
@@ -4859,6 +4859,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "phone": {
                     "type": "string"
                 },
@@ -4866,9 +4869,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "team_id": {
-                    "type": "string"
-                },
-                "tenant_id": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -5046,6 +5046,9 @@ const docTemplate = `{
                 "non_agricultural_area_ha": {
                     "type": "number"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "owner": {
                     "type": "string"
                 },
@@ -5079,9 +5082,6 @@ const docTemplate = `{
                 "state_registration": {
                     "type": "string"
                 },
-                "tenant_id": {
-                    "type": "string"
-                },
                 "total_area_ha": {
                     "type": "number"
                 },
@@ -5108,14 +5108,14 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "start_date": {
                     "type": "string"
                 },
                 "status": {
                     "$ref": "#/definitions/entity.HarvestStatus"
-                },
-                "tenant_id": {
-                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
@@ -5137,6 +5137,9 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "plot_id": {
                     "type": "string"
                 },
@@ -5144,9 +5147,6 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "recorded_at": {
-                    "type": "string"
-                },
-                "tenant_id": {
                     "type": "string"
                 }
             }
@@ -5175,6 +5175,9 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "plot_id": {
                     "type": "string"
                 },
@@ -5188,9 +5191,6 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "responsible": {
-                    "type": "string"
-                },
-                "tenant_id": {
                     "type": "string"
                 },
                 "type": {
@@ -5258,6 +5258,9 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "plant_count": {
                     "type": "integer"
                 },
@@ -5284,9 +5287,6 @@ const docTemplate = `{
                 },
                 "stage": {
                     "$ref": "#/definitions/entity.PlotStage"
-                },
-                "tenant_id": {
-                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
@@ -5583,6 +5583,20 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.createOrganizationRequest": {
+            "type": "object",
+            "properties": {
+                "brand_name": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "plan": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.createPlotRequest": {
             "type": "object",
             "properties": {
@@ -5712,20 +5726,6 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.createTenantRequest": {
-            "type": "object",
-            "properties": {
-                "brand_name": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "plan": {
-                    "type": "string"
-                }
-            }
-        },
         "handler.createUserRequest": {
             "type": "object",
             "properties": {
@@ -5735,13 +5735,13 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "organization_id": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string"
                 },
                 "role": {
-                    "type": "string"
-                },
-                "tenant_id": {
                     "type": "string"
                 }
             }
@@ -5826,7 +5826,7 @@ const docTemplate = `{
         "handler.loginResponse": {
             "type": "object",
             "properties": {
-                "tenant_id": {
+                "organization_id": {
                     "type": "string"
                 },
                 "token": {
@@ -5974,7 +5974,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.updateTenantRequest": {
+        "handler.updateOrganizationRequest": {
             "type": "object",
             "properties": {
                 "brand_name": {
@@ -6020,7 +6020,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "0.1.0",
 	Host:             "localhost:5001",
-	BasePath:         "/api/v1/{tenant_id}",
+	BasePath:         "/api/v1/{organization_id}",
 	Schemes:          []string{"http"},
 	Title:            "CafeOS API",
 	Description:      "Plataforma SaaS especializada em cafeicultura para gestão operacional, produtiva, financeira e analítica de propriedades cafeeiras.",

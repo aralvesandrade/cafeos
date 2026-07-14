@@ -10,20 +10,20 @@ const (
 )
 
 type FinancialTransaction struct {
-	ID            string          `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	TenantID      string          `json:"tenant_id" gorm:"type:uuid;not null;index"`
-	Type          TransactionType `json:"type" gorm:"not null"`
-	CostCenterID  *string         `json:"cost_center_id" gorm:"type:uuid;index"`
-	Description   string          `json:"description" gorm:"not null"`
-	Amount        float64         `json:"amount" gorm:"type:numeric(12,2);not null"`
-	Date          time.Time       `json:"date" gorm:"not null;index"`
-	DueDate       time.Time       `json:"due_date"`
-	PaymentDate   *time.Time      `json:"payment_date"`
-	Status        string          `json:"status" gorm:"default:'pending'"`
-	PaymentMethod string          `json:"payment_method" gorm:"default:''"`
-	Notes         string          `json:"notes" gorm:"default:''"`
-	CreatedAt     time.Time       `json:"created_at"`
-	UpdatedAt     time.Time       `json:"updated_at"`
-	Tenant        Tenant          `json:"-" gorm:"foreignKey:TenantID"`
-	CostCenter    *CostCenter     `json:"-" gorm:"foreignKey:CostCenterID"`
+	ID             string          `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	OrganizationID string          `json:"organization_id" gorm:"type:uuid;not null;index"`
+	Type           TransactionType `json:"type" gorm:"not null"`
+	CostCenterID   *string         `json:"cost_center_id" gorm:"type:uuid;index"`
+	Description    string          `json:"description" gorm:"not null"`
+	Amount         float64         `json:"amount" gorm:"type:numeric(12,2);not null"`
+	Date           time.Time       `json:"date" gorm:"not null;index"`
+	DueDate        time.Time       `json:"due_date"`
+	PaymentDate    *time.Time      `json:"payment_date"`
+	Status         string          `json:"status" gorm:"default:'pending'"`
+	PaymentMethod  string          `json:"payment_method" gorm:"default:''"`
+	Notes          string          `json:"notes" gorm:"default:''"`
+	CreatedAt      time.Time       `json:"created_at"`
+	UpdatedAt      time.Time       `json:"updated_at"`
+	Organization   Organization    `json:"-" gorm:"foreignKey:OrganizationID"`
+	CostCenter     *CostCenter     `json:"-" gorm:"foreignKey:CostCenterID"`
 }

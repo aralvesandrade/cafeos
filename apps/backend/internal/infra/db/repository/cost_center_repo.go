@@ -27,9 +27,9 @@ func (r *CostCenterRepository) GetByID(id string) (*entity.CostCenter, error) {
 	return &cc, err
 }
 
-func (r *CostCenterRepository) ListByTenant(tenantID string) ([]*entity.CostCenter, error) {
+func (r *CostCenterRepository) ListByOrganization(organizationID string) ([]*entity.CostCenter, error) {
 	var ccs []*entity.CostCenter
-	err := r.db.Where("tenant_id = ?", tenantID).Order("code").Find(&ccs).Error
+	err := r.db.Where("organization_id = ?", organizationID).Order("code").Find(&ccs).Error
 	return ccs, err
 }
 

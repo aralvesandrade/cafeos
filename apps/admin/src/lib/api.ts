@@ -11,13 +11,13 @@ function getToken(): string | null {
   return localStorage.getItem('cafeos_token')
 }
 
-function getTenantId(): string | null {
-  return localStorage.getItem('cafeos_tenant_id')
+function getOrganizationId(): string | null {
+  return localStorage.getItem('cafeos_organization_id')
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const token = getToken()
-  const tenantId = getTenantId()
+  const organizationId = getOrganizationId()
 
   const isPublic = path.startsWith('/auth/') || path.startsWith('/health')
 
@@ -27,7 +27,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   } else if (options.admin) {
     url = `${API_BASE}/api/v1${path}`
   } else {
-    url = `${API_BASE}/api/v1${tenantId ? `/${tenantId}` : ''}${path}`
+    url = `${API_BASE}/api/v1${organizationId ? `/${organizationId}` : ''}${path}`
   }
 
   if (options.params) {
@@ -59,12 +59,12 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   return response.json()
 }
 
-export function setAuthData(token: string, tenantId: string) {
+export function setAuthData(token: string, organizationId: string) {
   localStorage.setItem('cafeos_token', token)
-  localStorage.setItem('cafeos_tenant_id', tenantId)
+  localStorage.setItem('cafeos_organization_id', organizationId)
 }
 
 export function clearAuthData() {
   localStorage.removeItem('cafeos_token')
-  localStorage.removeItem('cafeos_tenant_id')
+  localStorage.removeItem('cafeos_organization_id')
 }

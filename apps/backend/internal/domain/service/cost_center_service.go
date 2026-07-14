@@ -27,7 +27,7 @@ func validCostGroup(g entity.CostGroup) bool {
 	}
 }
 
-func (s *CostCenterService) Create(tenantID, name, code string, ccType entity.CostCenterType, costGroup entity.CostGroup, description string) (*entity.CostCenter, error) {
+func (s *CostCenterService) Create(organizationID, name, code string, ccType entity.CostCenterType, costGroup entity.CostGroup, description string) (*entity.CostCenter, error) {
 	if name == "" {
 		return nil, errors.New("cost center name is required")
 	}
@@ -39,15 +39,15 @@ func (s *CostCenterService) Create(tenantID, name, code string, ccType entity.Co
 	}
 
 	cc := &entity.CostCenter{
-		ID:          uuid.New().String(),
-		TenantID:    tenantID,
-		Name:        name,
-		Code:        code,
-		Type:        ccType,
-		CostGroup:   costGroup,
-		Description: description,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		Name:           name,
+		Code:           code,
+		Type:           ccType,
+		CostGroup:      costGroup,
+		Description:    description,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
 	}
 
 	if err := s.repo.Create(cc); err != nil {
@@ -66,8 +66,8 @@ func (s *CostCenterService) GetByID(id string) (*entity.CostCenter, error) {
 	return s.repo.GetByID(id)
 }
 
-func (s *CostCenterService) ListByTenant(tenantID string) ([]*entity.CostCenter, error) {
-	return s.repo.ListByTenant(tenantID)
+func (s *CostCenterService) ListByOrganization(organizationID string) ([]*entity.CostCenter, error) {
+	return s.repo.ListByOrganization(organizationID)
 }
 
 func (s *CostCenterService) Update(cc *entity.CostCenter) error {

@@ -45,14 +45,14 @@ type syncErrorItem struct {
 // @Tags sync (Sincronização)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param batch body syncBatchRequest true "Dados do lote de sincronização"
 // @Success 202 {object} syncResponse
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/sync [post]
+// @Router /api/v1/{organization_id}/sync [post]
 func (h *SyncHandler) Sync(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 
 	var req syncBatchRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -73,7 +73,7 @@ func (h *SyncHandler) Sync(w http.ResponseWriter, r *http.Request) {
 		msg := messaging.SyncMessage{
 			ClientID:        item.ClientID,
 			EventType:       item.EventType,
-			TenantID:        tenantID,
+			OrganizationID:  organizationID,
 			Payload:         item.Payload,
 			ClientTimestamp: item.ClientTimestamp,
 			PublishedAt:     time.Now(),

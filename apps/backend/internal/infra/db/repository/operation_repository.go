@@ -39,18 +39,18 @@ func (r *OperationRepository) ListByPlot(plotID string) ([]*entity.Operation, er
 	return ops, err
 }
 
-func (r *OperationRepository) ListByTenant(tenantID string) ([]*entity.Operation, error) {
+func (r *OperationRepository) ListByOrganization(organizationID string) ([]*entity.Operation, error) {
 	var ops []*entity.Operation
-	err := r.db.Preload("Plot").Where("tenant_id = ?", tenantID).Order("date DESC").Find(&ops).Error
+	err := r.db.Preload("Plot").Where("organization_id = ?", organizationID).Order("date DESC").Find(&ops).Error
 	for _, op := range ops {
 		op.PlotName = op.Plot.Name
 	}
 	return ops, err
 }
 
-func (r *OperationRepository) ListByTenantAndPeriod(tenantID string, start, end string) ([]*entity.Operation, error) {
+func (r *OperationRepository) ListByOrganizationAndPeriod(organizationID string, start, end string) ([]*entity.Operation, error) {
 	var ops []*entity.Operation
-	err := r.db.Preload("Plot").Where("tenant_id = ? AND date >= ? AND date <= ?", tenantID, start, end).
+	err := r.db.Preload("Plot").Where("organization_id = ? AND date >= ? AND date <= ?", organizationID, start, end).
 		Order("date DESC").Find(&ops).Error
 	for _, op := range ops {
 		op.PlotName = op.Plot.Name

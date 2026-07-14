@@ -1,4 +1,4 @@
-basePath: /api/v1/{tenant_id}
+basePath: /api/v1/{organization_id}
 definitions:
   entity.AgriculturalProduct:
     properties:
@@ -8,7 +8,7 @@ definitions:
         type: string
       name:
         type: string
-      tenant_id:
+      organization_id:
         type: string
       type:
         $ref: '#/definitions/entity.ProductType'
@@ -35,10 +35,10 @@ definitions:
         type: string
       id:
         type: string
+      organization_id:
+        type: string
       planned_amount:
         type: number
-      tenant_id:
-        type: string
       updated_at:
         type: string
     type: object
@@ -62,7 +62,7 @@ definitions:
         type: array
       method:
         $ref: '#/definitions/entity.AllocationMethod'
-      tenant_id:
+      organization_id:
         type: string
       total_amount:
         type: number
@@ -94,7 +94,7 @@ definitions:
         type: string
       name:
         type: string
-      tenant_id:
+      organization_id:
         type: string
       type:
         $ref: '#/definitions/entity.CostCenterType'
@@ -139,13 +139,13 @@ definitions:
         type: string
       notes:
         type: string
+      organization_id:
+        type: string
       payment_date:
         type: string
       payment_method:
         type: string
       status:
-        type: string
-      tenant_id:
         type: string
       type:
         $ref: '#/definitions/entity.TransactionType'
@@ -180,7 +180,7 @@ definitions:
         type: string
       odometer:
         type: number
-      tenant_id:
+      organization_id:
         type: string
       type:
         description: '"preventive" | "corrective"'
@@ -202,6 +202,31 @@ definitions:
     - OpIrrigacao
     - OpPoda
     - OpColheita
+  entity.Organization:
+    properties:
+      brand_name:
+        type: string
+      created_at:
+        type: string
+      domain:
+        type: string
+      id:
+        type: string
+      logo_url:
+        type: string
+      name:
+        type: string
+      plan:
+        type: string
+      primary_color:
+        type: string
+      slug:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
   entity.Plot:
     properties:
       activation_date:
@@ -242,6 +267,8 @@ definitions:
         type: string
       notes:
         type: string
+      organization_id:
+        type: string
       plant_count:
         type: integer
       plant_spacing_m:
@@ -260,8 +287,6 @@ definitions:
         type: string
       stage:
         $ref: '#/definitions/entity.PlotStage'
-      tenant_id:
-        type: string
       updated_at:
         type: string
       useful_life_years:
@@ -299,11 +324,11 @@ definitions:
         type: string
       name:
         type: string
+      organization_id:
+        type: string
       phone:
         type: string
       rg:
-        type: string
-      tenant_id:
         type: string
       updated_at:
         type: string
@@ -343,12 +368,12 @@ definitions:
         type: number
       notes:
         type: string
+      organization_id:
+        type: string
       product_id:
         type: string
       quantity:
         type: number
-      tenant_id:
-        type: string
       unit:
         type: string
       updated_at:
@@ -366,11 +391,11 @@ definitions:
         type: string
       notes:
         type: string
+      organization_id:
+        type: string
       quantity:
         type: number
       reference:
-        type: string
-      tenant_id:
         type: string
       type:
         description: '"in" | "out"'
@@ -388,32 +413,7 @@ definitions:
         type: string
       name:
         type: string
-      tenant_id:
-        type: string
-    type: object
-  entity.Tenant:
-    properties:
-      brand_name:
-        type: string
-      created_at:
-        type: string
-      domain:
-        type: string
-      id:
-        type: string
-      logo_url:
-        type: string
-      name:
-        type: string
-      plan:
-        type: string
-      primary_color:
-        type: string
-      slug:
-        type: string
-      status:
-        type: string
-      updated_at:
+      organization_id:
         type: string
     type: object
   entity.TransactionType:
@@ -436,17 +436,17 @@ definitions:
         type: boolean
       name:
         type: string
+      organization_id:
+        type: string
       role:
         $ref: '#/definitions/entity.UserRole'
-      tenant_id:
-        type: string
       updated_at:
         type: string
     type: object
   entity.UserRole:
     enum:
     - platform_owner
-    - tenant_admin
+    - organization_admin
     - proprietario
     - gerente_agricola
     - engenheiro_agronomo
@@ -458,7 +458,7 @@ definitions:
     type: string
     x-enum-varnames:
     - RolePlatformOwner
-    - RoleTenantAdmin
+    - RoleOrganizationAdmin
     - RoleProprietario
     - RoleGerente
     - RoleEngenheiro
@@ -479,11 +479,11 @@ definitions:
         type: string
       name:
         type: string
+      organization_id:
+        type: string
       plate:
         type: string
       status:
-        type: string
-      tenant_id:
         type: string
       type:
         $ref: '#/definitions/entity.VehicleType'
@@ -524,7 +524,7 @@ definitions:
         type: string
       operation_id:
         type: string
-      tenant_id:
+      organization_id:
         type: string
       worker_id:
         type: string
@@ -541,13 +541,13 @@ definitions:
         type: boolean
       name:
         type: string
+      organization_id:
+        type: string
       phone:
         type: string
       role:
         type: string
       team_id:
-        type: string
-      tenant_id:
         type: string
       updated_at:
         type: string
@@ -664,6 +664,8 @@ definitions:
         type: string
       non_agricultural_area_ha:
         type: number
+      organization_id:
+        type: string
       owner:
         type: string
       phone:
@@ -686,8 +688,6 @@ definitions:
         type: string
       state_registration:
         type: string
-      tenant_id:
-        type: string
       total_area_ha:
         type: number
       updated_at:
@@ -705,12 +705,12 @@ definitions:
         type: number
       id:
         type: string
+      organization_id:
+        type: string
       start_date:
         type: string
       status:
         $ref: '#/definitions/entity.HarvestStatus'
-      tenant_id:
-        type: string
       updated_at:
         type: string
       year:
@@ -724,13 +724,13 @@ definitions:
         type: string
       notes:
         type: string
+      organization_id:
+        type: string
       plot_id:
         type: string
       quantity:
         type: number
       recorded_at:
-        type: string
-      tenant_id:
         type: string
     type: object
   handler.SwaggerOperation:
@@ -749,6 +749,8 @@ definitions:
         type: string
       notes:
         type: string
+      organization_id:
+        type: string
       plot_id:
         type: string
       plot_name:
@@ -758,8 +760,6 @@ definitions:
       quantity:
         type: number
       responsible:
-        type: string
-      tenant_id:
         type: string
       type:
         $ref: '#/definitions/entity.OperationType'
@@ -804,6 +804,8 @@ definitions:
         type: string
       notes:
         type: string
+      organization_id:
+        type: string
       plant_count:
         type: integer
       plant_spacing_m:
@@ -822,8 +824,6 @@ definitions:
         type: string
       stage:
         $ref: '#/definitions/entity.PlotStage'
-      tenant_id:
-        type: string
       updated_at:
         type: string
       useful_life_years:
@@ -1018,6 +1018,15 @@ definitions:
       type:
         type: string
     type: object
+  handler.createOrganizationRequest:
+    properties:
+      brand_name:
+        type: string
+      name:
+        type: string
+      plan:
+        type: string
+    type: object
   handler.createPlotRequest:
     properties:
       activation_date:
@@ -1103,26 +1112,17 @@ definitions:
       name:
         type: string
     type: object
-  handler.createTenantRequest:
-    properties:
-      brand_name:
-        type: string
-      name:
-        type: string
-      plan:
-        type: string
-    type: object
   handler.createUserRequest:
     properties:
       email:
         type: string
       name:
         type: string
+      organization_id:
+        type: string
       password:
         type: string
       role:
-        type: string
-      tenant_id:
         type: string
     type: object
   handler.createVehicleRequest:
@@ -1177,7 +1177,7 @@ definitions:
     type: object
   handler.loginResponse:
     properties:
-      tenant_id:
+      organization_id:
         type: string
       token:
         type: string
@@ -1273,7 +1273,7 @@ definitions:
           $ref: '#/definitions/handler.syncErrorItem'
         type: array
     type: object
-  handler.updateTenantRequest:
+  handler.updateOrganizationRequest:
     properties:
       brand_name:
         type: string
@@ -1303,13 +1303,13 @@ info:
   title: CafeOS API
   version: 0.1.0
 paths:
-  /api/v1/{tenant_id}/agricultural-products:
+  /api/v1/{organization_id}/agricultural-products:
     get:
-      description: Lista todos os produtos agrícolas pertencentes ao tenant
+      description: Lista todos os produtos agrícolas pertencentes à organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -1332,15 +1332,15 @@ paths:
       summary: Listar produtos agrícolas
       tags:
       - agricultural-products (Produtos Agrícolas)
-  /api/v1/{tenant_id}/budgets:
+  /api/v1/{organization_id}/budgets:
     post:
       consumes:
       - application/json
       description: Registra um novo orçamento para uma colheita e centro de custo
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados do orçamento
@@ -1367,13 +1367,13 @@ paths:
       summary: Criar orçamento
       tags:
       - budgets (Orçamentos)
-  /api/v1/{tenant_id}/budgets/{id}:
+  /api/v1/{organization_id}/budgets/{id}:
     delete:
       description: Exclui um orçamento por ID
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Orçamento
@@ -1398,9 +1398,9 @@ paths:
     get:
       description: Retorna um único orçamento
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Orçamento
@@ -1432,9 +1432,9 @@ paths:
       description: Atualiza dados do orçamento por ID (atualização parcial - somente
         os campos informados são alterados)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Orçamento
@@ -1466,15 +1466,15 @@ paths:
       summary: Atualizar orçamento
       tags:
       - budgets (Orçamentos)
-  /api/v1/{tenant_id}/cost-allocations:
+  /api/v1/{organization_id}/cost-allocations:
     post:
       consumes:
       - application/json
       description: Registra um novo rateio de custo, distribuindo um valor entre talhões
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados do rateio de custo
@@ -1501,13 +1501,13 @@ paths:
       summary: Criar rateio de custo
       tags:
       - cost-allocations (Rateios de Custo)
-  /api/v1/{tenant_id}/cost-allocations/{id}:
+  /api/v1/{organization_id}/cost-allocations/{id}:
     delete:
       description: Exclui um rateio de custo por ID
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Rateio de Custo
@@ -1532,9 +1532,9 @@ paths:
     get:
       description: Retorna um único rateio de custo
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Rateio de Custo
@@ -1560,13 +1560,13 @@ paths:
       summary: Obter rateio de custo por ID
       tags:
       - cost-allocations (Rateios de Custo)
-  /api/v1/{tenant_id}/cost-centers:
+  /api/v1/{organization_id}/cost-centers:
     get:
-      description: Lista todos os centros de custo pertencentes ao tenant
+      description: Lista todos os centros de custo pertencentes à organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -1592,11 +1592,11 @@ paths:
     post:
       consumes:
       - application/json
-      description: Registra um novo centro de custo no tenant
+      description: Registra um novo centro de custo na organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados do centro de custo
@@ -1623,13 +1623,13 @@ paths:
       summary: Criar centro de custo
       tags:
       - cost-centers (Centros de Custo)
-  /api/v1/{tenant_id}/cost-centers/{id}:
+  /api/v1/{organization_id}/cost-centers/{id}:
     delete:
       description: Exclui um centro de custo por ID
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Centro de Custo
@@ -1654,9 +1654,9 @@ paths:
     get:
       description: Retorna um único centro de custo
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Centro de Custo
@@ -1688,9 +1688,9 @@ paths:
       description: Atualiza dados do centro de custo por ID (atualização parcial -
         somente os campos informados são alterados)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Centro de Custo
@@ -1722,13 +1722,13 @@ paths:
       summary: Atualizar centro de custo
       tags:
       - cost-centers (Centros de Custo)
-  /api/v1/{tenant_id}/cost-centers/senar-categories:
+  /api/v1/{organization_id}/cost-centers/senar-categories:
     get:
       description: Retorna o catálogo fixo de categorias de despesa SENAR/CEPEA
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -1745,13 +1745,13 @@ paths:
       summary: Listar categorias SENAR/CEPEA
       tags:
       - cost-centers (Centros de Custo)
-  /api/v1/{tenant_id}/dashboard:
+  /api/v1/{organization_id}/dashboard:
     get:
       description: Retorna produção, custos, indicadores e operações recentes consolidados
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -1766,13 +1766,13 @@ paths:
       summary: Obter painel
       tags:
       - dashboard (Painel)
-  /api/v1/{tenant_id}/farms:
+  /api/v1/{organization_id}/farms:
     get:
-      description: Lista todas as fazendas pertencentes ao tenant
+      description: Lista todas as fazendas pertencentes à organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -1798,11 +1798,11 @@ paths:
     post:
       consumes:
       - application/json
-      description: Registra uma nova fazenda no tenant
+      description: Registra uma nova fazenda na organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados da fazenda
@@ -1829,13 +1829,13 @@ paths:
       summary: Criar fazenda
       tags:
       - farms (Fazendas)
-  /api/v1/{tenant_id}/farms/{farm_id}/plots:
+  /api/v1/{organization_id}/farms/{farm_id}/plots:
     get:
       description: Lista todos os talhões pertencentes a uma fazenda
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Fazenda
@@ -1863,13 +1863,13 @@ paths:
       summary: Listar talhões por fazenda
       tags:
       - plots (Talhões)
-  /api/v1/{tenant_id}/farms/{id}:
+  /api/v1/{organization_id}/farms/{id}:
     delete:
       description: Exclui uma fazenda por ID
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Fazenda
@@ -1894,9 +1894,9 @@ paths:
     get:
       description: Retorna uma única fazenda
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Fazenda
@@ -1928,9 +1928,9 @@ paths:
       description: Atualiza dados da fazenda por ID (atualização parcial - somente
         os campos informados são alterados)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Fazenda
@@ -1962,13 +1962,13 @@ paths:
       summary: Atualizar fazenda
       tags:
       - farms (Fazendas)
-  /api/v1/{tenant_id}/financial:
+  /api/v1/{organization_id}/financial:
     get:
-      description: Lista todas as transações financeiras pertencentes ao tenant
+      description: Lista todas as transações financeiras pertencentes à organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -1994,11 +1994,11 @@ paths:
     post:
       consumes:
       - application/json
-      description: Registra uma nova transação financeira (receita/despesa) no tenant
+      description: Registra uma nova transação financeira (receita/despesa) na organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados da transação financeira
@@ -2025,13 +2025,13 @@ paths:
       summary: Criar transação financeira
       tags:
       - financial (Financeiro)
-  /api/v1/{tenant_id}/financial/{id}:
+  /api/v1/{organization_id}/financial/{id}:
     delete:
       description: Exclui uma transação financeira por ID
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Transação Financeira
@@ -2056,9 +2056,9 @@ paths:
     get:
       description: Retorna uma única transação financeira
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Transação Financeira
@@ -2090,9 +2090,9 @@ paths:
       description: Atualiza dados da transação financeira por ID (atualização parcial
         - somente os campos informados são alterados)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Transação Financeira
@@ -2124,14 +2124,14 @@ paths:
       summary: Atualizar transação financeira
       tags:
       - financial (Financeiro)
-  /api/v1/{tenant_id}/fleet/maintenance:
+  /api/v1/{organization_id}/fleet/maintenance:
     get:
-      description: Lista todos os registros de manutenção pertencentes à frota do
-        tenant
+      description: Lista todos os registros de manutenção pertencentes à frota da
+        organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -2159,9 +2159,9 @@ paths:
       - application/json
       description: Registra um novo registro de manutenção para um veículo
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados da manutenção
@@ -2188,13 +2188,13 @@ paths:
       summary: Criar registro de manutenção
       tags:
       - fleet (Frota)
-  /api/v1/{tenant_id}/fleet/maintenance/{id}:
+  /api/v1/{organization_id}/fleet/maintenance/{id}:
     delete:
       description: Exclui um registro de manutenção por ID
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Manutenção
@@ -2219,9 +2219,9 @@ paths:
     get:
       description: Retorna um único registro de manutenção
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Manutenção
@@ -2247,13 +2247,13 @@ paths:
       summary: Obter registro de manutenção por ID
       tags:
       - fleet (Frota)
-  /api/v1/{tenant_id}/fleet/vehicles:
+  /api/v1/{organization_id}/fleet/vehicles:
     get:
-      description: Lista todos os veículos pertencentes à frota do tenant
+      description: Lista todos os veículos pertencentes à frota da organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -2279,11 +2279,11 @@ paths:
     post:
       consumes:
       - application/json
-      description: Registra um novo veículo na frota do tenant
+      description: Registra um novo veículo na frota da organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados do veículo
@@ -2310,13 +2310,13 @@ paths:
       summary: Criar veículo
       tags:
       - fleet (Frota)
-  /api/v1/{tenant_id}/fleet/vehicles/{id}:
+  /api/v1/{organization_id}/fleet/vehicles/{id}:
     delete:
       description: Exclui um veículo por ID
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Veículo
@@ -2341,9 +2341,9 @@ paths:
     get:
       description: Retorna um único veículo
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Veículo
@@ -2375,9 +2375,9 @@ paths:
       description: Atualiza dados do veículo por ID (atualização parcial - somente
         os campos informados são alterados)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Veículo
@@ -2409,13 +2409,13 @@ paths:
       summary: Atualizar veículo
       tags:
       - fleet (Frota)
-  /api/v1/{tenant_id}/harvests:
+  /api/v1/{organization_id}/harvests:
     get:
-      description: Lista todas as colheitas (safras) do tenant
+      description: Lista todas as colheitas (safras) da organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -2443,9 +2443,9 @@ paths:
       - application/json
       description: Registra uma nova colheita (safra) para um ano
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados da colheita
@@ -2472,13 +2472,13 @@ paths:
       summary: Criar colheita
       tags:
       - harvests (Colheitas)
-  /api/v1/{tenant_id}/harvests/{harvest_id}/budgets:
+  /api/v1/{organization_id}/harvests/{harvest_id}/budgets:
     get:
       description: Lista todos os orçamentos pertencentes a uma colheita
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Colheita
@@ -2506,13 +2506,13 @@ paths:
       summary: Listar orçamentos por colheita
       tags:
       - budgets (Orçamentos)
-  /api/v1/{tenant_id}/harvests/{harvest_id}/cost-allocations:
+  /api/v1/{organization_id}/harvests/{harvest_id}/cost-allocations:
     get:
       description: Lista todos os rateios de custo pertencentes a uma colheita
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Colheita
@@ -2540,13 +2540,13 @@ paths:
       summary: Listar rateios de custo por colheita
       tags:
       - cost-allocations (Rateios de Custo)
-  /api/v1/{tenant_id}/harvests/{id}:
+  /api/v1/{organization_id}/harvests/{id}:
     get:
       description: Retorna uma única colheita (safra)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Colheita
@@ -2572,14 +2572,14 @@ paths:
       summary: Obter colheita por ID
       tags:
       - harvests (Colheitas)
-  /api/v1/{tenant_id}/harvests/{id}/finalize:
+  /api/v1/{organization_id}/harvests/{id}/finalize:
     put:
       description: Finaliza uma colheita (safra), calculando todos os indicadores
         (sacas/ha, custo/saca, etc.)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Colheita
@@ -2601,13 +2601,13 @@ paths:
       summary: Finalizar colheita
       tags:
       - harvests (Colheitas)
-  /api/v1/{tenant_id}/harvests/{id}/production:
+  /api/v1/{organization_id}/harvests/{id}/production:
     get:
       description: Obtém todos os registros de produção de uma colheita específica
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Colheita
@@ -2641,9 +2641,9 @@ paths:
       description: Registra a quantidade produzida em um talhão específico dentro
         de uma colheita
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Colheita
@@ -2675,13 +2675,13 @@ paths:
       summary: Registrar produção da colheita
       tags:
       - harvests (Colheitas)
-  /api/v1/{tenant_id}/labor/shifts:
+  /api/v1/{organization_id}/labor/shifts:
     get:
-      description: Lista todos os turnos de trabalho pertencentes ao tenant
+      description: Lista todos os turnos de trabalho pertencentes à organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -2709,9 +2709,9 @@ paths:
       - application/json
       description: Registra um novo turno de trabalho de um trabalhador em uma operação
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados do turno de trabalho
@@ -2738,13 +2738,13 @@ paths:
       summary: Criar turno de trabalho
       tags:
       - labor (Mão de Obra)
-  /api/v1/{tenant_id}/labor/shifts/{id}:
+  /api/v1/{organization_id}/labor/shifts/{id}:
     delete:
       description: Exclui um turno de trabalho por ID
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Turno de Trabalho
@@ -2766,13 +2766,13 @@ paths:
       summary: Excluir turno de trabalho
       tags:
       - labor (Mão de Obra)
-  /api/v1/{tenant_id}/labor/teams:
+  /api/v1/{organization_id}/labor/teams:
     get:
-      description: Lista todas as equipes de trabalho pertencentes ao tenant
+      description: Lista todas as equipes de trabalho pertencentes à organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -2798,11 +2798,11 @@ paths:
     post:
       consumes:
       - application/json
-      description: Registra uma nova equipe de trabalho no tenant
+      description: Registra uma nova equipe de trabalho na organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados da equipe
@@ -2829,13 +2829,13 @@ paths:
       summary: Criar equipe de trabalho
       tags:
       - labor (Mão de Obra)
-  /api/v1/{tenant_id}/labor/teams/{id}:
+  /api/v1/{organization_id}/labor/teams/{id}:
     delete:
       description: Exclui uma equipe de trabalho por ID
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Equipe
@@ -2863,9 +2863,9 @@ paths:
       description: Atualiza dados da equipe de trabalho por ID (atualização parcial
         - somente os campos informados são alterados)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Equipe
@@ -2897,13 +2897,13 @@ paths:
       summary: Atualizar equipe de trabalho
       tags:
       - labor (Mão de Obra)
-  /api/v1/{tenant_id}/labor/workers:
+  /api/v1/{organization_id}/labor/workers:
     get:
-      description: Lista todos os trabalhadores pertencentes ao tenant
+      description: Lista todos os trabalhadores pertencentes à organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -2929,11 +2929,11 @@ paths:
     post:
       consumes:
       - application/json
-      description: Registra um novo trabalhador no tenant
+      description: Registra um novo trabalhador na organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados do trabalhador
@@ -2960,13 +2960,13 @@ paths:
       summary: Criar trabalhador
       tags:
       - labor (Mão de Obra)
-  /api/v1/{tenant_id}/labor/workers/{id}:
+  /api/v1/{organization_id}/labor/workers/{id}:
     delete:
       description: Exclui um trabalhador por ID
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Trabalhador
@@ -2994,9 +2994,9 @@ paths:
       description: Atualiza dados do trabalhador por ID (atualização parcial - somente
         os campos informados são alterados)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Trabalhador
@@ -3028,13 +3028,13 @@ paths:
       summary: Atualizar trabalhador
       tags:
       - labor (Mão de Obra)
-  /api/v1/{tenant_id}/operations:
+  /api/v1/{organization_id}/operations:
     get:
-      description: Lista todas as operações de todos os talhões do tenant
+      description: Lista todas as operações de todos os talhões da organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -3063,9 +3063,9 @@ paths:
       description: Registra uma operação agrícola (adubação, pulverização, irrigação,
         poda, colheita)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados da operação
@@ -3092,13 +3092,13 @@ paths:
       summary: Registrar operação
       tags:
       - operations (Operações)
-  /api/v1/{tenant_id}/operations/{id}:
+  /api/v1/{organization_id}/operations/{id}:
     delete:
       description: Exclui uma operação por ID
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Operação
@@ -3123,9 +3123,9 @@ paths:
     get:
       description: Retorna uma única operação
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID da Operação
@@ -3151,13 +3151,13 @@ paths:
       summary: Obter operação por ID
       tags:
       - operations (Operações)
-  /api/v1/{tenant_id}/operations/recent:
+  /api/v1/{organization_id}/operations/recent:
     get:
       description: Lista as operações mais recentes, limitadas por parâmetro de consulta
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Máximo de resultados (padrão 10)
@@ -3184,13 +3184,13 @@ paths:
       summary: Listar operações recentes
       tags:
       - operations (Operações)
-  /api/v1/{tenant_id}/plots:
+  /api/v1/{organization_id}/plots:
     get:
-      description: Lista todos os talhões de todas as fazendas do tenant
+      description: Lista todos os talhões de todas as fazendas da organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -3218,9 +3218,9 @@ paths:
       - application/json
       description: Registra um novo talhão em uma fazenda
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados do talhão
@@ -3247,13 +3247,13 @@ paths:
       summary: Criar talhão
       tags:
       - plots (Talhões)
-  /api/v1/{tenant_id}/plots/{id}:
+  /api/v1/{organization_id}/plots/{id}:
     delete:
       description: Exclui um talhão por ID
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Talhão
@@ -3278,9 +3278,9 @@ paths:
     get:
       description: Retorna um único talhão
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Talhão
@@ -3312,9 +3312,9 @@ paths:
       description: Atualiza dados do talhão por ID (atualização parcial - somente
         os campos informados são alterados)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Talhão
@@ -3346,13 +3346,13 @@ paths:
       summary: Atualizar talhão
       tags:
       - plots (Talhões)
-  /api/v1/{tenant_id}/plots/{plot_id}/operations:
+  /api/v1/{organization_id}/plots/{plot_id}/operations:
     get:
       description: Lista todas as operações de um talhão específico
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Talhão
@@ -3380,13 +3380,13 @@ paths:
       summary: Listar operações por talhão
       tags:
       - operations (Operações)
-  /api/v1/{tenant_id}/stock/items:
+  /api/v1/{organization_id}/stock/items:
     get:
-      description: Lista todos os itens de estoque pertencentes ao tenant
+      description: Lista todos os itens de estoque pertencentes à organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -3412,11 +3412,11 @@ paths:
     post:
       consumes:
       - application/json
-      description: Registra um novo item de estoque no tenant
+      description: Registra um novo item de estoque na organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados do item de estoque
@@ -3443,13 +3443,13 @@ paths:
       summary: Criar item de estoque
       tags:
       - stock (Estoque)
-  /api/v1/{tenant_id}/stock/items/{id}:
+  /api/v1/{organization_id}/stock/items/{id}:
     delete:
       description: Exclui um item de estoque por ID
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Item de Estoque
@@ -3474,9 +3474,9 @@ paths:
     get:
       description: Retorna um único item de estoque
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Item de Estoque
@@ -3508,9 +3508,9 @@ paths:
       description: Atualiza dados do item de estoque por ID (atualização parcial -
         somente os campos informados são alterados)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: ID do Item de Estoque
@@ -3542,13 +3542,13 @@ paths:
       summary: Atualizar item de estoque
       tags:
       - stock (Estoque)
-  /api/v1/{tenant_id}/stock/movements:
+  /api/v1/{organization_id}/stock/movements:
     get:
-      description: Lista todas as movimentações de estoque pertencentes ao tenant
+      description: Lista todas as movimentações de estoque pertencentes à organização
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       produces:
@@ -3577,9 +3577,9 @@ paths:
       description: Registra uma movimentação de estoque (entrada/saída) para um item
         de estoque
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados da movimentação de estoque
@@ -3606,16 +3606,16 @@ paths:
       summary: Registrar movimentação de estoque
       tags:
       - stock (Estoque)
-  /api/v1/{tenant_id}/sync:
+  /api/v1/{organization_id}/sync:
     post:
       consumes:
       - application/json
       description: Aceita um lote (máximo 50) de eventos mobile offline e publica
         cada um no RabbitMQ para persistência assíncrona
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
-        name: tenant_id
+        name: organization_id
         required: true
         type: string
       - description: Dados do lote de sincronização
@@ -3642,9 +3642,9 @@ paths:
       summary: Sincronizar lote offline
       tags:
       - sync (Sincronização)
-  /api/v1/admin/tenants:
+  /api/v1/admin/organizations:
     get:
-      description: Lista todos os tenants (somente platform_owner)
+      description: Lista todas as organizações (somente platform_owner)
       produces:
       - application/json
       responses:
@@ -3652,31 +3652,31 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/entity.Tenant'
+              $ref: '#/definitions/entity.Organization'
             type: array
       security:
       - BearerAuth: []
-      summary: Listar tenants
+      summary: Listar organizações
       tags:
-      - tenants (Inquilinos)
+      - organizations (Organizações)
     post:
       consumes:
       - application/json
-      description: Cria um novo tenant (somente platform_owner)
+      description: Cria uma nova organização (somente platform_owner)
       parameters:
-      - description: Dados do tenant
+      - description: Dados da organização
         in: body
-        name: tenant
+        name: organization
         required: true
         schema:
-          $ref: '#/definitions/handler.createTenantRequest'
+          $ref: '#/definitions/handler.createOrganizationRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/entity.Tenant'
+            $ref: '#/definitions/entity.Organization'
         "400":
           description: Bad Request
           schema:
@@ -3685,14 +3685,14 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Criar tenant
+      summary: Criar organização
       tags:
-      - tenants (Inquilinos)
-  /api/v1/admin/tenants/{id}:
+      - organizations (Organizações)
+  /api/v1/admin/organizations/{id}:
     delete:
-      description: Exclui um tenant por ID (somente platform_owner)
+      description: Exclui uma organização por ID (somente platform_owner)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
         name: id
         required: true
@@ -3702,13 +3702,13 @@ paths:
           description: No Content
       security:
       - BearerAuth: []
-      summary: Excluir tenant
+      summary: Excluir organização
       tags:
-      - tenants (Inquilinos)
+      - organizations (Organizações)
     get:
-      description: Retorna um único tenant (somente platform_owner)
+      description: Retorna uma única organização (somente platform_owner)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
         name: id
         required: true
@@ -3719,7 +3719,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Tenant'
+            $ref: '#/definitions/entity.Organization'
         "404":
           description: Not Found
           schema:
@@ -3728,32 +3728,32 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Obter tenant por ID
+      summary: Obter organização por ID
       tags:
-      - tenants (Inquilinos)
+      - organizations (Organizações)
     put:
       consumes:
       - application/json
-      description: Atualiza dados do tenant (somente platform_owner)
+      description: Atualiza dados da organização (somente platform_owner)
       parameters:
-      - description: ID do Tenant
+      - description: ID da Organização
         in: path
         name: id
         required: true
         type: string
-      - description: Dados atualizados do tenant
+      - description: Dados atualizados da organização
         in: body
-        name: tenant
+        name: organization
         required: true
         schema:
-          $ref: '#/definitions/handler.updateTenantRequest'
+          $ref: '#/definitions/handler.updateOrganizationRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Tenant'
+            $ref: '#/definitions/entity.Organization'
         "400":
           description: Bad Request
           schema:
@@ -3762,9 +3762,9 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Atualizar tenant
+      summary: Atualizar organização
       tags:
-      - tenants (Inquilinos)
+      - organizations (Organizações)
   /api/v1/admin/users:
     get:
       description: Lista todos os usuários (somente platform_owner)

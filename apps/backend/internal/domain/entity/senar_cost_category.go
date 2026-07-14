@@ -2,7 +2,7 @@ package entity
 
 // SenarCostCategory is a pre-classified despesa cost center category from
 // the SENAR/CEPEA coffee production cost methodology. It is a fixed catalog
-// (not persisted) offered to tenants when registering new cost centers, so
+// (not persisted) offered to organizations when registering new cost centers, so
 // that COE/COT/CT can be computed automatically without asking the user to
 // classify free-text categories by hand.
 type SenarCostCategory struct {
@@ -11,7 +11,7 @@ type SenarCostCategory struct {
 }
 
 // SenarCostCategories lists the 18 despesa categories from the reference
-// methodology. Existing tenant-created cost centers are unaffected by this
+// methodology. Existing organization-created cost centers are unaffected by this
 // catalog — it only pre-fills Name/CostGroup for newly created ones.
 var SenarCostCategories = []SenarCostCategory{
 	{Name: "Adubação via folha", CostGroup: CostGroupOperacionalEfetivo},

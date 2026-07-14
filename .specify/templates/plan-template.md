@@ -59,10 +59,10 @@ apps/
 │   ├── internal/
 │   │   ├── api/
 │   │   │   ├── handler/     # HTTP handlers (writeJSON/writeError)
-│   │   │   ├── middleware/  # Auth, RBAC, Tenant, CORS
+│   │   │   ├── middleware/  # Auth, RBAC, Organization, CORS
 │   │   │   └── router.go    # Route config
 │   │   ├── domain/
-│   │   │   ├── entity/      # GORM entities (UUID PK, TenantID FK)
+│   │   │   ├── entity/      # GORM entities (UUID PK, OrganizationID FK)
 │   │   │   ├── repository/  # Go interfaces
 │   │   │   └── service/     # Business logic
 │   │   ├── event/           # In-memory event bus

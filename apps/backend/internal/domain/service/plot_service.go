@@ -61,8 +61,8 @@ func (s *PlotService) ListByFarm(farmID string) ([]*entity.Plot, error) {
 	return s.repo.ListByFarm(farmID)
 }
 
-func (s *PlotService) ListByTenant(tenantID string) ([]*entity.Plot, error) {
-	return s.repo.ListByTenant(tenantID)
+func (s *PlotService) ListByOrganization(organizationID string) ([]*entity.Plot, error) {
+	return s.repo.ListByOrganization(organizationID)
 }
 
 func (s *PlotService) Update(plot *entity.Plot) error {

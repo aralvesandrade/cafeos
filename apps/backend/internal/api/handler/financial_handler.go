@@ -28,20 +28,20 @@ type createFinancialRequest struct {
 	Notes        string  `json:"notes"`
 }
 
-// Create registra uma nova transação financeira para o tenant autenticado
+// Create registra uma nova transação financeira para a organização autenticada
 // @Summary Criar transação financeira
-// @Description Registra uma nova transação financeira (receita/despesa) no tenant
+// @Description Registra uma nova transação financeira (receita/despesa) na organização
 // @Tags financial (Financeiro)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param financial body createFinancialRequest true "Dados da transação financeira"
 // @Success 201 {object} entity.FinancialTransaction
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/financial [post]
+// @Router /api/v1/{organization_id}/financial [post]
 func (h *FinancialHandler) Create(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	var req createFinancialRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, "invalid request body", http.StatusBadRequest)
@@ -49,7 +49,7 @@ func (h *FinancialHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	date, _ := time.Parse("2006-01-02", req.Date)
 	dueDate, _ := time.Parse("2006-01-02", req.DueDate)
-	tx, err := h.svc.Create(tenantID, req.Type, req.CostCenterID, req.Description, req.Amount, date, dueDate, req.Notes)
+	tx, err := h.svc.Create(organizationID, req.Type, req.CostCenterID, req.Description, req.Amount, date, dueDate, req.Notes)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -57,19 +57,19 @@ func (h *FinancialHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, tx, http.StatusCreated)
 }
 
-// List retorna todas as transações financeiras do tenant autenticado
+// List retorna todas as transações financeiras da organização autenticada
 // @Summary Listar transações financeiras
-// @Description Lista todas as transações financeiras pertencentes ao tenant
+// @Description Lista todas as transações financeiras pertencentes à organização
 // @Tags financial (Financeiro)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Success 200 {array} entity.FinancialTransaction
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/financial [get]
+// @Router /api/v1/{organization_id}/financial [get]
 func (h *FinancialHandler) List(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
-	txs, err := h.svc.ListByTenant(tenantID)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	txs, err := h.svc.ListByOrganization(organizationID)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -82,12 +82,12 @@ func (h *FinancialHandler) List(w http.ResponseWriter, r *http.Request) {
 // @Description Retorna uma única transação financeira
 // @Tags financial (Financeiro)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID da Transação Financeira"
 // @Success 200 {object} entity.FinancialTransaction
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/financial/{id} [get]
+// @Router /api/v1/{organization_id}/financial/{id} [get]
 func (h *FinancialHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	tx, err := h.svc.GetByID(id)
@@ -104,13 +104,13 @@ func (h *FinancialHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 // @Tags financial (Financeiro)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID da Transação Financeira"
 // @Param financial body entity.FinancialTransaction true "Dados atualizados da transação financeira"
 // @Success 200 {object} entity.FinancialTransaction
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/financial/{id} [put]
+// @Router /api/v1/{organization_id}/financial/{id} [put]
 func (h *FinancialHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	existing, err := h.svc.GetByID(id)
@@ -159,12 +159,12 @@ func (h *FinancialHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Summary Excluir transação financeira
 // @Description Exclui uma transação financeira por ID
 // @Tags financial (Financeiro)
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID da Transação Financeira"
 // @Success 204 "No Content"
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/financial/{id} [delete]
+// @Router /api/v1/{organization_id}/financial/{id} [delete]
 func (h *FinancialHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.svc.Delete(id); err != nil {

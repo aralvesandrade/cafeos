@@ -46,7 +46,7 @@ internal/
 │   └── service/          # Serviços de domínio + Rule Engine
 ├── api/
 │   ├── handler/          # Handlers HTTP (REST)
-│   ├── middleware/       # Auth, RBAC, Tenant, CORS
+│   ├── middleware/       # Auth, RBAC, Organization, CORS
 │   └── router.go         # Configuração de rotas
 ├── event/                # Event bus in-memory (preparado para RabbitMQ/Kafka)
 └── infra/
@@ -62,7 +62,7 @@ internal/
 
 | Entidade               | Descrição                                      |
 | ---------------------- | ---------------------------------------------- |
-| `Tenant`               | Cliente multi-tenant (White Label)             |
+| `Organization`         | Cliente da plataforma (White Label)            |
 | `User`                 | Usuário com RBAC (10 perfis)                   |
 | `Farm`                 | Propriedade rural (fazenda)                    |
 | `Plot` (Talhão)        | Talhão vinculado a uma fazenda                 |
@@ -74,8 +74,8 @@ internal/
 
 ### Perfis RBAC
 
-- `platform_owner` — Admin global (cria tenants, planos)
-- `tenant_admin` — Admin do tenant (usuários, config)
+- `platform_owner` — Admin global (cria organizações, planos)
+- `organization_admin` — Admin da organização (usuários, config)
 - `proprietario` — Proprietário rural (indicadores)
 - `gerente_agricola` — Gerente agrícola (operações)
 - `engenheiro_agronomo` — Recomendações técnicas
@@ -123,7 +123,7 @@ src/
 │   ├── api.ts        # Cliente HTTP com JWT
 │   ├── auth.tsx      # AuthContext + hook
 │   └── theme.tsx     # ThemeProvider + useTheme (light/dark)
-├── pages/            # Login, Dashboard, Farms, Plots, Operations, Harvests, Tenants, Users, NotFound
+├── pages/            # Login, Dashboard, Farms, Plots, Operations, Harvests, Organizations, Users, NotFound
 ├── router.tsx        # React Router DOM v7 (nested layouts, lazy routes)
 ├── App.tsx
 ├── main.tsx
@@ -144,7 +144,7 @@ Documentação interativa disponível em `http://localhost:5001/swagger/index.ht
 
 ### API REST
 
-Rotas multi-tenant sob `/api/v1/{tenant_id}`:
+Rotas multi-tenant sob `/api/v1/{organization_id}`:
 
 | Método | Rota                           | Descrição                    |
 | ------ | ------------------------------ | ---------------------------- |
@@ -209,11 +209,11 @@ Rotas admin (`platform_owner` apenas, prefixo `/api/v1/admin`):
 
 | Método | Rota                          | Descrição              |
 | ------ | ----------------------------- | ---------------------- |
-| GET    | `/api/v1/admin/tenants`       | Listar tenants         |
-| POST   | `/api/v1/admin/tenants`       | Criar tenant           |
-| GET    | `/api/v1/admin/tenants/{id}`  | Detalhe do tenant      |
-| PUT    | `/api/v1/admin/tenants/{id}`  | Atualizar tenant       |
-| DELETE | `/api/v1/admin/tenants/{id}`  | Remover tenant         |
+| GET    | `/api/v1/admin/organizations`       | Listar organizações |
+| POST   | `/api/v1/admin/organizations`       | Criar organização   |
+| GET    | `/api/v1/admin/organizations/{id}`  | Detalhe da organização |
+| PUT    | `/api/v1/admin/organizations/{id}`  | Atualizar organização |
+| DELETE | `/api/v1/admin/organizations/{id}`  | Remover organização |
 | GET    | `/api/v1/admin/users`         | Listar usuários        |
 | POST   | `/api/v1/admin/users`         | Criar usuário          |
 | PUT    | `/api/v1/admin/users/{id}`    | Atualizar usuário      |
@@ -340,7 +340,7 @@ cd apps/backend && go run ./cmd/worker/main.go
 - [x] API REST multi-tenant
 - [x] Event system
 - [x] RBAC com 10 perfis + autorização por rota
-- [x] Gestão de tenants e usuários (platform_owner)
+- [x] Gestão de organizações e usuários (platform_owner)
 - [x] Login com acesso rápido por perfil (dev)
 
 ### Fase 2 ✅ (implementado)

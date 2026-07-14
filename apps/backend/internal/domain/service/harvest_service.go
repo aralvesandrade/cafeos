@@ -52,7 +52,7 @@ func NewHarvestService(
 	}
 }
 
-func (s *HarvestService) Create(tenantID string, year int, description string, estimatedProduction float64) (*entity.Harvest, error) {
+func (s *HarvestService) Create(organizationID string, year int, description string, estimatedProduction float64) (*entity.Harvest, error) {
 	if year <= 0 {
 		return nil, errors.New("year is required")
 	}
@@ -62,7 +62,7 @@ func (s *HarvestService) Create(tenantID string, year int, description string, e
 
 	harvest := &entity.Harvest{
 		ID:                  uuid.New().String(),
-		TenantID:            tenantID,
+		OrganizationID:      organizationID,
 		Year:                year,
 		Description:         description,
 		EstimatedProduction: estimatedProduction,
@@ -81,8 +81,8 @@ func (s *HarvestService) GetByID(id string) (*entity.Harvest, error) {
 	return s.harvestRepo.GetByID(id)
 }
 
-func (s *HarvestService) ListByTenant(tenantID string) ([]*entity.Harvest, error) {
-	return s.harvestRepo.ListByTenant(tenantID)
+func (s *HarvestService) ListByOrganization(organizationID string) ([]*entity.Harvest, error) {
+	return s.harvestRepo.ListByOrganization(organizationID)
 }
 
 func (s *HarvestService) Finalize(harvestID string) error {
@@ -105,27 +105,27 @@ func (s *HarvestService) Finalize(harvestID string) error {
 	}
 
 	s.eventBus.Publish(event.HarvestFinalized{
-		HarvestID: harvestID,
-		TenantID:  harvest.TenantID,
-		Year:      harvest.Year,
+		HarvestID:      harvestID,
+		OrganizationID: harvest.OrganizationID,
+		Year:           harvest.Year,
 	})
 
 	return nil
 }
 
-func (s *HarvestService) RecordProduction(tenantID, harvestID, plotID string, quantity float64, notes string) (*entity.HarvestProduction, error) {
+func (s *HarvestService) RecordProduction(organizationID, harvestID, plotID string, quantity float64, notes string) (*entity.HarvestProduction, error) {
 	if quantity < 0 {
 		return nil, errors.New("quantity cannot be negative")
 	}
 
 	prod := &entity.HarvestProduction{
-		ID:         uuid.New().String(),
-		TenantID:   tenantID,
-		HarvestID:  harvestID,
-		PlotID:     plotID,
-		Quantity:   quantity,
-		RecordedAt: time.Now(),
-		Notes:      notes,
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		HarvestID:      harvestID,
+		PlotID:         plotID,
+		Quantity:       quantity,
+		RecordedAt:     time.Now(),
+		Notes:          notes,
 	}
 
 	if err := s.productionRepo.Create(prod); err != nil {
@@ -150,7 +150,7 @@ func (s *HarvestService) calculateIndicators(harvest *entity.Harvest) error {
 		totalProduction += p.Quantity
 	}
 
-	plots, err := s.plotRepo.ListByTenant(harvest.TenantID)
+	plots, err := s.plotRepo.ListByOrganization(harvest.OrganizationID)
 	if err != nil {
 		return err
 	}
@@ -161,10 +161,10 @@ func (s *HarvestService) calculateIndicators(harvest *entity.Harvest) error {
 	}
 
 	totalCost := s.calculateTotalCost(harvest,
-		s.operationRepo.ListByTenant,
-		s.maintenanceRepo.ListByTenant,
-		s.shiftRepo.ListByTenant,
-		s.financialRepo.ListByTenant,
+		s.operationRepo.ListByOrganization,
+		s.maintenanceRepo.ListByOrganization,
+		s.shiftRepo.ListByOrganization,
+		s.financialRepo.ListByOrganization,
 		s.allocationRepo.ListByHarvest,
 	)
 
@@ -190,7 +190,7 @@ func (s *HarvestService) calculateIndicatorsWithRepos(harvest *entity.Harvest, r
 		totalProduction += p.Quantity
 	}
 
-	plots, err := repos.Plot().ListByTenant(harvest.TenantID)
+	plots, err := repos.Plot().ListByOrganization(harvest.OrganizationID)
 	if err != nil {
 		return err
 	}
@@ -227,7 +227,7 @@ func (s *HarvestService) calculateTotalCost(harvest *entity.Harvest,
 	var totalCost float64
 
 	// Operations by HarvestID
-	ops, _ := listOps(harvest.TenantID)
+	ops, _ := listOps(harvest.OrganizationID)
 	for _, op := range ops {
 		if op.HarvestID != nil && *op.HarvestID == harvest.ID {
 			totalCost += op.Cost
@@ -238,7 +238,7 @@ func (s *HarvestService) calculateTotalCost(harvest *entity.Harvest,
 	end := harvest.EndDate
 
 	// Maintenance by date range
-	maints, _ := listMaint(harvest.TenantID)
+	maints, _ := listMaint(harvest.OrganizationID)
 	for _, m := range maints {
 		if inDateRange(m.Date, start, end) {
 			totalCost += m.Cost
@@ -246,7 +246,7 @@ func (s *HarvestService) calculateTotalCost(harvest *entity.Harvest,
 	}
 
 	// WorkShift by date range
-	shifts, _ := listShifts(harvest.TenantID)
+	shifts, _ := listShifts(harvest.OrganizationID)
 	for _, ws := range shifts {
 		if inDateRange(ws.Date, start, end) {
 			totalCost += ws.Cost
@@ -254,7 +254,7 @@ func (s *HarvestService) calculateTotalCost(harvest *entity.Harvest,
 	}
 
 	// FinancialTransaction (despesas) by date range
-	transactions, _ := listFin(harvest.TenantID)
+	transactions, _ := listFin(harvest.OrganizationID)
 	for _, ft := range transactions {
 		if ft.Type == entity.TranDespesa && inDateRange(ft.Date, start, end) {
 			totalCost += ft.Amount
@@ -273,7 +273,7 @@ func (s *HarvestService) calculateTotalCost(harvest *entity.Harvest,
 func (s *HarvestService) calculateTotalCostWithRepos(harvest *entity.Harvest, repos repository.TransactionProvider) float64 {
 	var totalCost float64
 
-	ops, _ := repos.Operation().ListByTenant(harvest.TenantID)
+	ops, _ := repos.Operation().ListByOrganization(harvest.OrganizationID)
 	for _, op := range ops {
 		if op.HarvestID != nil && *op.HarvestID == harvest.ID {
 			totalCost += op.Cost
@@ -283,21 +283,21 @@ func (s *HarvestService) calculateTotalCostWithRepos(harvest *entity.Harvest, re
 	start := harvest.StartDate
 	end := harvest.EndDate
 
-	maints, _ := repos.Maintenance().ListByTenant(harvest.TenantID)
+	maints, _ := repos.Maintenance().ListByOrganization(harvest.OrganizationID)
 	for _, m := range maints {
 		if inDateRange(m.Date, start, end) {
 			totalCost += m.Cost
 		}
 	}
 
-	shifts, _ := repos.WorkShift().ListByTenant(harvest.TenantID)
+	shifts, _ := repos.WorkShift().ListByOrganization(harvest.OrganizationID)
 	for _, ws := range shifts {
 		if inDateRange(ws.Date, start, end) {
 			totalCost += ws.Cost
 		}
 	}
 
-	transactions, _ := repos.Financial().ListByTenant(harvest.TenantID)
+	transactions, _ := repos.Financial().ListByOrganization(harvest.OrganizationID)
 	for _, ft := range transactions {
 		if ft.Type == entity.TranDespesa && inDateRange(ft.Date, start, end) {
 			totalCost += ft.Amount
@@ -318,7 +318,7 @@ func (s *HarvestService) calculateTotalCostWithRepos(harvest *entity.Harvest, re
 // CostCenterID, or whose CostCenter has no CostGroup set, are not counted
 // in any bucket (but still count towards the legacy custo_total).
 func (s *HarvestService) calculateCostByGroupWithRepos(harvest *entity.Harvest, repos repository.TransactionProvider) (map[entity.CostGroup]float64, error) {
-	costCenters, err := repos.CostCenter().ListByTenant(harvest.TenantID)
+	costCenters, err := repos.CostCenter().ListByOrganization(harvest.OrganizationID)
 	if err != nil {
 		return nil, err
 	}
@@ -339,7 +339,7 @@ func (s *HarvestService) calculateCostByGroupWithRepos(harvest *entity.Harvest, 
 		byGroup[group] += amount
 	}
 
-	ops, _ := repos.Operation().ListByTenant(harvest.TenantID)
+	ops, _ := repos.Operation().ListByOrganization(harvest.OrganizationID)
 	for _, op := range ops {
 		if op.HarvestID != nil && *op.HarvestID == harvest.ID {
 			add(op.CostCenterID, op.Cost)
@@ -349,21 +349,21 @@ func (s *HarvestService) calculateCostByGroupWithRepos(harvest *entity.Harvest, 
 	start := harvest.StartDate
 	end := harvest.EndDate
 
-	maints, _ := repos.Maintenance().ListByTenant(harvest.TenantID)
+	maints, _ := repos.Maintenance().ListByOrganization(harvest.OrganizationID)
 	for _, m := range maints {
 		if inDateRange(m.Date, start, end) {
 			add(m.CostCenterID, m.Cost)
 		}
 	}
 
-	shifts, _ := repos.WorkShift().ListByTenant(harvest.TenantID)
+	shifts, _ := repos.WorkShift().ListByOrganization(harvest.OrganizationID)
 	for _, ws := range shifts {
 		if inDateRange(ws.Date, start, end) {
 			add(ws.CostCenterID, ws.Cost)
 		}
 	}
 
-	transactions, _ := repos.Financial().ListByTenant(harvest.TenantID)
+	transactions, _ := repos.Financial().ListByOrganization(harvest.OrganizationID)
 	for _, ft := range transactions {
 		if ft.Type == entity.TranDespesa && inDateRange(ft.Date, start, end) {
 			add(ft.CostCenterID, ft.Amount)
@@ -393,12 +393,12 @@ func (s *HarvestService) buildIndicators(harvest *entity.Harvest, totalProductio
 	now := time.Now()
 	add := func(indicators []*entity.Indicator, t entity.IndicatorType, value float64) []*entity.Indicator {
 		return append(indicators, &entity.Indicator{
-			ID:           uuid.New().String(),
-			TenantID:     harvest.TenantID,
-			HarvestID:    harvest.ID,
-			Type:         t,
-			Value:        value,
-			CalculatedAt: now,
+			ID:             uuid.New().String(),
+			OrganizationID: harvest.OrganizationID,
+			HarvestID:      harvest.ID,
+			Type:           t,
+			Value:          value,
+			CalculatedAt:   now,
 		})
 	}
 

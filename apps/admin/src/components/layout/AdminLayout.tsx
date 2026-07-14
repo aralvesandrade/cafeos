@@ -4,7 +4,7 @@ import { useAuth } from '@/lib/auth'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 
-const adminRoutes = ['/tenants', '/users']
+const adminRoutes = ['/organizations', '/users']
 
 export function AdminLayout() {
   const { isAuthenticated, user } = useAuth()

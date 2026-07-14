@@ -20,17 +20,17 @@ func NewLaborService(teamRepo repository.TeamRepository, workerRepo repository.W
 }
 
 // Team operations
-func (s *LaborService) CreateTeam(tenantID, name, leader, description string) (*entity.Team, error) {
+func (s *LaborService) CreateTeam(organizationID, name, leader, description string) (*entity.Team, error) {
 	if name == "" {
 		return nil, errors.New("team name is required")
 	}
 	t := &entity.Team{
-		ID:          uuid.New().String(),
-		TenantID:    tenantID,
-		Name:        name,
-		Leader:      leader,
-		Description: description,
-		CreatedAt:   time.Now(),
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		Name:           name,
+		Leader:         leader,
+		Description:    description,
+		CreatedAt:      time.Now(),
 	}
 	if err := s.teamRepo.Create(t); err != nil {
 		return nil, err
@@ -38,8 +38,8 @@ func (s *LaborService) CreateTeam(tenantID, name, leader, description string) (*
 	return t, nil
 }
 
-func (s *LaborService) ListTeams(tenantID string) ([]*entity.Team, error) {
-	return s.teamRepo.ListByTenant(tenantID)
+func (s *LaborService) ListTeams(organizationID string) ([]*entity.Team, error) {
+	return s.teamRepo.ListByOrganization(organizationID)
 }
 
 func (s *LaborService) GetTeamByID(id string) (*entity.Team, error) {
@@ -55,21 +55,21 @@ func (s *LaborService) DeleteTeam(id string) error {
 }
 
 // Worker operations
-func (s *LaborService) CreateWorker(tenantID, teamID, name, role, phone string, hourlyRate float64) (*entity.Worker, error) {
+func (s *LaborService) CreateWorker(organizationID, teamID, name, role, phone string, hourlyRate float64) (*entity.Worker, error) {
 	if name == "" {
 		return nil, errors.New("worker name is required")
 	}
 	w := &entity.Worker{
-		ID:         uuid.New().String(),
-		TenantID:   tenantID,
-		TeamID:     teamID,
-		Name:       name,
-		Role:       role,
-		Phone:      phone,
-		HourlyRate: hourlyRate,
-		IsActive:   true,
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		TeamID:         teamID,
+		Name:           name,
+		Role:           role,
+		Phone:          phone,
+		HourlyRate:     hourlyRate,
+		IsActive:       true,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
 	}
 	if err := s.workerRepo.Create(w); err != nil {
 		return nil, err
@@ -77,8 +77,8 @@ func (s *LaborService) CreateWorker(tenantID, teamID, name, role, phone string, 
 	return w, nil
 }
 
-func (s *LaborService) ListWorkers(tenantID string) ([]*entity.Worker, error) {
-	return s.workerRepo.ListByTenant(tenantID)
+func (s *LaborService) ListWorkers(organizationID string) ([]*entity.Worker, error) {
+	return s.workerRepo.ListByOrganization(organizationID)
 }
 
 func (s *LaborService) GetWorkerByID(id string) (*entity.Worker, error) {
@@ -95,7 +95,7 @@ func (s *LaborService) DeleteWorker(id string) error {
 }
 
 // WorkShift operations
-func (s *LaborService) CreateWorkShift(tenantID, workerID, operationID, notes string, hours, cost float64, date time.Time) (*entity.WorkShift, error) {
+func (s *LaborService) CreateWorkShift(organizationID, workerID, operationID, notes string, hours, cost float64, date time.Time) (*entity.WorkShift, error) {
 	if workerID == "" {
 		return nil, errors.New("worker is required")
 	}
@@ -107,15 +107,15 @@ func (s *LaborService) CreateWorkShift(tenantID, workerID, operationID, notes st
 		opRef = &operationID
 	}
 	ws := &entity.WorkShift{
-		ID:          uuid.New().String(),
-		TenantID:    tenantID,
-		WorkerID:    workerID,
-		OperationID: opRef,
-		Date:        date,
-		Hours:       hours,
-		Cost:        cost,
-		Notes:       notes,
-		CreatedAt:   time.Now(),
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		WorkerID:       workerID,
+		OperationID:    opRef,
+		Date:           date,
+		Hours:          hours,
+		Cost:           cost,
+		Notes:          notes,
+		CreatedAt:      time.Now(),
 	}
 	if err := s.shiftRepo.Create(ws); err != nil {
 		return nil, err
@@ -123,8 +123,8 @@ func (s *LaborService) CreateWorkShift(tenantID, workerID, operationID, notes st
 	return ws, nil
 }
 
-func (s *LaborService) ListWorkShifts(tenantID string) ([]*entity.WorkShift, error) {
-	return s.shiftRepo.ListByTenant(tenantID)
+func (s *LaborService) ListWorkShifts(organizationID string) ([]*entity.WorkShift, error) {
+	return s.shiftRepo.ListByOrganization(organizationID)
 }
 
 func (s *LaborService) DeleteWorkShift(id string) error {

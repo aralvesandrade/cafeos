@@ -25,7 +25,7 @@ src/
 │   ├── api.ts        # Cliente HTTP com JWT + suporte a rotas admin
 │   ├── auth.tsx       # AuthContext + hook
 │   └── theme.tsx      # ThemeProvider + useTheme (light/dark, persistido em localStorage)
-├── pages/            # Login, Dashboard, Farms, Plots, Operations, Harvests, Tenants, Users, NotFound
+├── pages/            # Login, Dashboard, Farms, Plots, Operations, Harvests, Organizations, Users, NotFound
 ├── router.tsx        # React Router DOM v7 (nested layouts, role-based guards)
 ├── App.tsx
 ├── main.tsx          # aplica classe .dark antes do primeiro render (evita flash)
@@ -40,8 +40,8 @@ Tokens semânticos (`background`, `foreground`, `card`, `primary`, `sidebar`, et
 
 | Perfil | Visibilidade |
 |--------|-------------|
-| `platform_owner` | Dashboard + CRUD fazendas/talhões/operações/safras + Administração (Tenants, Usuários) |
-| Demais perfis | Dashboard + dados do próprio tenant apenas |
+| `platform_owner` | Dashboard + CRUD fazendas/talhões/operações/safras + Administração (Organizações, Usuários) |
+| Demais perfis | Dashboard + dados da própria organização apenas |
 
 ## Comandos
 

@@ -31,13 +31,13 @@ const (
 )
 
 type Indicator struct {
-	ID           string        `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	TenantID     string        `json:"tenant_id" gorm:"type:uuid;not null;index"`
-	HarvestID    string        `json:"harvest_id" gorm:"type:uuid;not null;index"`
-	PlotID       *string       `json:"plot_id,omitempty" gorm:"type:uuid"`
-	Type         IndicatorType `json:"type" gorm:"not null;index"`
-	Value        float64       `json:"value" gorm:"type:numeric(14,2);default:0"`
-	CalculatedAt time.Time     `json:"calculated_at"`
-	Tenant       Tenant        `json:"-" gorm:"foreignKey:TenantID"`
-	Harvest      Harvest       `json:"-" gorm:"foreignKey:HarvestID"`
+	ID             string        `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	OrganizationID string        `json:"organization_id" gorm:"type:uuid;not null;index"`
+	HarvestID      string        `json:"harvest_id" gorm:"type:uuid;not null;index"`
+	PlotID         *string       `json:"plot_id,omitempty" gorm:"type:uuid"`
+	Type           IndicatorType `json:"type" gorm:"not null;index"`
+	Value          float64       `json:"value" gorm:"type:numeric(14,2);default:0"`
+	CalculatedAt   time.Time     `json:"calculated_at"`
+	Organization   Organization  `json:"-" gorm:"foreignKey:OrganizationID"`
+	Harvest        Harvest       `json:"-" gorm:"foreignKey:HarvestID"`
 }

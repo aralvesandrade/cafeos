@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native'
-import { loginRequest, setToken, setTenantId } from '../api/client'
+import { loginRequest, setToken, setOrganizationId } from '../api/client'
 
 interface Props {
   onLogin: () => void
@@ -21,7 +21,7 @@ export function LoginScreen({ onLogin }: Props) {
     try {
       const resp = await loginRequest(email, password)
       await setToken(resp.token)
-      await setTenantId(resp.tenant_id)
+      await setOrganizationId(resp.organization_id)
       onLogin()
     } catch (err: any) {
       Alert.alert('Erro', err.message || 'Falha ao conectar')

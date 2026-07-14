@@ -17,12 +17,12 @@ func TestFarmService_Create(t *testing.T) {
 	svc, _ := newFarmSvc()
 
 	farm, err := svc.Create(&entity.Farm{
-		TenantID:      "tenant-1",
-		Name:          "Fazenda Boa Vista",
-		Owner:         "João",
-		Location:      "MG",
-		TotalAreaHA:   100.0,
-		PlantedAreaHA: 80.0,
+		OrganizationID: "organization-1",
+		Name:           "Fazenda Boa Vista",
+		Owner:          "João",
+		Location:       "MG",
+		TotalAreaHA:    100.0,
+		PlantedAreaHA:  80.0,
 	}, nil)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
@@ -31,8 +31,8 @@ func TestFarmService_Create(t *testing.T) {
 	if farm.Name != "Fazenda Boa Vista" {
 		t.Errorf("expected name 'Fazenda Boa Vista', got %s", farm.Name)
 	}
-	if farm.TenantID != "tenant-1" {
-		t.Errorf("expected tenant-1, got %s", farm.TenantID)
+	if farm.OrganizationID != "organization-1" {
+		t.Errorf("expected organization-1, got %s", farm.OrganizationID)
 	}
 	if farm.PlantedAreaHA != 80.0 {
 		t.Errorf("expected 80.0, got %f", farm.PlantedAreaHA)
@@ -43,9 +43,9 @@ func TestFarmService_Create_WithProducer(t *testing.T) {
 	svc, _ := newFarmSvc()
 
 	farm, err := svc.Create(&entity.Farm{
-		TenantID:    "tenant-1",
-		Name:        "Fazenda Boa Vista",
-		TotalAreaHA: 100.0,
+		OrganizationID: "organization-1",
+		Name:           "Fazenda Boa Vista",
+		TotalAreaHA:    100.0,
 	}, &entity.Producer{
 		Name: "Carlos Eduardo Rosa",
 		CPF:  "930.744.338-68",
@@ -78,10 +78,10 @@ func TestFarmService_Create_Validation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := svc.Create(&entity.Farm{
-				TenantID:      "t1",
-				Name:          tt.farmName,
-				TotalAreaHA:   tt.total,
-				PlantedAreaHA: tt.planted,
+				OrganizationID: "t1",
+				Name:           tt.farmName,
+				TotalAreaHA:    tt.total,
+				PlantedAreaHA:  tt.planted,
 			}, nil)
 			if err == nil {
 				t.Error("expected error, got nil")
@@ -90,14 +90,14 @@ func TestFarmService_Create_Validation(t *testing.T) {
 	}
 }
 
-func TestFarmService_ListByTenant(t *testing.T) {
+func TestFarmService_ListByOrganization(t *testing.T) {
 	svc, _ := newFarmSvc()
 
-	svc.Create(&entity.Farm{TenantID: "t1", Name: "Farm A", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
-	svc.Create(&entity.Farm{TenantID: "t1", Name: "Farm B", TotalAreaHA: 200, PlantedAreaHA: 150}, nil)
-	svc.Create(&entity.Farm{TenantID: "t2", Name: "Farm C", TotalAreaHA: 50, PlantedAreaHA: 30}, nil)
+	svc.Create(&entity.Farm{OrganizationID: "t1", Name: "Farm A", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
+	svc.Create(&entity.Farm{OrganizationID: "t1", Name: "Farm B", TotalAreaHA: 200, PlantedAreaHA: 150}, nil)
+	svc.Create(&entity.Farm{OrganizationID: "t2", Name: "Farm C", TotalAreaHA: 50, PlantedAreaHA: 30}, nil)
 
-	farms, err := svc.ListByTenant("t1")
+	farms, err := svc.ListByOrganization("t1")
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -119,7 +119,7 @@ func TestFarmService_GetByID_NotFound(t *testing.T) {
 func TestFarmService_Update(t *testing.T) {
 	svc, _ := newFarmSvc()
 
-	farm, _ := svc.Create(&entity.Farm{TenantID: "t1", Name: "Old Name", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
+	farm, _ := svc.Create(&entity.Farm{OrganizationID: "t1", Name: "Old Name", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
 	farm.Name = "New Name"
 	err := svc.Update(farm)
 	if err != nil {
@@ -135,7 +135,7 @@ func TestFarmService_Update(t *testing.T) {
 func TestFarmService_Update_Validation(t *testing.T) {
 	svc, _ := newFarmSvc()
 
-	farm, _ := svc.Create(&entity.Farm{TenantID: "t1", Name: "Farm", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
+	farm, _ := svc.Create(&entity.Farm{OrganizationID: "t1", Name: "Farm", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
 	farm.Name = ""
 	err := svc.Update(farm)
 	if err == nil {
@@ -154,7 +154,7 @@ func TestFarmService_Update_Validation(t *testing.T) {
 func TestFarmService_Delete(t *testing.T) {
 	svc, _ := newFarmSvc()
 
-	farm, _ := svc.Create(&entity.Farm{TenantID: "t1", Name: "Farm", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
+	farm, _ := svc.Create(&entity.Farm{OrganizationID: "t1", Name: "Farm", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
 	err := svc.Delete(farm.ID)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
@@ -169,7 +169,7 @@ func TestFarmService_Delete(t *testing.T) {
 func TestFarmService_UpsertProducer(t *testing.T) {
 	svc, _ := newFarmSvc()
 
-	farm, _ := svc.Create(&entity.Farm{TenantID: "t1", Name: "Farm", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
+	farm, _ := svc.Create(&entity.Farm{OrganizationID: "t1", Name: "Farm", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
 
 	producer, err := svc.UpsertProducer(farm.ID, &entity.Producer{Name: "Carlos"})
 	if err != nil {
@@ -193,13 +193,13 @@ func TestFarmService_UpsertProducer(t *testing.T) {
 
 func TestFarmService_EntityMapping(t *testing.T) {
 	farm := &entity.Farm{
-		ID:            "1",
-		TenantID:      "t1",
-		Name:          "Test Farm",
-		Owner:         "Owner",
-		Location:      "Location",
-		TotalAreaHA:   100.5,
-		PlantedAreaHA: 80.3,
+		ID:             "1",
+		OrganizationID: "t1",
+		Name:           "Test Farm",
+		Owner:          "Owner",
+		Location:       "Location",
+		TotalAreaHA:    100.5,
+		PlantedAreaHA:  80.3,
 	}
 
 	if farm.Name != "Test Farm" {

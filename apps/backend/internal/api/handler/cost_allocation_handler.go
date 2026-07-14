@@ -41,14 +41,14 @@ type allocationItemResponse struct {
 // @Tags cost-allocations (Rateios de Custo)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param allocation body createAllocationRequest true "Dados do rateio de custo"
 // @Success 201 {object} entity.CostAllocation
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/cost-allocations [post]
+// @Router /api/v1/{organization_id}/cost-allocations [post]
 func (h *CostAllocationHandler) Create(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 
 	var req createAllocationRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -62,14 +62,14 @@ func (h *CostAllocationHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	input := service.CreateAllocationInput{
-		TenantID:     tenantID,
-		HarvestID:    req.HarvestID,
-		CostCenterID: req.CostCenterID,
-		Description:  req.Description,
-		TotalAmount:  req.TotalAmount,
-		Method:       entity.AllocationMethod(req.Method),
-		Date:         date,
-		Percentages:  req.Percentages,
+		OrganizationID: organizationID,
+		HarvestID:      req.HarvestID,
+		CostCenterID:   req.CostCenterID,
+		Description:    req.Description,
+		TotalAmount:    req.TotalAmount,
+		Method:         entity.AllocationMethod(req.Method),
+		Date:           date,
+		Percentages:    req.Percentages,
 	}
 
 	allocation, err := h.svc.Create(input)
@@ -86,12 +86,12 @@ func (h *CostAllocationHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Description Lista todos os rateios de custo pertencentes a uma colheita
 // @Tags cost-allocations (Rateios de Custo)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param harvest_id path string true "ID da Colheita"
 // @Success 200 {array} entity.CostAllocation
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/harvests/{harvest_id}/cost-allocations [get]
+// @Router /api/v1/{organization_id}/harvests/{harvest_id}/cost-allocations [get]
 func (h *CostAllocationHandler) ListByHarvest(w http.ResponseWriter, r *http.Request) {
 	harvestID := r.PathValue("harvest_id")
 	allocs, err := h.svc.ListByHarvest(harvestID)
@@ -107,12 +107,12 @@ func (h *CostAllocationHandler) ListByHarvest(w http.ResponseWriter, r *http.Req
 // @Description Retorna um único rateio de custo
 // @Tags cost-allocations (Rateios de Custo)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID do Rateio de Custo"
 // @Success 200 {object} entity.CostAllocation
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/cost-allocations/{id} [get]
+// @Router /api/v1/{organization_id}/cost-allocations/{id} [get]
 func (h *CostAllocationHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	a, err := h.svc.GetByID(id)
@@ -127,12 +127,12 @@ func (h *CostAllocationHandler) GetByID(w http.ResponseWriter, r *http.Request) 
 // @Summary Excluir rateio de custo
 // @Description Exclui um rateio de custo por ID
 // @Tags cost-allocations (Rateios de Custo)
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID do Rateio de Custo"
 // @Success 204 "No Content"
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/cost-allocations/{id} [delete]
+// @Router /api/v1/{organization_id}/cost-allocations/{id} [delete]
 func (h *CostAllocationHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.svc.Delete(id); err != nil {

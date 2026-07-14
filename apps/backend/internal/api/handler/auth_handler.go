@@ -11,13 +11,13 @@ import (
 )
 
 type AuthHandler struct {
-	userRepo  repository.UserRepository
-	tenantRepo repository.TenantRepository
-	jwtSecret string
+	userRepo         repository.UserRepository
+	organizationRepo repository.OrganizationRepository
+	jwtSecret        string
 }
 
-func NewAuthHandler(userRepo repository.UserRepository, tenantRepo repository.TenantRepository, jwtSecret string) *AuthHandler {
-	return &AuthHandler{userRepo: userRepo, tenantRepo: tenantRepo, jwtSecret: jwtSecret}
+func NewAuthHandler(userRepo repository.UserRepository, organizationRepo repository.OrganizationRepository, jwtSecret string) *AuthHandler {
+	return &AuthHandler{userRepo: userRepo, organizationRepo: organizationRepo, jwtSecret: jwtSecret}
 }
 
 type loginRequest struct {
@@ -26,9 +26,9 @@ type loginRequest struct {
 }
 
 type loginResponse struct {
-	Token    string `json:"token"`
-	TenantID string `json:"tenant_id"`
-	User     struct {
+	Token          string `json:"token"`
+	OrganizationID string `json:"organization_id"`
+	User           struct {
 		ID    string `json:"id"`
 		Email string `json:"email"`
 		Name  string `json:"name"`
@@ -74,18 +74,18 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tenant, err := h.tenantRepo.GetByID(user.TenantID)
+	organization, err := h.organizationRepo.GetByID(user.OrganizationID)
 	if err != nil {
-		writeError(w, "tenant not found", http.StatusUnauthorized)
+		writeError(w, "organization not found", http.StatusUnauthorized)
 		return
 	}
 
 	claims := jwt.MapClaims{
-		"user_id":   user.ID,
-		"tenant_id": user.TenantID,
-		"role":      string(user.Role),
-		"exp":       time.Now().Add(24 * time.Hour).Unix(),
-		"iat":       time.Now().Unix(),
+		"user_id":         user.ID,
+		"organization_id": user.OrganizationID,
+		"role":            string(user.Role),
+		"exp":             time.Now().Add(24 * time.Hour).Unix(),
+		"iat":             time.Now().Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -96,8 +96,8 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := loginResponse{
-		Token:    tokenStr,
-		TenantID: tenant.Slug,
+		Token:          tokenStr,
+		OrganizationID: organization.Slug,
 	}
 	resp.User.ID = user.ID
 	resp.User.Email = user.Email

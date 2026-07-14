@@ -5,7 +5,7 @@ import "github.com/aralvesandrade/cafeos/internal/domain/entity"
 type HarvestRepository interface {
 	Create(harvest *entity.Harvest) error
 	GetByID(id string) (*entity.Harvest, error)
-	ListByTenant(tenantID string) ([]*entity.Harvest, error)
+	ListByOrganization(organizationID string) ([]*entity.Harvest, error)
 	Update(harvest *entity.Harvest) error
 }
 

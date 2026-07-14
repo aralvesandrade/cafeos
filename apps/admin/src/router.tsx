@@ -10,7 +10,7 @@ import { PlotDetail } from '@/pages/PlotDetail'
 import { Operations } from '@/pages/Operations'
 import { Harvests } from '@/pages/Harvests'
 import { HarvestDetail } from '@/pages/HarvestDetail'
-import { Tenants } from '@/pages/Tenants'
+import { Organizations } from '@/pages/Organizations'
 import { Users } from '@/pages/Users'
 import { Financial } from '@/pages/Financial'
 import { CostCenters } from '@/pages/CostCenters'
@@ -42,7 +42,7 @@ export const router = createBrowserRouter([
       { path: 'stock', element: <Stock /> },
       { path: 'fleet', element: <Fleet /> },
       { path: 'labor', element: <Labor /> },
-      { path: 'tenants', element: <Tenants /> },
+      { path: 'organizations', element: <Organizations /> },
       { path: 'users', element: <Users /> },
       { path: '404', element: <NotFound /> },
       { path: '*', element: <Navigate to="/404" replace /> },

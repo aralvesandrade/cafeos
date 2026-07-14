@@ -55,26 +55,26 @@ func hash(password string) string {
 }
 
 func seed(db *gorm.DB) error {
-	// Tenant
-	tenant := entity.Tenant{
+	// Organization
+	organization := entity.Organization{
 		Name:         "CafeOS Padrão",
 		Slug:         "cafeos",
 		BrandName:    "CafeOS",
 		Plan:         "pro",
 		PrimaryColor: "#2E7D32",
 	}
-	if err := db.Create(&tenant).Error; err != nil {
-		return fmt.Errorf("create tenant: %w", err)
+	if err := db.Create(&organization).Error; err != nil {
+		return fmt.Errorf("create organization: %w", err)
 	}
-	fmt.Println("  ✓ Tenant: CafeOS Padrão (cafeos)")
+	fmt.Println("  ✓ Organization: CafeOS Padrão (cafeos)")
 
 	// Users
 	users := []entity.User{
-		{TenantID: tenant.ID, Name: "Administrador", Email: adminEmail, PasswordHash: hash(adminPass), Role: entity.RolePlatformOwner, IsActive: true},
-		{TenantID: tenant.ID, Name: "João Silva", Email: "joao@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleProprietario, IsActive: true},
-		{TenantID: tenant.ID, Name: "Maria Oliveira", Email: "maria@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleGerente, IsActive: true},
-		{TenantID: tenant.ID, Name: "Carlos Santos", Email: "carlos@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleEngenheiro, IsActive: true},
-		{TenantID: tenant.ID, Name: "Ana Costa", Email: "ana@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleOperador, IsActive: true},
+		{OrganizationID: organization.ID, Name: "Administrador", Email: adminEmail, PasswordHash: hash(adminPass), Role: entity.RolePlatformOwner, IsActive: true},
+		{OrganizationID: organization.ID, Name: "João Silva", Email: "joao@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleProprietario, IsActive: true},
+		{OrganizationID: organization.ID, Name: "Maria Oliveira", Email: "maria@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleGerente, IsActive: true},
+		{OrganizationID: organization.ID, Name: "Carlos Santos", Email: "carlos@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleEngenheiro, IsActive: true},
+		{OrganizationID: organization.ID, Name: "Ana Costa", Email: "ana@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleOperador, IsActive: true},
 	}
 	for _, u := range users {
 		if err := db.Create(&u).Error; err != nil {
@@ -85,11 +85,11 @@ func seed(db *gorm.DB) error {
 
 	// Agricultural Products
 	products := []entity.AgriculturalProduct{
-		{TenantID: tenant.ID, Name: "NPK 20-05-20", Type: entity.ProdFertilizante, Unit: "kg"},
-		{TenantID: tenant.ID, Name: "Calcário Dolomítico", Type: entity.ProdFertilizante, Unit: "kg"},
-		{TenantID: tenant.ID, Name: "Glyphosate", Type: entity.ProdDefensivo, Unit: "l"},
-		{TenantID: tenant.ID, Name: "Óleo Mineral", Type: entity.ProdDefensivo, Unit: "l"},
-		{TenantID: tenant.ID, Name: "Óleo Diesel", Type: entity.ProdCombustivel, Unit: "l"},
+		{OrganizationID: organization.ID, Name: "NPK 20-05-20", Type: entity.ProdFertilizante, Unit: "kg"},
+		{OrganizationID: organization.ID, Name: "Calcário Dolomítico", Type: entity.ProdFertilizante, Unit: "kg"},
+		{OrganizationID: organization.ID, Name: "Glyphosate", Type: entity.ProdDefensivo, Unit: "l"},
+		{OrganizationID: organization.ID, Name: "Óleo Mineral", Type: entity.ProdDefensivo, Unit: "l"},
+		{OrganizationID: organization.ID, Name: "Óleo Diesel", Type: entity.ProdCombustivel, Unit: "l"},
 	}
 	for _, p := range products {
 		if err := db.Create(&p).Error; err != nil {
@@ -100,9 +100,9 @@ func seed(db *gorm.DB) error {
 
 	// Farms
 	farms := []entity.Farm{
-		{TenantID: tenant.ID, Name: "Fazenda Recanto Verde", Owner: "João Silva", Location: "Alfenas - MG", TotalAreaHA: 120, PlantedAreaHA: 95},
-		{TenantID: tenant.ID, Name: "Sítio Boa Esperança", Owner: "João Silva", Location: "Machado - MG", TotalAreaHA: 45, PlantedAreaHA: 40},
-		{TenantID: tenant.ID, Name: "Fazenda Monte Alegre", Owner: "Maria Oliveira", Location: "Poços de Caldas - MG", TotalAreaHA: 200, PlantedAreaHA: 160},
+		{OrganizationID: organization.ID, Name: "Fazenda Recanto Verde", Owner: "João Silva", Location: "Alfenas - MG", TotalAreaHA: 120, PlantedAreaHA: 95},
+		{OrganizationID: organization.ID, Name: "Sítio Boa Esperança", Owner: "João Silva", Location: "Machado - MG", TotalAreaHA: 45, PlantedAreaHA: 40},
+		{OrganizationID: organization.ID, Name: "Fazenda Monte Alegre", Owner: "Maria Oliveira", Location: "Poços de Caldas - MG", TotalAreaHA: 200, PlantedAreaHA: 160},
 	}
 	for i := range farms {
 		if err := db.Create(&farms[i]).Error; err != nil {
@@ -113,12 +113,12 @@ func seed(db *gorm.DB) error {
 
 	// Plots
 	plots := []entity.Plot{
-		{TenantID: tenant.ID, FarmID: farms[0].ID, Name: "Talhão A-1", AreaHA: 30, Cultivar: "Catuaí Vermelho", PlantingYear: 2018, Altitude: 950, SoilType: "argiloso"},
-		{TenantID: tenant.ID, FarmID: farms[0].ID, Name: "Talhão A-2", AreaHA: 35, Cultivar: "Mundo Novo", PlantingYear: 2019, Altitude: 920, SoilType: "argiloso"},
-		{TenantID: tenant.ID, FarmID: farms[0].ID, Name: "Talhão B-1", AreaHA: 30, Cultivar: "Catuaí Amarelo", PlantingYear: 2020, Altitude: 980, SoilType: "arenoso"},
-		{TenantID: tenant.ID, FarmID: farms[1].ID, Name: "Talhão Único", AreaHA: 40, Cultivar: "Bourbon Amarelo", PlantingYear: 2017, Altitude: 1050, SoilType: "organico"},
-		{TenantID: tenant.ID, FarmID: farms[2].ID, Name: "Talhão Sul", AreaHA: 80, Cultivar: "Catuaí Vermelho", PlantingYear: 2016, Altitude: 1100, SoilType: "argiloso"},
-		{TenantID: tenant.ID, FarmID: farms[2].ID, Name: "Talhão Norte", AreaHA: 80, Cultivar: "Acauã", PlantingYear: 2018, Altitude: 1080, SoilType: "siltoso"},
+		{OrganizationID: organization.ID, FarmID: farms[0].ID, Name: "Talhão A-1", AreaHA: 30, Cultivar: "Catuaí Vermelho", PlantingYear: 2018, Altitude: 950, SoilType: "argiloso"},
+		{OrganizationID: organization.ID, FarmID: farms[0].ID, Name: "Talhão A-2", AreaHA: 35, Cultivar: "Mundo Novo", PlantingYear: 2019, Altitude: 920, SoilType: "argiloso"},
+		{OrganizationID: organization.ID, FarmID: farms[0].ID, Name: "Talhão B-1", AreaHA: 30, Cultivar: "Catuaí Amarelo", PlantingYear: 2020, Altitude: 980, SoilType: "arenoso"},
+		{OrganizationID: organization.ID, FarmID: farms[1].ID, Name: "Talhão Único", AreaHA: 40, Cultivar: "Bourbon Amarelo", PlantingYear: 2017, Altitude: 1050, SoilType: "organico"},
+		{OrganizationID: organization.ID, FarmID: farms[2].ID, Name: "Talhão Sul", AreaHA: 80, Cultivar: "Catuaí Vermelho", PlantingYear: 2016, Altitude: 1100, SoilType: "argiloso"},
+		{OrganizationID: organization.ID, FarmID: farms[2].ID, Name: "Talhão Norte", AreaHA: 80, Cultivar: "Acauã", PlantingYear: 2018, Altitude: 1080, SoilType: "siltoso"},
 	}
 	for i := range plots {
 		if err := db.Create(&plots[i]).Error; err != nil {
@@ -130,13 +130,13 @@ func seed(db *gorm.DB) error {
 	// Operations
 	now := time.Now()
 	operations := []entity.Operation{
-		{TenantID: tenant.ID, PlotID: plots[0].ID, Type: entity.OpAdubacao, Date: now.AddDate(0, -3, 0), Responsible: "Ana Costa", ProductUsed: "NPK 20-05-20", Quantity: 600, Cost: 4800, Notes: "Adubação de cobertura"},
-		{TenantID: tenant.ID, PlotID: plots[1].ID, Type: entity.OpAdubacao, Date: now.AddDate(0, -3, -2), Responsible: "Ana Costa", ProductUsed: "NPK 20-05-20", Quantity: 700, Cost: 5600, Notes: ""},
-		{TenantID: tenant.ID, PlotID: plots[0].ID, Type: entity.OpPulverizacao, Date: now.AddDate(0, -2, 0), Responsible: "Carlos Santos", ProductUsed: "Glyphosate", Quantity: 30, Cost: 1200, Notes: "Controle de plantas daninhas"},
-		{TenantID: tenant.ID, PlotID: plots[3].ID, Type: entity.OpPoda, Date: now.AddDate(0, -1, -15), Responsible: "Maria Oliveira", ProductUsed: "", Quantity: 0, Cost: 2500, Notes: "Poda de formação"},
-		{TenantID: tenant.ID, PlotID: plots[2].ID, Type: entity.OpIrrigacao, Date: now.AddDate(0, -1, -5), Responsible: "Ana Costa", ProductUsed: "", Quantity: 0, Cost: 1800, Notes: "Irrigação de salvamento"},
-		{TenantID: tenant.ID, PlotID: plots[4].ID, Type: entity.OpPulverizacao, Date: now.AddDate(0, 0, -10), Responsible: "Carlos Santos", ProductUsed: "Óleo Mineral", Quantity: 50, Cost: 2000, Notes: "Controle de ácaros"},
-		{TenantID: tenant.ID, PlotID: plots[0].ID, Type: entity.OpAdubacao, Date: now.AddDate(0, 0, -5), Responsible: "Ana Costa", ProductUsed: "Calcário Dolomítico", Quantity: 1500, Cost: 3000, Notes: "Calagem"},
+		{OrganizationID: organization.ID, PlotID: plots[0].ID, Type: entity.OpAdubacao, Date: now.AddDate(0, -3, 0), Responsible: "Ana Costa", ProductUsed: "NPK 20-05-20", Quantity: 600, Cost: 4800, Notes: "Adubação de cobertura"},
+		{OrganizationID: organization.ID, PlotID: plots[1].ID, Type: entity.OpAdubacao, Date: now.AddDate(0, -3, -2), Responsible: "Ana Costa", ProductUsed: "NPK 20-05-20", Quantity: 700, Cost: 5600, Notes: ""},
+		{OrganizationID: organization.ID, PlotID: plots[0].ID, Type: entity.OpPulverizacao, Date: now.AddDate(0, -2, 0), Responsible: "Carlos Santos", ProductUsed: "Glyphosate", Quantity: 30, Cost: 1200, Notes: "Controle de plantas daninhas"},
+		{OrganizationID: organization.ID, PlotID: plots[3].ID, Type: entity.OpPoda, Date: now.AddDate(0, -1, -15), Responsible: "Maria Oliveira", ProductUsed: "", Quantity: 0, Cost: 2500, Notes: "Poda de formação"},
+		{OrganizationID: organization.ID, PlotID: plots[2].ID, Type: entity.OpIrrigacao, Date: now.AddDate(0, -1, -5), Responsible: "Ana Costa", ProductUsed: "", Quantity: 0, Cost: 1800, Notes: "Irrigação de salvamento"},
+		{OrganizationID: organization.ID, PlotID: plots[4].ID, Type: entity.OpPulverizacao, Date: now.AddDate(0, 0, -10), Responsible: "Carlos Santos", ProductUsed: "Óleo Mineral", Quantity: 50, Cost: 2000, Notes: "Controle de ácaros"},
+		{OrganizationID: organization.ID, PlotID: plots[0].ID, Type: entity.OpAdubacao, Date: now.AddDate(0, 0, -5), Responsible: "Ana Costa", ProductUsed: "Calcário Dolomítico", Quantity: 1500, Cost: 3000, Notes: "Calagem"},
 	}
 	for i := range operations {
 		if err := db.Create(&operations[i]).Error; err != nil {
@@ -147,8 +147,8 @@ func seed(db *gorm.DB) error {
 
 	// Harvests
 	harvests := []entity.Harvest{
-		{TenantID: tenant.ID, Year: 2024, Description: "Safra 2024", EstimatedProduction: 3000, Status: entity.HarvestFinalizada},
-		{TenantID: tenant.ID, Year: 2025, Description: "Safra 2025", EstimatedProduction: 3500, Status: entity.HarvestEmAndamento},
+		{OrganizationID: organization.ID, Year: 2024, Description: "Safra 2024", EstimatedProduction: 3000, Status: entity.HarvestFinalizada},
+		{OrganizationID: organization.ID, Year: 2025, Description: "Safra 2025", EstimatedProduction: 3500, Status: entity.HarvestEmAndamento},
 	}
 	for i := range harvests {
 		if err := db.Create(&harvests[i]).Error; err != nil {
@@ -159,11 +159,11 @@ func seed(db *gorm.DB) error {
 
 	// Harvest Productions
 	productions := []entity.HarvestProduction{
-		{TenantID: tenant.ID, HarvestID: harvests[0].ID, PlotID: plots[0].ID, Quantity: 800, RecordedAt: now.AddDate(0, -6, 0), Notes: "Lote 1"},
-		{TenantID: tenant.ID, HarvestID: harvests[0].ID, PlotID: plots[1].ID, Quantity: 950, RecordedAt: now.AddDate(0, -6, -5), Notes: "Lote 2"},
-		{TenantID: tenant.ID, HarvestID: harvests[0].ID, PlotID: plots[2].ID, Quantity: 750, RecordedAt: now.AddDate(0, -5, -10), Notes: "Lote 3"},
-		{TenantID: tenant.ID, HarvestID: harvests[0].ID, PlotID: plots[3].ID, Quantity: 1100, RecordedAt: now.AddDate(0, -5, -15), Notes: ""},
-		{TenantID: tenant.ID, HarvestID: harvests[1].ID, PlotID: plots[0].ID, Quantity: 400, RecordedAt: now.AddDate(0, -1, 0), Notes: "Parcial 1"},
+		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, PlotID: plots[0].ID, Quantity: 800, RecordedAt: now.AddDate(0, -6, 0), Notes: "Lote 1"},
+		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, PlotID: plots[1].ID, Quantity: 950, RecordedAt: now.AddDate(0, -6, -5), Notes: "Lote 2"},
+		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, PlotID: plots[2].ID, Quantity: 750, RecordedAt: now.AddDate(0, -5, -10), Notes: "Lote 3"},
+		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, PlotID: plots[3].ID, Quantity: 1100, RecordedAt: now.AddDate(0, -5, -15), Notes: ""},
+		{OrganizationID: organization.ID, HarvestID: harvests[1].ID, PlotID: plots[0].ID, Quantity: 400, RecordedAt: now.AddDate(0, -1, 0), Notes: "Parcial 1"},
 	}
 	for i := range productions {
 		if err := db.Create(&productions[i]).Error; err != nil {
@@ -174,23 +174,23 @@ func seed(db *gorm.DB) error {
 
 	// Cost Centers (default seed)
 	costCenters := []entity.CostCenter{
-		{TenantID: tenant.ID, Name: "Adubos", Code: "DESP_ADUBOS", Type: entity.CCDespesa, Description: "Fertilizantes e corretivos"},
-		{TenantID: tenant.ID, Name: "Defensivos", Code: "DESP_DEFENSIVOS", Type: entity.CCDespesa, Description: "Agrotóxicos e defensivos agrícolas"},
-		{TenantID: tenant.ID, Name: "Combustíveis", Code: "DESP_COMBUSTIVEL", Type: entity.CCDespesa, Description: "Diesel, gasolina e lubrificantes"},
-		{TenantID: tenant.ID, Name: "Mão de Obra", Code: "DESP_MAO_OBRA", Type: entity.CCDespesa, Description: "Salários e encargos trabalhistas"},
-		{TenantID: tenant.ID, Name: "Frete", Code: "DESP_FRETE", Type: entity.CCDespesa, Description: "Transporte de insumos e produção"},
-		{TenantID: tenant.ID, Name: "Manutenção", Code: "DESP_MANUTENCAO", Type: entity.CCDespesa, Description: "Manutenção de máquinas e equipamentos"},
-		{TenantID: tenant.ID, Name: "Irrigação", Code: "DESP_IRRIGACAO", Type: entity.CCDespesa, Description: "Custo de irrigação e água"},
-		{TenantID: tenant.ID, Name: "Análise de Solo", Code: "DESP_ANALISE_SOLO", Type: entity.CCDespesa, Description: "Análises laboratoriais de solo e folha"},
-		{TenantID: tenant.ID, Name: "Outros Insumos", Code: "DESP_OUTROS_INSUMOS", Type: entity.CCDespesa, Description: "Outros insumos agrícolas"},
-		{TenantID: tenant.ID, Name: "Serviços Terceiros", Code: "DESP_SERV_TERCEIROS", Type: entity.CCDespesa, Description: "Serviços contratados de terceiros"},
-		{TenantID: tenant.ID, Name: "Energia", Code: "DESP_ENERGIA", Type: entity.CCDespesa, Description: "Energia elétrica"},
-		{TenantID: tenant.ID, Name: "Depreciação", Code: "DESP_DEPRECIACAO", Type: entity.CCDespesa, Description: "Depreciação de máquinas e benfeitorias"},
-		{TenantID: tenant.ID, Name: "Administrativo", Code: "DESP_ADMINISTRATIVO", Type: entity.CCDespesa, Description: "Despesas administrativas"},
-		{TenantID: tenant.ID, Name: "Outras Despesas", Code: "DESP_OUTRAS", Type: entity.CCDespesa, Description: "Outras despesas operacionais"},
-		{TenantID: tenant.ID, Name: "Venda de Café", Code: "REC_CAFE", Type: entity.CCReceita, Description: "Receita com venda de café"},
-		{TenantID: tenant.ID, Name: "Venda de Mudas", Code: "REC_MUDAS", Type: entity.CCReceita, Description: "Receita com venda de mudas"},
-		{TenantID: tenant.ID, Name: "Outras Receitas", Code: "REC_OUTRAS", Type: entity.CCReceita, Description: "Outras receitas"},
+		{OrganizationID: organization.ID, Name: "Adubos", Code: "DESP_ADUBOS", Type: entity.CCDespesa, Description: "Fertilizantes e corretivos"},
+		{OrganizationID: organization.ID, Name: "Defensivos", Code: "DESP_DEFENSIVOS", Type: entity.CCDespesa, Description: "Agrotóxicos e defensivos agrícolas"},
+		{OrganizationID: organization.ID, Name: "Combustíveis", Code: "DESP_COMBUSTIVEL", Type: entity.CCDespesa, Description: "Diesel, gasolina e lubrificantes"},
+		{OrganizationID: organization.ID, Name: "Mão de Obra", Code: "DESP_MAO_OBRA", Type: entity.CCDespesa, Description: "Salários e encargos trabalhistas"},
+		{OrganizationID: organization.ID, Name: "Frete", Code: "DESP_FRETE", Type: entity.CCDespesa, Description: "Transporte de insumos e produção"},
+		{OrganizationID: organization.ID, Name: "Manutenção", Code: "DESP_MANUTENCAO", Type: entity.CCDespesa, Description: "Manutenção de máquinas e equipamentos"},
+		{OrganizationID: organization.ID, Name: "Irrigação", Code: "DESP_IRRIGACAO", Type: entity.CCDespesa, Description: "Custo de irrigação e água"},
+		{OrganizationID: organization.ID, Name: "Análise de Solo", Code: "DESP_ANALISE_SOLO", Type: entity.CCDespesa, Description: "Análises laboratoriais de solo e folha"},
+		{OrganizationID: organization.ID, Name: "Outros Insumos", Code: "DESP_OUTROS_INSUMOS", Type: entity.CCDespesa, Description: "Outros insumos agrícolas"},
+		{OrganizationID: organization.ID, Name: "Serviços Terceiros", Code: "DESP_SERV_TERCEIROS", Type: entity.CCDespesa, Description: "Serviços contratados de terceiros"},
+		{OrganizationID: organization.ID, Name: "Energia", Code: "DESP_ENERGIA", Type: entity.CCDespesa, Description: "Energia elétrica"},
+		{OrganizationID: organization.ID, Name: "Depreciação", Code: "DESP_DEPRECIACAO", Type: entity.CCDespesa, Description: "Depreciação de máquinas e benfeitorias"},
+		{OrganizationID: organization.ID, Name: "Administrativo", Code: "DESP_ADMINISTRATIVO", Type: entity.CCDespesa, Description: "Despesas administrativas"},
+		{OrganizationID: organization.ID, Name: "Outras Despesas", Code: "DESP_OUTRAS", Type: entity.CCDespesa, Description: "Outras despesas operacionais"},
+		{OrganizationID: organization.ID, Name: "Venda de Café", Code: "REC_CAFE", Type: entity.CCReceita, Description: "Receita com venda de café"},
+		{OrganizationID: organization.ID, Name: "Venda de Mudas", Code: "REC_MUDAS", Type: entity.CCReceita, Description: "Receita com venda de mudas"},
+		{OrganizationID: organization.ID, Name: "Outras Receitas", Code: "REC_OUTRAS", Type: entity.CCReceita, Description: "Outras receitas"},
 	}
 	for _, cc := range costCenters {
 		if err := db.Create(&cc).Error; err != nil {
@@ -201,11 +201,11 @@ func seed(db *gorm.DB) error {
 
 	// Indicators for finalized harvest
 	indicators := []entity.Indicator{
-		{TenantID: tenant.ID, HarvestID: harvests[0].ID, Type: entity.IndProducaoTotal, Value: 3600, CalculatedAt: now.AddDate(0, -4, 0)},
-		{TenantID: tenant.ID, HarvestID: harvests[0].ID, Type: entity.IndCustoTotal, Value: 45000, CalculatedAt: now.AddDate(0, -4, 0)},
-		{TenantID: tenant.ID, HarvestID: harvests[0].ID, Type: entity.IndSacasHA, Value: 37.89, CalculatedAt: now.AddDate(0, -4, 0)},
-		{TenantID: tenant.ID, HarvestID: harvests[0].ID, Type: entity.IndCustoSaca, Value: 12.50, CalculatedAt: now.AddDate(0, -4, 0)},
-		{TenantID: tenant.ID, HarvestID: harvests[0].ID, Type: entity.IndRentabilidade, Value: 85000, CalculatedAt: now.AddDate(0, -4, 0)},
+		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, Type: entity.IndProducaoTotal, Value: 3600, CalculatedAt: now.AddDate(0, -4, 0)},
+		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, Type: entity.IndCustoTotal, Value: 45000, CalculatedAt: now.AddDate(0, -4, 0)},
+		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, Type: entity.IndSacasHA, Value: 37.89, CalculatedAt: now.AddDate(0, -4, 0)},
+		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, Type: entity.IndCustoSaca, Value: 12.50, CalculatedAt: now.AddDate(0, -4, 0)},
+		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, Type: entity.IndRentabilidade, Value: 85000, CalculatedAt: now.AddDate(0, -4, 0)},
 	}
 	for i := range indicators {
 		if err := db.Create(&indicators[i]).Error; err != nil {

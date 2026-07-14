@@ -3,11 +3,11 @@ package entity
 import "time"
 
 type Farm struct {
-	ID       string `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	TenantID string `json:"tenant_id" gorm:"type:uuid;not null;index"`
-	Name     string `json:"name" gorm:"not null"`
-	Owner    string `json:"owner" gorm:"default:''"`
-	Location string `json:"location" gorm:"default:''"`
+	ID             string `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	OrganizationID string `json:"organization_id" gorm:"type:uuid;not null;index"`
+	Name           string `json:"name" gorm:"not null"`
+	Owner          string `json:"owner" gorm:"default:''"`
+	Location       string `json:"location" gorm:"default:''"`
 
 	Phone                    string `json:"phone" gorm:"default:''"`
 	Activities               string `json:"activities" gorm:"default:''"`
@@ -48,11 +48,11 @@ type Farm struct {
 	AgricultureAreaNotCoveredHA float64 `json:"agriculture_area_not_covered_ha" gorm:"type:numeric(12,2);default:0"`
 	NonAgriculturalAreaHA       float64 `json:"non_agricultural_area_ha" gorm:"type:numeric(12,2);default:0"`
 
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Tenant    Tenant    `json:"-" gorm:"foreignKey:TenantID"`
-	Plots     []Plot    `json:"plots,omitempty" gorm:"foreignKey:FarmID"`
-	Producer  *Producer `json:"producer,omitempty" gorm:"foreignKey:FarmID"`
+	CreatedAt    time.Time    `json:"created_at"`
+	UpdatedAt    time.Time    `json:"updated_at"`
+	Organization Organization `json:"-" gorm:"foreignKey:OrganizationID"`
+	Plots        []Plot       `json:"plots,omitempty" gorm:"foreignKey:FarmID"`
+	Producer     *Producer    `json:"producer,omitempty" gorm:"foreignKey:FarmID"`
 }
 
 // ProductiveAreaAvailableHA returns the total area minus the non-productive

@@ -56,8 +56,8 @@ func (p *txProvider) User() repository.UserRepository {
 	return infraRepo.NewUserRepository(p.tx)
 }
 
-func (p *txProvider) Tenant() repository.TenantRepository {
-	return infraRepo.NewTenantRepository(p.tx)
+func (p *txProvider) Organization() repository.OrganizationRepository {
+	return infraRepo.NewOrganizationRepository(p.tx)
 }
 
 func (p *txProvider) AgriculturalProduct() repository.AgriculturalProductRepository {

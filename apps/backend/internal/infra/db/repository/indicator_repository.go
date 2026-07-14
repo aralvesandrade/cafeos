@@ -27,15 +27,15 @@ func (r *IndicatorRepository) ListByHarvest(harvestID string) ([]*entity.Indicat
 	return indicators, err
 }
 
-func (r *IndicatorRepository) ListByTenant(tenantID string) ([]*entity.Indicator, error) {
+func (r *IndicatorRepository) ListByOrganization(organizationID string) ([]*entity.Indicator, error) {
 	var indicators []*entity.Indicator
-	err := r.db.Where("tenant_id = ?", tenantID).Order("calculated_at DESC").Find(&indicators).Error
+	err := r.db.Where("organization_id = ?", organizationID).Order("calculated_at DESC").Find(&indicators).Error
 	return indicators, err
 }
 
-func (r *IndicatorRepository) ListByTenantAndType(tenantID string, indicatorType entity.IndicatorType) ([]*entity.Indicator, error) {
+func (r *IndicatorRepository) ListByOrganizationAndType(organizationID string, indicatorType entity.IndicatorType) ([]*entity.Indicator, error) {
 	var indicators []*entity.Indicator
-	err := r.db.Where("tenant_id = ? AND type = ?", tenantID, indicatorType).
+	err := r.db.Where("organization_id = ? AND type = ?", organizationID, indicatorType).
 		Order("calculated_at DESC").Find(&indicators).Error
 	return indicators, err
 }

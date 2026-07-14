@@ -27,9 +27,9 @@ func (r *HarvestRepository) GetByID(id string) (*entity.Harvest, error) {
 	return &h, err
 }
 
-func (r *HarvestRepository) ListByTenant(tenantID string) ([]*entity.Harvest, error) {
+func (r *HarvestRepository) ListByOrganization(organizationID string) ([]*entity.Harvest, error) {
 	var harvests []*entity.Harvest
-	err := r.db.Where("tenant_id = ?", tenantID).Order("year DESC").Find(&harvests).Error
+	err := r.db.Where("organization_id = ?", organizationID).Order("year DESC").Find(&harvests).Error
 	return harvests, err
 }
 

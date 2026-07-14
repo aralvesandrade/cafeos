@@ -33,7 +33,7 @@ apps/
 │   │   └── event/               # In-memory event bus
 │   └── docs/         # Swagger
 ├── admin/            # Admin panel (:5174)
-│   └── src/pages/    # Dashboard, Farms, Plots, Operations, Harvests, Financial, Stock, Fleet, Labor, Tenants, Users
+│   └── src/pages/    # Dashboard, Farms, Plots, Operations, Harvests, Financial, Stock, Fleet, Labor, Organizations, Users
 ├── frontend/         # Landing page
 └── mobile/           # Expo app (:8081)
     └── src/
@@ -57,8 +57,8 @@ apps/
 
 ## RBAC Roles
 
-- `platform_owner` — full access + admin (tenants, users)
-- `tenant_admin` — tenant config
+- `platform_owner` — full access + admin (organizations, users)
+- `organization_admin` — organization config
 - `proprietario` — farm owner
 - `gerente_agricola` — agricultural manager
 - `engenheiro_agronomo` — agronomic engineer
@@ -70,27 +70,27 @@ apps/
 
 ## Routes
 
-### Multi-tenant (`/api/v1/{tenant_id}`)
+### Multi-tenant (`/api/v1/{organization_id}`)
 - CRUD: farms, plots, operations, harvests, financial, stock/*, fleet/*, labor/*
 - GET: dashboard, agricultural-products, operations/recent
 - POST: sync
 
 ### Admin (`/api/v1/admin`, platform_owner only)
-- CRUD: tenants, users
+- CRUD: organizations, users
 
 ### Auth
 - POST /auth/login
 
 ## Key Conventions
 
-- Entities: `domain/entity/`, GORM tags, UUID PK, TenantID FK
+- Entities: `domain/entity/`, GORM tags, UUID PK, OrganizationID FK
 - Repos: interface in `domain/repository/`, impl in `infra/db/repository/`
 - Handlers: `api/handler/`, use `writeJSON()` and `writeError()`
 - Services: optional business logic layer
-- Every handler gets tenantID from context via `middleware.TenantIDKey`
+- Every handler gets organizationID from context via `middleware.OrganizationIDKey`
 - Admin routes use `RequireRole(entity.RolePlatformOwner)`
 - Frontend API calls use `apiRequest()` from `lib/api.ts`
-- Admin API calls use `{ admin: true }` to skip tenant_id URL prefix
+- Admin API calls use `{ admin: true }` to skip organization_id URL prefix
 
 ## Mobile Offline Sync
 

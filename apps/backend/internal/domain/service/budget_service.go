@@ -17,19 +17,19 @@ func NewBudgetService(repo repository.BudgetRepository) *BudgetService {
 	return &BudgetService{repo: repo}
 }
 
-func (s *BudgetService) Create(tenantID, harvestID, costCenterID string, plannedAmount float64, description string) (*entity.Budget, error) {
+func (s *BudgetService) Create(organizationID, harvestID, costCenterID string, plannedAmount float64, description string) (*entity.Budget, error) {
 	if plannedAmount < 0 {
 		return nil, errors.New("planned amount cannot be negative")
 	}
 	b := &entity.Budget{
-		ID:            uuid.New().String(),
-		TenantID:      tenantID,
-		HarvestID:     harvestID,
-		CostCenterID:  costCenterID,
-		PlannedAmount: plannedAmount,
-		Description:   description,
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		HarvestID:      harvestID,
+		CostCenterID:   costCenterID,
+		PlannedAmount:  plannedAmount,
+		Description:    description,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
 	}
 	if err := s.repo.Create(b); err != nil {
 		return nil, err

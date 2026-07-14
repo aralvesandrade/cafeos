@@ -8,9 +8,9 @@ import (
 )
 
 type Connection struct {
-	url   string
-	conn  *amqp.Connection
-	ch    *amqp.Channel
+	url  string
+	conn *amqp.Connection
+	ch   *amqp.Channel
 }
 
 func NewConnection(url string) (*Connection, error) {

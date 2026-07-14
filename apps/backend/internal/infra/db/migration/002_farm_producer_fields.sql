@@ -46,7 +46,7 @@ ALTER TABLE farms
 -- ============================================================
 CREATE TABLE IF NOT EXISTS producers (
     id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    tenant_id      UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    organization_id      UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
     farm_id        UUID NOT NULL UNIQUE REFERENCES farms(id) ON DELETE CASCADE,
     cpf            VARCHAR(32)  NOT NULL DEFAULT '',
     name           VARCHAR(255) NOT NULL,
@@ -62,4 +62,4 @@ CREATE TABLE IF NOT EXISTS producers (
     updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_producers_tenant ON producers(tenant_id);
+CREATE INDEX idx_producers_organization ON producers(organization_id);

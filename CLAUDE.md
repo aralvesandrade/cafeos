@@ -69,21 +69,21 @@ api/handler/ → domain/service/ → domain/repository/ (interfaces)
                                   infra/db/repository/ (GORM impl)
 ```
 
-- `domain/entity/` — GORM entities. UUID PK, `TenantID` FK on every tenant-scoped entity. No external deps.
+- `domain/entity/` — GORM entities. UUID PK, `OrganizationID` FK on every organization-scoped entity. No external deps.
 - `domain/repository/` — Go interfaces only, no GORM imports. Includes `Transactor` for cross-repo atomicity.
 - `domain/service/` — business logic + the Rule Engine; depends on repository interfaces, never on `infra/db/repository` implementations directly.
 - `infra/db/repository/` — GORM implementations (`WithTx` variants for transactions).
 - `api/handler/` — thin: parse request → call service → `writeJSON()`/`writeError()`.
-- `api/middleware/` — auth (JWT), RBAC (`RequireRole`), tenant resolution (`middleware.TenantIDKey`), CORS.
+- `api/middleware/` — auth (JWT), RBAC (`RequireRole`), organization resolution (`middleware.OrganizationIDKey`), CORS.
 - `event/` — in-memory event bus, decoupled from messaging infra (RabbitMQ is separate, in `infra/messaging/`).
 - `cmd/api` — API entrypoint (:5001). `cmd/worker` — RabbitMQ consumer that persists to Postgres. `cmd/seed` — seed data.
 
-Every handler pulls tenant ID from context via `middleware.TenantIDKey`; routes live under `/api/v1/{tenant_id}/...`. Admin-only routes (`/api/v1/admin/...`) require `platform_owner` via `RequireRole`.
+Every handler pulls the organization ID from context via `middleware.OrganizationIDKey`; routes live under `/api/v1/{organization_id}/...`. Admin-only routes (`/api/v1/admin/...`) require `platform_owner` via `RequireRole`.
 
 Transactions: use `Transactor.RunInTx` when a flow touches multiple repos atomically (e.g. `HarvestService` updates harvest + recalculates indicators in one tx). Most other services operate on individual repositories without a tx wrapper.
 
 ### RBAC roles (10)
-`platform_owner`, `tenant_admin`, `proprietario`, `gerente_agricola`, `engenheiro_agronomo`, `tecnico_agricola`, `operador_campo`, `financeiro`, `consultor_externo`, `auditor`.
+`platform_owner`, `organization_admin`, `proprietario`, `gerente_agricola`, `engenheiro_agronomo`, `tecnico_agricola`, `operador_campo`, `financeiro`, `consultor_externo`, `auditor`.
 
 ### Rule Engine
 Configurable alerting (`RuleEngine.AddRule()`) — e.g. low productivity (<25 sacas/ha), high cost (>R$400/saca) — emits `AlertGenerated` events.

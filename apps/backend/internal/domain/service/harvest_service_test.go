@@ -8,7 +8,7 @@ import (
 
 func TestHarvestService_BuildIndicators_COE_COT_CT(t *testing.T) {
 	s := &HarvestService{}
-	harvest := &entity.Harvest{ID: "h1", TenantID: "t1"}
+	harvest := &entity.Harvest{ID: "h1", OrganizationID: "t1"}
 
 	costByGroup := map[entity.CostGroup]float64{
 		entity.CostGroupOperacionalEfetivo: 1000,
@@ -50,7 +50,7 @@ func TestHarvestService_BuildIndicators_COE_COT_CT(t *testing.T) {
 
 func TestHarvestService_BuildIndicators_UnclassifiedCostsExcluded(t *testing.T) {
 	s := &HarvestService{}
-	harvest := &entity.Harvest{ID: "h1", TenantID: "t1"}
+	harvest := &entity.Harvest{ID: "h1", OrganizationID: "t1"}
 
 	// no classified cost groups at all (legacy cost centers)
 	indicators := s.buildIndicators(harvest, 100, 10, 5000, map[entity.CostGroup]float64{})

@@ -18,23 +18,23 @@ func NewStockService(itemRepo repository.StockItemRepository, movRepo repository
 	return &StockService{itemRepo: itemRepo, movRepo: movRepo}
 }
 
-func (s *StockService) CreateItem(tenantID, productID, unit, batch, location, notes string, quantity, minStock float64, expiryDate *time.Time) (*entity.StockItem, error) {
+func (s *StockService) CreateItem(organizationID, productID, unit, batch, location, notes string, quantity, minStock float64, expiryDate *time.Time) (*entity.StockItem, error) {
 	if productID == "" {
 		return nil, errors.New("product is required")
 	}
 	item := &entity.StockItem{
-		ID:         uuid.New().String(),
-		TenantID:   tenantID,
-		ProductID:  productID,
-		Quantity:   quantity,
-		Unit:       unit,
-		Batch:      batch,
-		ExpiryDate: expiryDate,
-		MinStock:   minStock,
-		Location:   location,
-		Notes:      notes,
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		ProductID:      productID,
+		Quantity:       quantity,
+		Unit:           unit,
+		Batch:          batch,
+		ExpiryDate:     expiryDate,
+		MinStock:       minStock,
+		Location:       location,
+		Notes:          notes,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
 	}
 	if err := s.itemRepo.Create(item); err != nil {
 		return nil, err
@@ -46,8 +46,8 @@ func (s *StockService) GetItemByID(id string) (*entity.StockItem, error) {
 	return s.itemRepo.GetByID(id)
 }
 
-func (s *StockService) ListItems(tenantID string) ([]*entity.StockItem, error) {
-	return s.itemRepo.ListByTenant(tenantID)
+func (s *StockService) ListItems(organizationID string) ([]*entity.StockItem, error) {
+	return s.itemRepo.ListByOrganization(organizationID)
 }
 
 func (s *StockService) UpdateItem(item *entity.StockItem) error {
@@ -59,20 +59,20 @@ func (s *StockService) DeleteItem(id string) error {
 	return s.itemRepo.Delete(id)
 }
 
-func (s *StockService) RecordMovement(tenantID, itemID, movType, reference, notes string, quantity float64, date time.Time) (*entity.StockMovement, error) {
+func (s *StockService) RecordMovement(organizationID, itemID, movType, reference, notes string, quantity float64, date time.Time) (*entity.StockMovement, error) {
 	if quantity <= 0 {
 		return nil, errors.New("quantity must be greater than zero")
 	}
 	mov := &entity.StockMovement{
-		ID:        uuid.New().String(),
-		TenantID:  tenantID,
-		ItemID:    itemID,
-		Type:      movType,
-		Quantity:  quantity,
-		Date:      date,
-		Reference: reference,
-		Notes:     notes,
-		CreatedAt: time.Now(),
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		ItemID:         itemID,
+		Type:           movType,
+		Quantity:       quantity,
+		Date:           date,
+		Reference:      reference,
+		Notes:          notes,
+		CreatedAt:      time.Now(),
 	}
 	if err := s.movRepo.Create(mov); err != nil {
 		return nil, err
@@ -90,8 +90,8 @@ func (s *StockService) RecordMovement(tenantID, itemID, movType, reference, note
 	return mov, nil
 }
 
-func (s *StockService) ListMovements(tenantID string) ([]*entity.StockMovement, error) {
-	return s.movRepo.ListByTenant(tenantID)
+func (s *StockService) ListMovements(organizationID string) ([]*entity.StockMovement, error) {
+	return s.movRepo.ListByOrganization(organizationID)
 }
 
 func (s *StockService) ListMovementsByItem(itemID string) ([]*entity.StockMovement, error) {

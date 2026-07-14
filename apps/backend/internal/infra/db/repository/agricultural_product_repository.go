@@ -27,9 +27,9 @@ func (r *AgriculturalProductRepository) GetByID(id string) (*entity.Agricultural
 	return &p, err
 }
 
-func (r *AgriculturalProductRepository) ListByTenant(tenantID string) ([]*entity.AgriculturalProduct, error) {
+func (r *AgriculturalProductRepository) ListByOrganization(organizationID string) ([]*entity.AgriculturalProduct, error) {
 	var products []*entity.AgriculturalProduct
-	err := r.db.Where("tenant_id = ?", tenantID).Order("name").Find(&products).Error
+	err := r.db.Where("organization_id = ?", organizationID).Order("name").Find(&products).Error
 	return products, err
 }
 

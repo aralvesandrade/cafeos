@@ -22,11 +22,11 @@ func NewConsumer(ch *amqp.Channel, queue string, handler Handler) *Consumer {
 func (c *Consumer) Start() error {
 	msgs, err := c.ch.Consume(
 		c.queue,
-		"",     // consumer
-		false,  // autoAck (manual ack)
-		false,  // exclusive
-		false,  // noLocal
-		false,  // noWait
+		"",    // consumer
+		false, // autoAck (manual ack)
+		false, // exclusive
+		false, // noLocal
+		false, // noWait
 		nil,
 	)
 	if err != nil {

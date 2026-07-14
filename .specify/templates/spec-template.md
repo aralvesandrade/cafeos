@@ -89,11 +89,11 @@
 
 | Method | Route | Auth | Description |
 |--------|-------|------|-------------|
-| POST | `/api/v1/{tenant_id}/[resource]` | JWT + RBAC | [description] |
-| GET | `/api/v1/{tenant_id}/[resource]` | JWT + RBAC | [description] |
-| GET | `/api/v1/{tenant_id}/[resource]/{id}` | JWT + RBAC | [description] |
-| PUT | `/api/v1/{tenant_id}/[resource]/{id}` | JWT + RBAC | [description] |
-| DELETE | `/api/v1/{tenant_id}/[resource]/{id}` | JWT + RBAC | [description] |
+| POST | `/api/v1/{organization_id}/[resource]` | JWT + RBAC | [description] |
+| GET | `/api/v1/{organization_id}/[resource]` | JWT + RBAC | [description] |
+| GET | `/api/v1/{organization_id}/[resource]/{id}` | JWT + RBAC | [description] |
+| PUT | `/api/v1/{organization_id}/[resource]/{id}` | JWT + RBAC | [description] |
+| DELETE | `/api/v1/{organization_id}/[resource]/{id}` | JWT + RBAC | [description] |
 
 **Admin routes** (platform_owner only):
 
@@ -112,7 +112,7 @@
 | Role | Access |
 |------|--------|
 | platform_owner | [full/admin access] |
-| tenant_admin | [tenant config access] |
+| organization_admin | [organization config access] |
 | proprietario | [read indicators, approve] |
 | gerente_agricola | [manage operations] |
 | engenheiro_agronomo | [technical recommendations] |

@@ -30,13 +30,13 @@ export function Login() {
     try {
       const data = await apiRequest<{
         token: string
-        tenant_id: string
+        organization_id: string
         user: { id: string; email: string; name: string; role: string }
       }>('/auth/login', {
         method: 'POST',
         body: { email, password },
       })
-      login(data.token, data.tenant_id, data.user)
+      login(data.token, data.organization_id, data.user)
       navigate('/')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao fazer login')

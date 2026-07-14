@@ -111,9 +111,9 @@ type createFarmRequest struct {
 	Producer *producerRequest `json:"producer"`
 }
 
-func (req *createFarmRequest) toEntity(tenantID string) *entity.Farm {
+func (req *createFarmRequest) toEntity(organizationID string) *entity.Farm {
 	return &entity.Farm{
-		TenantID:                    tenantID,
+		OrganizationID:              organizationID,
 		Name:                        req.Name,
 		Owner:                       req.Owner,
 		Location:                    req.Location,
@@ -154,20 +154,20 @@ func (req *createFarmRequest) toEntity(tenantID string) *entity.Farm {
 	}
 }
 
-// Create registra uma nova fazenda para o tenant autenticado
+// Create registra uma nova fazenda para a organização autenticada
 // @Summary Criar fazenda
-// @Description Registra uma nova fazenda no tenant
+// @Description Registra uma nova fazenda na organização
 // @Tags farms (Fazendas)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param farm body createFarmRequest true "Dados da fazenda"
 // @Success 201 {object} SwaggerFarm
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/farms [post]
+// @Router /api/v1/{organization_id}/farms [post]
 func (h *FarmHandler) Create(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 
 	var req createFarmRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -185,7 +185,7 @@ func (h *FarmHandler) Create(w http.ResponseWriter, r *http.Request) {
 		producer = p
 	}
 
-	farm, err := h.svc.Create(req.toEntity(tenantID), producer)
+	farm, err := h.svc.Create(req.toEntity(organizationID), producer)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -199,12 +199,12 @@ func (h *FarmHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Description Retorna uma única fazenda
 // @Tags farms (Fazendas)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID da Fazenda"
 // @Success 200 {object} SwaggerFarm
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/farms/{id} [get]
+// @Router /api/v1/{organization_id}/farms/{id} [get]
 func (h *FarmHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	farm, err := h.svc.GetByID(id)
@@ -215,19 +215,19 @@ func (h *FarmHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, farm, http.StatusOK)
 }
 
-// List retorna todas as fazendas do tenant autenticado
+// List retorna todas as fazendas da organização autenticada
 // @Summary Listar fazendas
-// @Description Lista todas as fazendas pertencentes ao tenant
+// @Description Lista todas as fazendas pertencentes à organização
 // @Tags farms (Fazendas)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Success 200 {array} SwaggerFarm
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/farms [get]
+// @Router /api/v1/{organization_id}/farms [get]
 func (h *FarmHandler) List(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
-	farms, err := h.svc.ListByTenant(tenantID)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	farms, err := h.svc.ListByOrganization(organizationID)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -241,13 +241,13 @@ func (h *FarmHandler) List(w http.ResponseWriter, r *http.Request) {
 // @Tags farms (Fazendas)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID da Fazenda"
 // @Param farm body SwaggerFarm true "Dados atualizados da fazenda"
 // @Success 200 {object} SwaggerFarm
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/farms/{id} [put]
+// @Router /api/v1/{organization_id}/farms/{id} [put]
 func (h *FarmHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
@@ -446,12 +446,12 @@ func (h *FarmHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Summary Excluir fazenda
 // @Description Exclui uma fazenda por ID
 // @Tags farms (Fazendas)
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID da Fazenda"
 // @Success 204 "No Content"
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/farms/{id} [delete]
+// @Router /api/v1/{organization_id}/farms/{id} [delete]
 func (h *FarmHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.svc.Delete(id); err != nil {

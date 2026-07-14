@@ -17,7 +17,7 @@ func NewFinancialService(repo repository.FinancialRepository) *FinancialService 
 	return &FinancialService{repo: repo}
 }
 
-func (s *FinancialService) Create(tenantID, txType string, costCenterID *string, description string, amount float64, date time.Time, dueDate time.Time, notes string) (*entity.FinancialTransaction, error) {
+func (s *FinancialService) Create(organizationID, txType string, costCenterID *string, description string, amount float64, date time.Time, dueDate time.Time, notes string) (*entity.FinancialTransaction, error) {
 	if description == "" {
 		return nil, errors.New("description is required")
 	}
@@ -25,17 +25,17 @@ func (s *FinancialService) Create(tenantID, txType string, costCenterID *string,
 		return nil, errors.New("amount must be greater than zero")
 	}
 	tx := &entity.FinancialTransaction{
-		ID:           uuid.New().String(),
-		TenantID:     tenantID,
-		Type:         entity.TransactionType(txType),
-		CostCenterID: costCenterID,
-		Description:  description,
-		Amount:       amount,
-		Date:         date,
-		DueDate:      dueDate,
-		Status:       "pending",
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		Type:           entity.TransactionType(txType),
+		CostCenterID:   costCenterID,
+		Description:    description,
+		Amount:         amount,
+		Date:           date,
+		DueDate:        dueDate,
+		Status:         "pending",
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
 	}
 	if err := s.repo.Create(tx); err != nil {
 		return nil, err
@@ -47,8 +47,8 @@ func (s *FinancialService) GetByID(id string) (*entity.FinancialTransaction, err
 	return s.repo.GetByID(id)
 }
 
-func (s *FinancialService) ListByTenant(tenantID string) ([]*entity.FinancialTransaction, error) {
-	return s.repo.ListByTenant(tenantID)
+func (s *FinancialService) ListByOrganization(organizationID string) ([]*entity.FinancialTransaction, error) {
+	return s.repo.ListByOrganization(organizationID)
 }
 
 func (s *FinancialService) Update(tx *entity.FinancialTransaction) error {

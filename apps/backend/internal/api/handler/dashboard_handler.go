@@ -10,11 +10,11 @@ import (
 )
 
 type DashboardHandler struct {
-	harvestRepo    repository.HarvestRepository
-	indicatorRepo  repository.IndicatorRepository
-	operationRepo  repository.OperationRepository
-	plotRepo       repository.PlotRepository
-	farmRepo       repository.FarmRepository
+	harvestRepo   repository.HarvestRepository
+	indicatorRepo repository.IndicatorRepository
+	operationRepo repository.OperationRepository
+	plotRepo      repository.PlotRepository
+	farmRepo      repository.FarmRepository
 }
 
 func NewDashboardHandler(
@@ -52,13 +52,13 @@ type RecentOperationItem struct {
 }
 
 type DashboardResponse struct {
-	TotalFarms        int                   `json:"total_farms"`
-	TotalPlots        int                   `json:"total_plots"`
-	TotalProduction   float64               `json:"total_production"`
-	TotalCost         float64               `json:"total_cost"`
+	TotalFarms          int                   `json:"total_farms"`
+	TotalPlots          int                   `json:"total_plots"`
+	TotalProduction     float64               `json:"total_production"`
+	TotalCost           float64               `json:"total_cost"`
 	ProductionByHarvest []ProductionByHarvest `json:"production_by_harvest"`
-	CostPerBag        []CostPerBag          `json:"cost_per_bag"`
-	RecentOperations  []RecentOperationItem `json:"recent_operations"`
+	CostPerBag          []CostPerBag          `json:"cost_per_bag"`
+	RecentOperations    []RecentOperationItem `json:"recent_operations"`
 }
 
 // GetDashboard retorna os dados consolidados do painel
@@ -66,22 +66,22 @@ type DashboardResponse struct {
 // @Description Retorna produção, custos, indicadores e operações recentes consolidados
 // @Tags dashboard (Painel)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Success 200 {object} DashboardResponse
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/dashboard [get]
+// @Router /api/v1/{organization_id}/dashboard [get]
 func (h *DashboardHandler) GetDashboard(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
-	if tenantID == "" {
-		writeError(w, "tenant not found", http.StatusUnauthorized)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	if organizationID == "" {
+		writeError(w, "organization not found", http.StatusUnauthorized)
 		return
 	}
 
-	harvests, _ := h.harvestRepo.ListByTenant(tenantID)
-	indicators, _ := h.indicatorRepo.ListByTenant(tenantID)
-	operations, _ := h.operationRepo.ListByTenant(tenantID)
-	plots, _ := h.plotRepo.ListByTenant(tenantID)
-	farms, _ := h.farmRepo.ListByTenant(tenantID)
+	harvests, _ := h.harvestRepo.ListByOrganization(organizationID)
+	indicators, _ := h.indicatorRepo.ListByOrganization(organizationID)
+	operations, _ := h.operationRepo.ListByOrganization(organizationID)
+	plots, _ := h.plotRepo.ListByOrganization(organizationID)
+	farms, _ := h.farmRepo.ListByOrganization(organizationID)
 
 	var totalProduction, totalCost float64
 

@@ -27,9 +27,9 @@ func (r *FarmRepository) GetByID(id string) (*entity.Farm, error) {
 	return &f, err
 }
 
-func (r *FarmRepository) ListByTenant(tenantID string) ([]*entity.Farm, error) {
+func (r *FarmRepository) ListByOrganization(organizationID string) ([]*entity.Farm, error) {
 	var farms []*entity.Farm
-	err := r.db.Preload("Producer").Where("tenant_id = ?", tenantID).Order("name").Find(&farms).Error
+	err := r.db.Preload("Producer").Where("organization_id = ?", organizationID).Order("name").Find(&farms).Error
 	return farms, err
 }
 

@@ -20,11 +20,11 @@ func NewUserHandler(repo repository.UserRepository) *UserHandler {
 }
 
 type createUserRequest struct {
-	TenantID string `json:"tenant_id"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Role     string `json:"role"`
+	OrganizationID string `json:"organization_id"`
+	Name           string `json:"name"`
+	Email          string `json:"email"`
+	Password       string `json:"password"`
+	Role           string `json:"role"`
 }
 
 type updateUserRequest struct {
@@ -49,13 +49,13 @@ func (h *UserHandler) List(w http.ResponseWriter, r *http.Request) {
 	}
 	// Strip password hashes from response
 	type userResponse struct {
-		ID       string `json:"id"`
-		TenantID string `json:"tenant_id"`
-		Name     string `json:"name"`
-		Email    string `json:"email"`
-		Role     string `json:"role"`
-		IsActive bool   `json:"is_active"`
-		Status   string `json:"status"`
+		ID             string `json:"id"`
+		OrganizationID string `json:"organization_id"`
+		Name           string `json:"name"`
+		Email          string `json:"email"`
+		Role           string `json:"role"`
+		IsActive       bool   `json:"is_active"`
+		Status         string `json:"status"`
 	}
 	resp := make([]userResponse, 0, len(users))
 	for _, u := range users {
@@ -64,13 +64,13 @@ func (h *UserHandler) List(w http.ResponseWriter, r *http.Request) {
 			status = "inactive"
 		}
 		resp = append(resp, userResponse{
-			ID:       u.ID,
-			TenantID: u.TenantID,
-			Name:     u.Name,
-			Email:    u.Email,
-			Role:     string(u.Role),
-			IsActive: u.IsActive,
-			Status:   status,
+			ID:             u.ID,
+			OrganizationID: u.OrganizationID,
+			Name:           u.Name,
+			Email:          u.Email,
+			Role:           string(u.Role),
+			IsActive:       u.IsActive,
+			Status:         status,
 		})
 	}
 	writeJSON(w, resp, http.StatusOK)
@@ -111,15 +111,15 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := &entity.User{
-		ID:           uuid.New().String(),
-		TenantID:     req.TenantID,
-		Name:         req.Name,
-		Email:        req.Email,
-		PasswordHash: string(hash),
-		Role:         role,
-		IsActive:     true,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
+		ID:             uuid.New().String(),
+		OrganizationID: req.OrganizationID,
+		Name:           req.Name,
+		Email:          req.Email,
+		PasswordHash:   string(hash),
+		Role:           role,
+		IsActive:       true,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
 	}
 
 	if err := h.repo.Create(user); err != nil {

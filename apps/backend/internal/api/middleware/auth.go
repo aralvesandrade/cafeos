@@ -11,9 +11,9 @@ import (
 type contextKey string
 
 const (
-	UserIDKey   contextKey = "user_id"
-	TenantIDKey contextKey = "tenant_id"
-	RoleKey     contextKey = "role"
+	UserIDKey         contextKey = "user_id"
+	OrganizationIDKey contextKey = "organization_id"
+	RoleKey           contextKey = "role"
 )
 
 func Auth(jwtSecret string) func(http.Handler) http.Handler {
@@ -38,7 +38,7 @@ func Auth(jwtSecret string) func(http.Handler) http.Handler {
 			}
 
 			ctx := context.WithValue(r.Context(), UserIDKey, claims.UserID)
-			ctx = context.WithValue(ctx, TenantIDKey, claims.TenantID)
+			ctx = context.WithValue(ctx, OrganizationIDKey, claims.OrganizationID)
 			ctx = context.WithValue(ctx, RoleKey, claims.Role)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
@@ -46,9 +46,9 @@ func Auth(jwtSecret string) func(http.Handler) http.Handler {
 }
 
 type TokenClaims struct {
-	UserID   string
-	TenantID string
-	Role     string
+	UserID         string
+	OrganizationID string
+	Role           string
 }
 
 func validateToken(tokenStr, secret string) (*TokenClaims, error) {
@@ -68,9 +68,9 @@ func validateToken(tokenStr, secret string) (*TokenClaims, error) {
 	}
 
 	return &TokenClaims{
-		UserID:   getClaimString(claims, "user_id"),
-		TenantID: getClaimString(claims, "tenant_id"),
-		Role:     getClaimString(claims, "role"),
+		UserID:         getClaimString(claims, "user_id"),
+		OrganizationID: getClaimString(claims, "organization_id"),
+		Role:           getClaimString(claims, "role"),
 	}, nil
 }
 

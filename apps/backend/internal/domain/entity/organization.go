@@ -2,7 +2,7 @@ package entity
 
 import "time"
 
-type Tenant struct {
+type Organization struct {
 	ID           string    `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	Name         string    `json:"name" gorm:"not null"`
 	Slug         string    `json:"slug" gorm:"uniqueIndex;not null"`

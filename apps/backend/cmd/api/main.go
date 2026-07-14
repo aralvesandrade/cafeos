@@ -2,7 +2,7 @@
 // @version 0.1.0
 // @description Plataforma SaaS especializada em cafeicultura para gestão operacional, produtiva, financeira e analítica de propriedades cafeeiras.
 // @host localhost:5001
-// @BasePath /api/v1/{tenant_id}
+// @BasePath /api/v1/{organization_id}
 // @schemes http
 // @license.name Proprietary
 // @securityDefinitions.apiKey BearerAuth

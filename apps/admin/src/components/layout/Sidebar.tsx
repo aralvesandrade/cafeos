@@ -35,7 +35,7 @@ const phase2Items = [
 ]
 
 const adminItems = [
-  { to: '/tenants', icon: Building2, label: 'Tenants' },
+  { to: '/organizations', icon: Building2, label: 'Organizações' },
   { to: '/users', icon: Users, label: 'Usuários' },
 ]
 

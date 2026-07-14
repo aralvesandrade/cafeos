@@ -28,20 +28,20 @@ type createStockItemRequest struct {
 	Notes      string  `json:"notes"`
 }
 
-// CreateItem registra um novo item de estoque para o tenant autenticado
+// CreateItem registra um novo item de estoque para a organização autenticada
 // @Summary Criar item de estoque
-// @Description Registra um novo item de estoque no tenant
+// @Description Registra um novo item de estoque na organização
 // @Tags stock (Estoque)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param item body createStockItemRequest true "Dados do item de estoque"
 // @Success 201 {object} entity.StockItem
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/stock/items [post]
+// @Router /api/v1/{organization_id}/stock/items [post]
 func (h *StockHandler) CreateItem(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	var req createStockItemRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, "invalid request body", http.StatusBadRequest)
@@ -54,7 +54,7 @@ func (h *StockHandler) CreateItem(w http.ResponseWriter, r *http.Request) {
 			expiry = &t
 		}
 	}
-	item, err := h.svc.CreateItem(tenantID, req.ProductID, req.Unit, req.Batch, req.Location, req.Notes, req.Quantity, req.MinStock, expiry)
+	item, err := h.svc.CreateItem(organizationID, req.ProductID, req.Unit, req.Batch, req.Location, req.Notes, req.Quantity, req.MinStock, expiry)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -62,19 +62,19 @@ func (h *StockHandler) CreateItem(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, item, http.StatusCreated)
 }
 
-// ListItems retorna todos os itens de estoque do tenant autenticado
+// ListItems retorna todos os itens de estoque da organização autenticada
 // @Summary Listar itens de estoque
-// @Description Lista todos os itens de estoque pertencentes ao tenant
+// @Description Lista todos os itens de estoque pertencentes à organização
 // @Tags stock (Estoque)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Success 200 {array} entity.StockItem
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/stock/items [get]
+// @Router /api/v1/{organization_id}/stock/items [get]
 func (h *StockHandler) ListItems(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
-	items, err := h.svc.ListItems(tenantID)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	items, err := h.svc.ListItems(organizationID)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -87,12 +87,12 @@ func (h *StockHandler) ListItems(w http.ResponseWriter, r *http.Request) {
 // @Description Retorna um único item de estoque
 // @Tags stock (Estoque)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID do Item de Estoque"
 // @Success 200 {object} entity.StockItem
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/stock/items/{id} [get]
+// @Router /api/v1/{organization_id}/stock/items/{id} [get]
 func (h *StockHandler) GetItemByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	item, err := h.svc.GetItemByID(id)
@@ -109,13 +109,13 @@ func (h *StockHandler) GetItemByID(w http.ResponseWriter, r *http.Request) {
 // @Tags stock (Estoque)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID do Item de Estoque"
 // @Param item body entity.StockItem true "Dados atualizados do item de estoque"
 // @Success 200 {object} entity.StockItem
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/stock/items/{id} [put]
+// @Router /api/v1/{organization_id}/stock/items/{id} [put]
 func (h *StockHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	existing, err := h.svc.GetItemByID(id)
@@ -156,12 +156,12 @@ func (h *StockHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 // @Summary Excluir item de estoque
 // @Description Exclui um item de estoque por ID
 // @Tags stock (Estoque)
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID do Item de Estoque"
 // @Success 204 "No Content"
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/stock/items/{id} [delete]
+// @Router /api/v1/{organization_id}/stock/items/{id} [delete]
 func (h *StockHandler) DeleteItem(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.svc.DeleteItem(id); err != nil {
@@ -186,21 +186,21 @@ type recordMovementRequest struct {
 // @Tags stock (Estoque)
 // @Accept json
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Param movement body recordMovementRequest true "Dados da movimentação de estoque"
 // @Success 201 {object} entity.StockMovement
 // @Failure 400 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/stock/movements [post]
+// @Router /api/v1/{organization_id}/stock/movements [post]
 func (h *StockHandler) RecordMovement(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	var req recordMovementRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
 	date, _ := time.Parse("2006-01-02", req.Date)
-	mov, err := h.svc.RecordMovement(tenantID, req.ItemID, req.Type, req.Reference, req.Notes, req.Quantity, date)
+	mov, err := h.svc.RecordMovement(organizationID, req.ItemID, req.Type, req.Reference, req.Notes, req.Quantity, date)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -208,19 +208,19 @@ func (h *StockHandler) RecordMovement(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, mov, http.StatusCreated)
 }
 
-// ListMovements retorna todas as movimentações de estoque do tenant autenticado
+// ListMovements retorna todas as movimentações de estoque da organização autenticada
 // @Summary Listar movimentações de estoque
-// @Description Lista todas as movimentações de estoque pertencentes ao tenant
+// @Description Lista todas as movimentações de estoque pertencentes à organização
 // @Tags stock (Estoque)
 // @Produce json
-// @Param tenant_id path string true "ID do Tenant"
+// @Param organization_id path string true "ID da Organização"
 // @Success 200 {array} entity.StockMovement
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
-// @Router /api/v1/{tenant_id}/stock/movements [get]
+// @Router /api/v1/{organization_id}/stock/movements [get]
 func (h *StockHandler) ListMovements(w http.ResponseWriter, r *http.Request) {
-	tenantID, _ := r.Context().Value(middleware.TenantIDKey).(string)
-	movs, err := h.svc.ListMovements(tenantID)
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	movs, err := h.svc.ListMovements(organizationID)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return

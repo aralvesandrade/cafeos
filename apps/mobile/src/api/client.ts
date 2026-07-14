@@ -22,24 +22,24 @@ export async function clearToken(): Promise<void> {
   await storage.removeItem('cafeos_token')
 }
 
-export async function getTenantId(): Promise<string | null> {
-  return storage.getItem('cafeos_tenant_id')
+export async function getOrganizationId(): Promise<string | null> {
+  return storage.getItem('cafeos_organization_id')
 }
 
-export async function setTenantId(id: string): Promise<void> {
-  await storage.setItem('cafeos_tenant_id', id)
+export async function setOrganizationId(id: string): Promise<void> {
+  await storage.setItem('cafeos_organization_id', id)
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const token = await getToken()
-  const tenantId = await getTenantId()
+  const organizationId = await getOrganizationId()
 
   const isPublic = path.startsWith('/auth/')
   let url: string
   if (isPublic) {
     url = `${API_BASE}${path}`
   } else {
-    url = `${API_BASE}/api/v1${tenantId ? `/${tenantId}` : ''}${path}`
+    url = `${API_BASE}/api/v1${organizationId ? `/${organizationId}` : ''}${path}`
   }
 
   if (options.params) {
@@ -66,7 +66,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 }
 
 export async function loginRequest(email: string, password: string): Promise<{
-  token: string; tenant_id: string; user: { id: string; email: string; name: string; role: string }
+  token: string; organization_id: string; user: { id: string; email: string; name: string; role: string }
 }> {
   return apiRequest('/auth/login', {
     method: 'POST',

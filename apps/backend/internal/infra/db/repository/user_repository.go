@@ -33,9 +33,9 @@ func (r *UserRepository) GetByEmail(email string) (*entity.User, error) {
 	return &u, err
 }
 
-func (r *UserRepository) ListByTenant(tenantID string) ([]*entity.User, error) {
+func (r *UserRepository) ListByOrganization(organizationID string) ([]*entity.User, error) {
 	var users []*entity.User
-	err := r.db.Where("tenant_id = ?", tenantID).Order("name").Find(&users).Error
+	err := r.db.Where("organization_id = ?", organizationID).Order("name").Find(&users).Error
 	return users, err
 }
 

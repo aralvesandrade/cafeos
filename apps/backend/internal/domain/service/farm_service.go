@@ -51,7 +51,7 @@ func (s *FarmService) Create(farm *entity.Farm, producer *entity.Producer) (*ent
 			return nil, errors.New("producer name is required")
 		}
 		producer.ID = uuid.New().String()
-		producer.TenantID = farm.TenantID
+		producer.OrganizationID = farm.OrganizationID
 		producer.FarmID = farm.ID
 		producer.CreatedAt = time.Now()
 		producer.UpdatedAt = time.Now()
@@ -70,8 +70,8 @@ func (s *FarmService) GetByID(id string) (*entity.Farm, error) {
 	return s.repo.GetByID(id)
 }
 
-func (s *FarmService) ListByTenant(tenantID string) ([]*entity.Farm, error) {
-	return s.repo.ListByTenant(tenantID)
+func (s *FarmService) ListByOrganization(organizationID string) ([]*entity.Farm, error) {
+	return s.repo.ListByOrganization(organizationID)
 }
 
 func (s *FarmService) Update(farm *entity.Farm) error {
@@ -95,7 +95,7 @@ func (s *FarmService) UpsertProducer(farmID string, producer *entity.Producer) (
 	existing, err := s.producerRepo.GetByFarmID(farmID)
 	if err != nil {
 		producer.ID = uuid.New().String()
-		producer.TenantID = farm.TenantID
+		producer.OrganizationID = farm.OrganizationID
 		producer.FarmID = farmID
 		producer.CreatedAt = time.Now()
 		producer.UpdatedAt = time.Now()
@@ -106,7 +106,7 @@ func (s *FarmService) UpsertProducer(farmID string, producer *entity.Producer) (
 	}
 
 	producer.ID = existing.ID
-	producer.TenantID = existing.TenantID
+	producer.OrganizationID = existing.OrganizationID
 	producer.FarmID = existing.FarmID
 	producer.CreatedAt = existing.CreatedAt
 	producer.UpdatedAt = time.Now()

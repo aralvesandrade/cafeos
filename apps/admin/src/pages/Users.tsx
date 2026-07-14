@@ -9,21 +9,21 @@ import { Plus, Pencil, Trash2, User, Building2 } from 'lucide-react'
 
 interface AppUser {
   id: string
-  tenant_id: string
+  organization_id: string
   name: string
   email: string
   role: string
   status: string
 }
 
-interface Tenant {
+interface Organization {
   id: string
   name: string
 }
 
 const roleLabels: Record<string, string> = {
   platform_owner: 'Platform Owner',
-  tenant_admin: 'Admin',
+  organization_admin: 'Admin',
   proprietario: 'Proprietário',
   gerente_agricola: 'Gerente Agrícola',
   engenheiro_agronomo: 'Eng. Agrônomo',
@@ -36,21 +36,21 @@ const roleLabels: Record<string, string> = {
 
 export function Users() {
   const [users, setUsers] = useState<AppUser[]>([])
-  const [tenants, setTenants] = useState<Tenant[]>([])
+  const [organizations, setOrganizations] = useState<Organization[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<AppUser | null>(null)
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: '', tenant_id: '' })
+  const [form, setForm] = useState({ name: '', email: '', password: '', role: '', organization_id: '' })
   const [saving, setSaving] = useState(false)
 
   const load = useCallback(async () => {
     try {
-      const [userData, tenantData] = await Promise.all([
+      const [userData, organizationData] = await Promise.all([
         apiRequest<AppUser[]>('/admin/users', { admin: true }),
-        apiRequest<Tenant[]>('/admin/tenants', { admin: true }),
+        apiRequest<Organization[]>('/admin/organizations', { admin: true }),
       ])
       setUsers(userData)
-      setTenants(tenantData)
+      setOrganizations(organizationData)
     } catch (err) {
       console.error(err)
     } finally {
@@ -66,7 +66,7 @@ export function Users() {
       if (editing) {
         await apiRequest(`/admin/users/${editing.id}`, { method: 'PUT', body: { name: form.name, email: form.email, role: form.role }, admin: true })
       } else {
-        await apiRequest('/admin/users', { method: 'POST', body: { name: form.name, email: form.email, password: form.password, role: form.role, tenant_id: form.tenant_id }, admin: true })
+        await apiRequest('/admin/users', { method: 'POST', body: { name: form.name, email: form.email, password: form.password, role: form.role, organization_id: form.organization_id }, admin: true })
       }
       setDialogOpen(false); setEditing(null)
       await load()
@@ -94,7 +94,7 @@ export function Users() {
           <h1 className="text-2xl font-bold text-primary">Usuários</h1>
           <p className="text-sm text-muted-foreground">Gerenciar usuários do sistema</p>
         </div>
-        <Button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: '', role: '', tenant_id: '' }); setDialogOpen(true) }}>
+        <Button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: '', role: '', organization_id: '' }); setDialogOpen(true) }}>
           <Plus className="h-4 w-4" /> Novo Usuário
         </Button>
       </div>
@@ -105,14 +105,14 @@ export function Users() {
             <TableHeader>Nome</TableHeader>
             <TableHeader>Email</TableHeader>
             <TableHeader>Perfil</TableHeader>
-            <TableHeader>Tenant</TableHeader>
+            <TableHeader>Organização</TableHeader>
             <TableHeader>Status</TableHeader>
             <TableHeader className="text-right">Ações</TableHeader>
           </TableRow>
         </TableHead>
         <TableBody>
           {users.map((u) => {
-            const tenantName = tenants.find((t) => t.id === u.tenant_id)?.name || u.tenant_id
+            const organizationName = organizations.find((o) => o.id === u.organization_id)?.name || u.organization_id
             return (
               <TableRow key={u.id}>
                 <TableCell className="font-medium">
@@ -126,7 +126,7 @@ export function Users() {
                 <TableCell className="text-muted-foreground text-sm">
                   <div className="flex items-center gap-1">
                     <Building2 className="h-3 w-3" />
-                    {tenantName}
+                    {organizationName}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -136,7 +136,7 @@ export function Users() {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => { setEditing(u); setForm({ name: u.name, email: u.email, password: '', role: u.role, tenant_id: u.tenant_id }); setDialogOpen(true) }}>
+                    <Button variant="ghost" size="sm" onClick={() => { setEditing(u); setForm({ name: u.name, email: u.email, password: '', role: u.role, organization_id: u.organization_id }); setDialogOpen(true) }}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => handleDelete(u.id)}>
@@ -179,11 +179,11 @@ export function Users() {
           </div>
           {!editing && (
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Tenant</label>
-              <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.tenant_id} onChange={(e) => setForm({ ...form, tenant_id: e.target.value })}>
-                <option value="">Selecione um tenant</option>
-                {tenants.map((t) => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
+              <label className="block text-sm font-medium text-foreground mb-1">Organização</label>
+              <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.organization_id} onChange={(e) => setForm({ ...form, organization_id: e.target.value })}>
+                <option value="">Selecione uma organização</option>
+                {organizations.map((o) => (
+                  <option key={o.id} value={o.id}>{o.name}</option>
                 ))}
               </select>
             </div>

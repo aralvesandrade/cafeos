@@ -27,9 +27,9 @@ func (r *VehicleRepository) GetByID(id string) (*entity.Vehicle, error) {
 	return &v, err
 }
 
-func (r *VehicleRepository) ListByTenant(tenantID string) ([]*entity.Vehicle, error) {
+func (r *VehicleRepository) ListByOrganization(organizationID string) ([]*entity.Vehicle, error) {
 	var items []*entity.Vehicle
-	err := r.db.Where("tenant_id = ?", tenantID).Order("name").Find(&items).Error
+	err := r.db.Where("organization_id = ?", organizationID).Order("name").Find(&items).Error
 	return items, err
 }
 
@@ -63,9 +63,9 @@ func (r *MaintenanceRepository) GetByID(id string) (*entity.Maintenance, error) 
 	return &m, err
 }
 
-func (r *MaintenanceRepository) ListByTenant(tenantID string) ([]*entity.Maintenance, error) {
+func (r *MaintenanceRepository) ListByOrganization(organizationID string) ([]*entity.Maintenance, error) {
 	var items []*entity.Maintenance
-	err := r.db.Preload("Vehicle").Where("tenant_id = ?", tenantID).Order("date DESC").Find(&items).Error
+	err := r.db.Preload("Vehicle").Where("organization_id = ?", organizationID).Order("date DESC").Find(&items).Error
 	return items, err
 }
 

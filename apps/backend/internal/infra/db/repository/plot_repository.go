@@ -33,9 +33,9 @@ func (r *PlotRepository) ListByFarm(farmID string) ([]*entity.Plot, error) {
 	return plots, err
 }
 
-func (r *PlotRepository) ListByTenant(tenantID string) ([]*entity.Plot, error) {
+func (r *PlotRepository) ListByOrganization(organizationID string) ([]*entity.Plot, error) {
 	var plots []*entity.Plot
-	err := r.db.Where("tenant_id = ?", tenantID).Order("name").Find(&plots).Error
+	err := r.db.Where("organization_id = ?", organizationID).Order("name").Find(&plots).Error
 	return plots, err
 }
 

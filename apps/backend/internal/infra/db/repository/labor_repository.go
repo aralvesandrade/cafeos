@@ -27,9 +27,9 @@ func (r *TeamRepository) GetByID(id string) (*entity.Team, error) {
 	return &t, err
 }
 
-func (r *TeamRepository) ListByTenant(tenantID string) ([]*entity.Team, error) {
+func (r *TeamRepository) ListByOrganization(organizationID string) ([]*entity.Team, error) {
 	var items []*entity.Team
-	err := r.db.Where("tenant_id = ?", tenantID).Order("name").Find(&items).Error
+	err := r.db.Where("organization_id = ?", organizationID).Order("name").Find(&items).Error
 	return items, err
 }
 
@@ -63,9 +63,9 @@ func (r *WorkerRepository) GetByID(id string) (*entity.Worker, error) {
 	return &w, err
 }
 
-func (r *WorkerRepository) ListByTenant(tenantID string) ([]*entity.Worker, error) {
+func (r *WorkerRepository) ListByOrganization(organizationID string) ([]*entity.Worker, error) {
 	var items []*entity.Worker
-	err := r.db.Preload("Team").Where("tenant_id = ?", tenantID).Order("name").Find(&items).Error
+	err := r.db.Preload("Team").Where("organization_id = ?", organizationID).Order("name").Find(&items).Error
 	return items, err
 }
 
@@ -105,9 +105,9 @@ func (r *WorkShiftRepository) GetByID(id string) (*entity.WorkShift, error) {
 	return &ws, err
 }
 
-func (r *WorkShiftRepository) ListByTenant(tenantID string) ([]*entity.WorkShift, error) {
+func (r *WorkShiftRepository) ListByOrganization(organizationID string) ([]*entity.WorkShift, error) {
 	var items []*entity.WorkShift
-	err := r.db.Preload("Worker").Where("tenant_id = ?", tenantID).Order("date DESC").Find(&items).Error
+	err := r.db.Preload("Worker").Where("organization_id = ?", organizationID).Order("date DESC").Find(&items).Error
 	return items, err
 }
 

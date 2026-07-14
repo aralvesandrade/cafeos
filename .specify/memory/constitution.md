@@ -20,12 +20,12 @@ api/handler/ → domain/service/ → domain/repository/ (interface)
                                   infra/db/repository/ (impl GORM)
 ```
 
-- `domain/entity/` — GORM entities, UUID PK, TenantID FK. No external dependencies.
+- `domain/entity/` — GORM entities, UUID PK, OrganizationID FK. No external dependencies.
 - `domain/repository/` — Go interfaces only. No GORM imports.
 - `domain/service/` — Business logic. Depends on repository interfaces, not implementations.
 - `infra/db/repository/` — GORM implementations of repository interfaces.
 - `api/handler/` — HTTP handlers. Thin layer: parse request → call service → write response.
-- `api/middleware/` — Auth, RBAC, Tenant resolution, CORS.
+- `api/middleware/` — Auth, RBAC, Organization resolution, CORS.
 - `event/` — In-memory event bus. Decoupled from messaging infra.
 
 ### III. Naming Conventions
@@ -51,10 +51,10 @@ api/handler/ → domain/service/ → domain/repository/ (interface)
 
 ### V. Multi-Tenant Rules
 
-- Every entity has `TenantID` UUID foreign key.
-- Every handler extracts tenant ID from context via `middleware.TenantIDKey`.
+- Every entity has `OrganizationID` UUID foreign key.
+- Every handler extracts the organization ID from context via `middleware.OrganizationIDKey`.
 - Admin routes (`/api/v1/admin/...`) are `platform_owner` only.
-- Multi-tenant routes are under `/api/v1/{tenant_id}/...`.
+- Multi-tenant routes are under `/api/v1/{organization_id}/...`.
 - Sync endpoint (`POST /sync`) handles offline mobile batches (max 50).
 
 ### VI. API Conventions
@@ -80,7 +80,7 @@ api/handler/ → domain/service/ → domain/repository/ (interface)
 
 ### IX. RBAC Roles
 
-10 roles enforced via middleware: `platform_owner`, `tenant_admin`, `proprietario`, `gerente_agricola`, `engenheiro_agronomo`, `tecnico_agricola`, `operador_campo`, `financeiro`, `consultor_externo`, `auditor`.
+10 roles enforced via middleware: `platform_owner`, `organization_admin`, `proprietario`, `gerente_agricola`, `engenheiro_agronomo`, `tecnico_agricola`, `operador_campo`, `financeiro`, `consultor_externo`, `auditor`.
 
 ### X. Infrastructure
 

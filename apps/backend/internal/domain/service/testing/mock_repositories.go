@@ -8,8 +8,8 @@ import (
 )
 
 type InMemoryFarmRepo struct {
-	mu     sync.RWMutex
-	farms  map[string]*entity.Farm
+	mu    sync.RWMutex
+	farms map[string]*entity.Farm
 }
 
 func NewInMemoryFarmRepo() *InMemoryFarmRepo {
@@ -33,12 +33,12 @@ func (r *InMemoryFarmRepo) GetByID(id string) (*entity.Farm, error) {
 	return f, nil
 }
 
-func (r *InMemoryFarmRepo) ListByTenant(tenantID string) ([]*entity.Farm, error) {
+func (r *InMemoryFarmRepo) ListByOrganization(organizationID string) ([]*entity.Farm, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	var result []*entity.Farm
 	for _, f := range r.farms {
-		if f.TenantID == tenantID {
+		if f.OrganizationID == organizationID {
 			result = append(result, f)
 		}
 	}
@@ -142,12 +142,12 @@ func (r *InMemoryPlotRepo) ListByFarm(farmID string) ([]*entity.Plot, error) {
 	return result, nil
 }
 
-func (r *InMemoryPlotRepo) ListByTenant(tenantID string) ([]*entity.Plot, error) {
+func (r *InMemoryPlotRepo) ListByOrganization(organizationID string) ([]*entity.Plot, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	var result []*entity.Plot
 	for _, p := range r.plots {
-		if p.TenantID == tenantID {
+		if p.OrganizationID == organizationID {
 			result = append(result, p)
 		}
 	}
@@ -206,20 +206,20 @@ func (r *InMemoryOperationRepo) ListByPlot(plotID string) ([]*entity.Operation, 
 	return result, nil
 }
 
-func (r *InMemoryOperationRepo) ListByTenant(tenantID string) ([]*entity.Operation, error) {
+func (r *InMemoryOperationRepo) ListByOrganization(organizationID string) ([]*entity.Operation, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	var result []*entity.Operation
 	for _, op := range r.operations {
-		if op.TenantID == tenantID {
+		if op.OrganizationID == organizationID {
 			result = append(result, op)
 		}
 	}
 	return result, nil
 }
 
-func (r *InMemoryOperationRepo) ListByTenantAndPeriod(tenantID string, start, end string) ([]*entity.Operation, error) {
-	return r.ListByTenant(tenantID)
+func (r *InMemoryOperationRepo) ListByOrganizationAndPeriod(organizationID string, start, end string) ([]*entity.Operation, error) {
+	return r.ListByOrganization(organizationID)
 }
 
 func (r *InMemoryOperationRepo) Delete(id string) error {
@@ -255,12 +255,12 @@ func (r *InMemoryHarvestRepo) GetByID(id string) (*entity.Harvest, error) {
 	return h, nil
 }
 
-func (r *InMemoryHarvestRepo) ListByTenant(tenantID string) ([]*entity.Harvest, error) {
+func (r *InMemoryHarvestRepo) ListByOrganization(organizationID string) ([]*entity.Harvest, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	var result []*entity.Harvest
 	for _, h := range r.harvests {
-		if h.TenantID == tenantID {
+		if h.OrganizationID == organizationID {
 			result = append(result, h)
 		}
 	}
@@ -359,24 +359,24 @@ func (r *InMemoryIndicatorRepo) ListByHarvest(harvestID string) ([]*entity.Indic
 	return result, nil
 }
 
-func (r *InMemoryIndicatorRepo) ListByTenant(tenantID string) ([]*entity.Indicator, error) {
+func (r *InMemoryIndicatorRepo) ListByOrganization(organizationID string) ([]*entity.Indicator, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	var result []*entity.Indicator
 	for _, ind := range r.indicators {
-		if ind.TenantID == tenantID {
+		if ind.OrganizationID == organizationID {
 			result = append(result, ind)
 		}
 	}
 	return result, nil
 }
 
-func (r *InMemoryIndicatorRepo) ListByTenantAndType(tenantID string, t entity.IndicatorType) ([]*entity.Indicator, error) {
+func (r *InMemoryIndicatorRepo) ListByOrganizationAndType(organizationID string, t entity.IndicatorType) ([]*entity.Indicator, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	var result []*entity.Indicator
 	for _, ind := range r.indicators {
-		if ind.TenantID == tenantID && ind.Type == t {
+		if ind.OrganizationID == organizationID && ind.Type == t {
 			result = append(result, ind)
 		}
 	}

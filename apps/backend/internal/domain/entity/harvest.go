@@ -12,8 +12,8 @@ const (
 
 type Harvest struct {
 	ID                  string        `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	TenantID            string        `json:"tenant_id" gorm:"type:uuid;not null;uniqueIndex:idx_tenant_year"`
-	Year                int           `json:"year" gorm:"not null;uniqueIndex:idx_tenant_year"`
+	OrganizationID      string        `json:"organization_id" gorm:"type:uuid;not null;uniqueIndex:idx_organization_year"`
+	Year                int           `json:"year" gorm:"not null;uniqueIndex:idx_organization_year"`
 	Description         string        `json:"description" gorm:"default:''"`
 	EstimatedProduction float64       `json:"estimated_production" gorm:"type:numeric(12,2);default:0"`
 	Status              HarvestStatus `json:"status" gorm:"default:'planejada'"`
@@ -21,5 +21,5 @@ type Harvest struct {
 	EndDate             *time.Time    `json:"end_date"`
 	CreatedAt           time.Time     `json:"created_at"`
 	UpdatedAt           time.Time     `json:"updated_at"`
-	Tenant              Tenant        `json:"-" gorm:"foreignKey:TenantID"`
+	Organization        Organization  `json:"-" gorm:"foreignKey:OrganizationID"`
 }
