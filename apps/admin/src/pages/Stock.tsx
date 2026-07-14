@@ -5,12 +5,14 @@ import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { Select } from '@/components/ui/select'
 import { Plus, Pencil, Trash2, Package, ArrowUpDown } from 'lucide-react'
 
 interface StockItem {
   id: string
   product_id: string
   product: { id: string; name: string }
+  farm_id: string | null
   quantity: number
   unit: string
   batch: string
@@ -25,35 +27,40 @@ interface Product {
   name: string
 }
 
+interface Farm { id: string; name: string }
+
 export function Stock() {
   const [items, setItems] = useState<StockItem[]>([])
   const [products, setProducts] = useState<Product[]>([])
+  const [farms, setFarms] = useState<Farm[]>([])
+  const [farmFilter, setFarmFilter] = useState('')
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [movDialogOpen, setMovDialogOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<string>('')
   const [editing, setEditing] = useState<StockItem | null>(null)
-  const [form, setForm] = useState({ product_id: '', quantity: '', unit: '', batch: '', expiry_date: '', min_stock: '', location: '', notes: '' })
+  const [form, setForm] = useState({ product_id: '', farm_id: '', quantity: '', unit: '', batch: '', expiry_date: '', min_stock: '', location: '', notes: '' })
   const [movForm, setMovForm] = useState({ item_id: '', type: 'in', quantity: '', date: '', reference: '', notes: '' })
   const [saving, setSaving] = useState(false)
 
   const load = useCallback(async () => {
     try {
-      const [itemData, prodData] = await Promise.all([
-        apiRequest<StockItem[]>('/stock/items'),
+      const [itemData, prodData, farmsData] = await Promise.all([
+        apiRequest<StockItem[]>('/stock/items', { params: farmFilter ? { farm_id: farmFilter } : undefined }),
         apiRequest<Product[]>('/agricultural-products'),
+        apiRequest<Farm[]>('/farms'),
       ])
-      setItems(itemData); setProducts(prodData)
+      setItems(itemData); setProducts(prodData); setFarms(farmsData)
     } catch (err) { console.error(err) }
     finally { setLoading(false) }
-  }, [])
+  }, [farmFilter])
 
   useEffect(() => { load() }, [load])
 
   const handleSave = async () => {
     setSaving(true)
     try {
-      const body = { ...form, quantity: parseFloat(form.quantity), min_stock: parseFloat(form.min_stock) }
+      const body = { ...form, farm_id: form.farm_id || null, quantity: parseFloat(form.quantity), min_stock: parseFloat(form.min_stock) }
       if (editing) await apiRequest(`/stock/items/${editing.id}`, { method: 'PUT', body })
       else await apiRequest('/stock/items', { method: 'POST', body })
       setDialogOpen(false); setEditing(null); await load()
@@ -73,20 +80,28 @@ export function Stock() {
   if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
 
   return (<div className="space-y-6">
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between flex-wrap gap-4">
       <div><h1 className="text-2xl font-bold text-primary">Estoque</h1><p className="text-sm text-muted-foreground">Insumos e produtos armazenados</p></div>
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
+        <Select value={farmFilter} onChange={(e) => setFarmFilter(e.target.value)} className="w-48">
+          <option value="">Todas as fazendas</option>
+          {farms.map((f) => (
+            <option key={f.id} value={f.id}>{f.name}</option>
+          ))}
+        </Select>
         <Button variant="outline" onClick={() => { setMovForm({ item_id: '', type: 'in', quantity: '', date: '', reference: '', notes: '' }); setMovDialogOpen(true) }}><ArrowUpDown className="h-4 w-4" /> Movimentar</Button>
-        <Button onClick={() => { setEditing(null); setForm({ product_id: '', quantity: '', unit: '', batch: '', expiry_date: '', min_stock: '', location: '', notes: '' }); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Novo Item</Button>
+        <Button onClick={() => { setEditing(null); setForm({ product_id: '', farm_id: '', quantity: '', unit: '', batch: '', expiry_date: '', min_stock: '', location: '', notes: '' }); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Novo Item</Button>
       </div>
     </div>
     <Table>
-      <TableHead><TableRow><TableHeader>Produto</TableHeader><TableHeader>Qtd</TableHeader><TableHeader>Un</TableHeader><TableHeader>Lote</TableHeader><TableHeader>Vencimento</TableHeader><TableHeader>Estoque Mín</TableHeader><TableHeader>Local</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
+      <TableHead><TableRow><TableHeader>Produto</TableHeader><TableHeader>Fazenda</TableHeader><TableHeader>Qtd</TableHeader><TableHeader>Un</TableHeader><TableHeader>Lote</TableHeader><TableHeader>Vencimento</TableHeader><TableHeader>Estoque Mín</TableHeader><TableHeader>Local</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
       <TableBody>{items.map((i) => {
         const prodName = i.product?.name || i.product_id
+        const farmName = farms.find(f => f.id === i.farm_id)?.name
         const lowStock = i.quantity <= i.min_stock
         return (<TableRow key={i.id}>
           <TableCell className="font-medium"><div className="flex items-center gap-2"><Package className="h-4 w-4 text-primary" />{prodName}</div></TableCell>
+          <TableCell className="text-muted-foreground text-sm">{farmName || '-'}</TableCell>
           <TableCell className={lowStock ? 'text-destructive font-medium' : ''}>{i.quantity}</TableCell>
           <TableCell>{i.unit}</TableCell>
           <TableCell className="text-muted-foreground text-sm">{i.batch || '-'}</TableCell>
@@ -94,12 +109,12 @@ export function Stock() {
           <TableCell>{i.min_stock}</TableCell>
           <TableCell className="text-sm">{i.location || '-'}</TableCell>
           <TableCell className="text-right"><div className="flex justify-end gap-1">
-            <Button variant="ghost" size="sm" onClick={() => { setEditing(i); setForm({ product_id: i.product_id, quantity: String(i.quantity), unit: i.unit, batch: i.batch, expiry_date: i.expiry_date || '', min_stock: String(i.min_stock), location: i.location, notes: i.notes }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="sm" onClick={() => { setEditing(i); setForm({ product_id: i.product_id, farm_id: i.farm_id || '', quantity: String(i.quantity), unit: i.unit, batch: i.batch, expiry_date: i.expiry_date || '', min_stock: String(i.min_stock), location: i.location, notes: i.notes }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
             <Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover item?')) apiRequest(`/stock/items/${i.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
           </div></TableCell>
         </TableRow>)
       })}
-      {items.length === 0 && <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">Nenhum item em estoque.</TableCell></TableRow>}
+      {items.length === 0 && <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">Nenhum item em estoque.</TableCell></TableRow>}
       </TableBody>
     </Table>
     <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Item' : 'Novo Item'}>
@@ -108,6 +123,11 @@ export function Stock() {
           <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.product_id} onChange={(e) => setForm({ ...form, product_id: e.target.value })}>
             <option value="">Selecione</option>{products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select></div>
+        <div><label className="block text-sm font-medium text-foreground mb-1">Fazenda</label>
+          <Select value={form.farm_id} onChange={(e) => setForm({ ...form, farm_id: e.target.value })}>
+            <option value="">Sem fazenda vinculada</option>
+            {farms.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
+          </Select></div>
         <div className="grid grid-cols-2 gap-3">
           <div><label className="block text-sm font-medium text-foreground mb-1">Quantidade</label><Input type="number" step="0.01" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} /></div>
           <div><label className="block text-sm font-medium text-foreground mb-1">Unidade</label><Input value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} placeholder="kg, l, un" /></div>

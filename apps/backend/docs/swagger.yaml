@@ -135,6 +135,8 @@ definitions:
         type: string
       due_date:
         type: string
+      farm_id:
+        type: string
       id:
         type: string
       notes:
@@ -332,6 +334,8 @@ definitions:
         type: string
       updated_at:
         type: string
+      user_id:
+        type: string
     type: object
   entity.ProductType:
     enum:
@@ -359,6 +363,8 @@ definitions:
       created_at:
         type: string
       expiry_date:
+        type: string
+      farm_id:
         type: string
       id:
         type: string
@@ -472,6 +478,8 @@ definitions:
       brand:
         type: string
       created_at:
+        type: string
+      farm_id:
         type: string
       id:
         type: string
@@ -964,6 +972,8 @@ definitions:
         type: string
       due_date:
         type: string
+      farm_id:
+        type: string
       notes:
         type: string
       type:
@@ -1090,6 +1100,8 @@ definitions:
         type: string
       expiry_date:
         type: string
+      farm_id:
+        type: string
       location:
         type: string
       min_stock:
@@ -1128,6 +1140,8 @@ definitions:
   handler.createVehicleRequest:
     properties:
       brand:
+        type: string
+      farm_id:
         type: string
       model:
         type: string
@@ -1754,6 +1768,14 @@ paths:
         name: organization_id
         required: true
         type: string
+      - description: Filtrar por ID da Fazenda
+        in: query
+        name: farm_id
+        type: string
+      - description: Filtrar por ID da Colheita
+        in: query
+        name: harvest_id
+        type: string
       produces:
       - application/json
       responses:
@@ -1971,6 +1993,10 @@ paths:
         name: organization_id
         required: true
         type: string
+      - description: Filtrar por ID da Fazenda
+        in: query
+        name: farm_id
+        type: string
       produces:
       - application/json
       responses:
@@ -2134,6 +2160,10 @@ paths:
         name: organization_id
         required: true
         type: string
+      - description: Filtrar por ID da Fazenda
+        in: query
+        name: farm_id
+        type: string
       produces:
       - application/json
       responses:
@@ -2255,6 +2285,10 @@ paths:
         in: path
         name: organization_id
         required: true
+        type: string
+      - description: Filtrar por ID da Fazenda
+        in: query
+        name: farm_id
         type: string
       produces:
       - application/json
@@ -2614,6 +2648,10 @@ paths:
         in: path
         name: id
         required: true
+        type: string
+      - description: Filtrar por ID da Fazenda
+        in: query
+        name: farm_id
         type: string
       produces:
       - application/json
@@ -3037,6 +3075,10 @@ paths:
         name: organization_id
         required: true
         type: string
+      - description: Filtrar por ID da Fazenda
+        in: query
+        name: farm_id
+        type: string
       produces:
       - application/json
       responses:
@@ -3164,6 +3206,10 @@ paths:
         in: query
         name: limit
         type: integer
+      - description: Filtrar por ID da Fazenda
+        in: query
+        name: farm_id
+        type: string
       produces:
       - application/json
       responses:
@@ -3192,6 +3238,10 @@ paths:
         in: path
         name: organization_id
         required: true
+        type: string
+      - description: Filtrar por ID da Fazenda
+        in: query
+        name: farm_id
         type: string
       produces:
       - application/json
@@ -3389,6 +3439,10 @@ paths:
         name: organization_id
         required: true
         type: string
+      - description: Filtrar por ID da Fazenda
+        in: query
+        name: farm_id
+        type: string
       produces:
       - application/json
       responses:
@@ -3550,6 +3604,10 @@ paths:
         in: path
         name: organization_id
         required: true
+        type: string
+      - description: Filtrar por ID da Fazenda
+        in: query
+        name: farm_id
         type: string
       produces:
       - application/json

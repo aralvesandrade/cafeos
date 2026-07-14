@@ -1079,6 +1079,18 @@ const docTemplate = `{
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Colheita",
+                        "name": "harvest_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1417,6 +1429,12 @@ const docTemplate = `{
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1668,6 +1686,12 @@ const docTemplate = `{
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1859,6 +1883,12 @@ const docTemplate = `{
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2416,6 +2446,12 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3071,6 +3107,12 @@ const docTemplate = `{
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3175,6 +3217,12 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Máximo de resultados (padrão 10)",
                         "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
                         "in": "query"
                     }
                 ],
@@ -3314,6 +3362,12 @@ const docTemplate = `{
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3618,6 +3672,12 @@ const docTemplate = `{
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3869,6 +3929,12 @@ const docTemplate = `{
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -4269,6 +4335,9 @@ const docTemplate = `{
                 "due_date": {
                     "type": "string"
                 },
+                "farm_id": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -4558,6 +4627,9 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
@@ -4597,6 +4669,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "expiry_date": {
+                    "type": "string"
+                },
+                "farm_id": {
                     "type": "string"
                 },
                 "id": {
@@ -4758,6 +4833,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "created_at": {
+                    "type": "string"
+                },
+                "farm_id": {
                     "type": "string"
                 },
                 "id": {
@@ -5500,6 +5578,9 @@ const docTemplate = `{
                 "due_date": {
                     "type": "string"
                 },
+                "farm_id": {
+                    "type": "string"
+                },
                 "notes": {
                     "type": "string"
                 },
@@ -5692,6 +5773,9 @@ const docTemplate = `{
                 "expiry_date": {
                     "type": "string"
                 },
+                "farm_id": {
+                    "type": "string"
+                },
                 "location": {
                     "type": "string"
                 },
@@ -5750,6 +5834,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "brand": {
+                    "type": "string"
+                },
+                "farm_id": {
                     "type": "string"
                 },
                 "model": {

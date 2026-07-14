@@ -6,6 +6,7 @@ type StockItem struct {
 	ID             string              `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	OrganizationID string              `json:"organization_id" gorm:"type:uuid;not null;index"`
 	ProductID      string              `json:"product_id" gorm:"type:uuid;not null;index"`
+	FarmID         *string             `json:"farm_id" gorm:"type:uuid;index"`
 	Quantity       float64             `json:"quantity" gorm:"type:numeric(12,2);default:0"`
 	Unit           string              `json:"unit" gorm:"default:''"`
 	Batch          string              `json:"batch" gorm:"default:''"`

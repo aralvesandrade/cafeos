@@ -74,6 +74,45 @@ func (s *FarmService) ListByOrganization(organizationID string) ([]*entity.Farm,
 	return s.repo.ListByOrganization(organizationID)
 }
 
+// ListByOwner returns only the farms whose linked producer is the given user
+// (used to scope the proprietario role to the farms it actually owns).
+func (s *FarmService) ListByOwner(organizationID, userID string) ([]*entity.Farm, error) {
+	farms, err := s.repo.ListByOrganization(organizationID)
+	if err != nil {
+		return nil, err
+	}
+	owned := make([]*entity.Farm, 0, len(farms))
+	for _, f := range farms {
+		if f.Producer != nil && f.Producer.UserID != nil && *f.Producer.UserID == userID {
+			owned = append(owned, f)
+		}
+	}
+	return owned, nil
+}
+
+// OwnedFarmIDs returns the set of farm IDs owned by the given user, for
+// cross-referencing plot/operation/financial/etc. records to that user's farms.
+func (s *FarmService) OwnedFarmIDs(organizationID, userID string) (map[string]bool, error) {
+	farms, err := s.ListByOwner(organizationID, userID)
+	if err != nil {
+		return nil, err
+	}
+	ids := make(map[string]bool, len(farms))
+	for _, f := range farms {
+		ids[f.ID] = true
+	}
+	return ids, nil
+}
+
+// IsOwner reports whether the given user is the producer linked to the farm.
+func (s *FarmService) IsOwner(farmID, userID string) bool {
+	producer, err := s.producerRepo.GetByFarmID(farmID)
+	if err != nil {
+		return false
+	}
+	return producer.UserID != nil && *producer.UserID == userID
+}
+
 func (s *FarmService) Update(farm *entity.Farm) error {
 	if err := validateFarm(farm); err != nil {
 		return err

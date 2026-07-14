@@ -72,13 +72,15 @@ func seed(db *gorm.DB) error {
 	users := []entity.User{
 		{OrganizationID: organization.ID, Name: "Administrador", Email: adminEmail, PasswordHash: hash(adminPass), Role: entity.RolePlatformOwner, IsActive: true},
 		{OrganizationID: organization.ID, Name: "João Silva", Email: "joao@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleProprietario, IsActive: true},
-		{OrganizationID: organization.ID, Name: "Maria Oliveira", Email: "maria@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleGerente, IsActive: true},
+		{OrganizationID: organization.ID, Name: "Maria Oliveira", Email: "maria@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleProprietario, IsActive: true},
 		{OrganizationID: organization.ID, Name: "Carlos Santos", Email: "carlos@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleEngenheiro, IsActive: true},
 		{OrganizationID: organization.ID, Name: "Ana Costa", Email: "ana@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleOperador, IsActive: true},
+		{OrganizationID: organization.ID, Name: "Fernanda Lima", Email: "fernanda@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleOrganizationAdmin, IsActive: true},
+		{OrganizationID: organization.ID, Name: "Rodrigo Alves", Email: "rodrigo@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleConsultor, IsActive: true},
 	}
-	for _, u := range users {
-		if err := db.Create(&u).Error; err != nil {
-			return fmt.Errorf("create user %s: %w", u.Email, err)
+	for i := range users {
+		if err := db.Create(&users[i]).Error; err != nil {
+			return fmt.Errorf("create user %s: %w", users[i].Email, err)
 		}
 	}
 	fmt.Printf("  ✓ Usuários: %d criados\n", len(users))
@@ -91,9 +93,9 @@ func seed(db *gorm.DB) error {
 		{OrganizationID: organization.ID, Name: "Óleo Mineral", Type: entity.ProdDefensivo, Unit: "l"},
 		{OrganizationID: organization.ID, Name: "Óleo Diesel", Type: entity.ProdCombustivel, Unit: "l"},
 	}
-	for _, p := range products {
-		if err := db.Create(&p).Error; err != nil {
-			return fmt.Errorf("create product %s: %w", p.Name, err)
+	for i := range products {
+		if err := db.Create(&products[i]).Error; err != nil {
+			return fmt.Errorf("create product %s: %w", products[i].Name, err)
 		}
 	}
 	fmt.Printf("  ✓ Produtos Agrícolas: %d criados\n", len(products))
@@ -110,6 +112,21 @@ func seed(db *gorm.DB) error {
 		}
 	}
 	fmt.Printf("  ✓ Fazendas: %d criadas\n", len(farms))
+
+	// Producers
+	joaoUserID := users[1].ID
+	mariaUserID := users[2].ID
+	producers := []entity.Producer{
+		{OrganizationID: organization.ID, FarmID: farms[0].ID, UserID: &joaoUserID, CPF: "123.456.789-00", Name: "João Silva", Phone: "(35) 99999-0001", Email: "joao@cafeos.com.br"},
+		{OrganizationID: organization.ID, FarmID: farms[1].ID, UserID: &joaoUserID, CPF: "123.456.789-00", Name: "João Silva", Phone: "(35) 99999-0001", Email: "joao@cafeos.com.br"},
+		{OrganizationID: organization.ID, FarmID: farms[2].ID, UserID: &mariaUserID, CPF: "987.654.321-00", Name: "Maria Oliveira", Phone: "(35) 99999-0002", Email: "maria@cafeos.com.br"},
+	}
+	for i := range producers {
+		if err := db.Create(&producers[i]).Error; err != nil {
+			return fmt.Errorf("create producer %s: %w", producers[i].Name, err)
+		}
+	}
+	fmt.Printf("  ✓ Produtores: %d criados\n", len(producers))
 
 	// Plots
 	plots := []entity.Plot{
@@ -213,6 +230,45 @@ func seed(db *gorm.DB) error {
 		}
 	}
 	fmt.Printf("  ✓ Indicadores: %d criados\n", len(indicators))
+
+	// Financial (one per farm, plus one org-wide with no farm link)
+	financials := []entity.FinancialTransaction{
+		{OrganizationID: organization.ID, FarmID: &farms[0].ID, Type: entity.TranDespesa, Description: "Adubação Recanto Verde", Amount: 4800, Date: now.AddDate(0, -3, 0), DueDate: now.AddDate(0, -3, 5), Status: "paid"},
+		{OrganizationID: organization.ID, FarmID: &farms[2].ID, Type: entity.TranReceita, Description: "Venda de café - Monte Alegre", Amount: 52000, Date: now.AddDate(0, -1, 0), DueDate: now.AddDate(0, -1, 0), Status: "paid"},
+		{OrganizationID: organization.ID, Type: entity.TranDespesa, Description: "Contabilidade (organização)", Amount: 1200, Date: now, DueDate: now.AddDate(0, 0, 10), Status: "pending"},
+	}
+	for i := range financials {
+		if err := db.Create(&financials[i]).Error; err != nil {
+			return fmt.Errorf("create financial transaction: %w", err)
+		}
+	}
+	fmt.Printf("  ✓ Transações Financeiras: %d criadas\n", len(financials))
+
+	// Stock (one item per farm, plus one org-wide with no farm link)
+	stockItems := []entity.StockItem{
+		{OrganizationID: organization.ID, FarmID: &farms[0].ID, ProductID: products[0].ID, Quantity: 500, Unit: "kg", Location: "Galpão Recanto Verde"},
+		{OrganizationID: organization.ID, FarmID: &farms[2].ID, ProductID: products[1].ID, Quantity: 300, Unit: "kg", Location: "Galpão Monte Alegre"},
+		{OrganizationID: organization.ID, ProductID: products[4].ID, Quantity: 1000, Unit: "l", Location: "Depósito Central"},
+	}
+	for i := range stockItems {
+		if err := db.Create(&stockItems[i]).Error; err != nil {
+			return fmt.Errorf("create stock item: %w", err)
+		}
+	}
+	fmt.Printf("  ✓ Itens de Estoque: %d criados\n", len(stockItems))
+
+	// Fleet (one vehicle per farm, plus one shared/org-wide with no farm link)
+	vehicles := []entity.Vehicle{
+		{OrganizationID: organization.ID, FarmID: &farms[0].ID, Name: "Trator Recanto Verde", Type: entity.VeicTractor, Plate: "ABC1D23", Brand: "Massey Ferguson", Model: "4275", Year: 2019, Status: "active"},
+		{OrganizationID: organization.ID, FarmID: &farms[2].ID, Name: "Trator Monte Alegre", Type: entity.VeicTractor, Plate: "XYZ9E87", Brand: "New Holland", Model: "TL75E", Year: 2021, Status: "active"},
+		{OrganizationID: organization.ID, Name: "Caminhão da Cooperativa", Type: entity.VeicCaminhao, Plate: "QAZ2W34", Brand: "Volkswagen", Model: "Delivery", Year: 2018, Status: "active"},
+	}
+	for i := range vehicles {
+		if err := db.Create(&vehicles[i]).Error; err != nil {
+			return fmt.Errorf("create vehicle %s: %w", vehicles[i].Name, err)
+		}
+	}
+	fmt.Printf("  ✓ Veículos: %d criados\n", len(vehicles))
 
 	return nil
 }

@@ -7,11 +7,11 @@ import { useAuth } from '@/lib/auth'
 import { apiRequest } from '@/lib/api'
 
 const profiles = [
-  { label: 'Administrador', email: 'admin@cafeos.com.br', password: 'admin123', role: 'platform_owner' },
-  { label: 'Proprietário', email: 'joao@cafeos.com.br', password: '123456', role: 'proprietario' },
-  { label: 'Gerente Agrícola', email: 'maria@cafeos.com.br', password: '123456', role: 'gerente_agricola' },
-  { label: 'Eng. Agrônomo', email: 'carlos@cafeos.com.br', password: '123456', role: 'engenheiro_agronomo' },
-  { label: 'Operador Campo', email: 'ana@cafeos.com.br', password: '123456', role: 'operador_campo' },
+  { label: 'Admin Plataforma', email: 'admin@cafeos.com.br', password: 'admin123', role: 'platform_owner' },
+  { label: 'Admin Organização', email: 'fernanda@cafeos.com.br', password: '123456', role: 'organization_admin' },
+  { label: 'Consultor', email: 'rodrigo@cafeos.com.br', password: '123456', role: 'consultor_externo' },
+  { label: 'Proprietário (2 fazendas)', email: 'joao@cafeos.com.br', password: '123456', role: 'proprietario' },
+  { label: 'Proprietário (1 fazenda)', email: 'maria@cafeos.com.br', password: '123456', role: 'proprietario' },
 ]
 
 export function Login() {

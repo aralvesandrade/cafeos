@@ -1076,6 +1076,18 @@
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Colheita",
+                        "name": "harvest_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1414,6 +1426,12 @@
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1665,6 +1683,12 @@
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1856,6 +1880,12 @@
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2413,6 +2443,12 @@
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3068,6 +3104,12 @@
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3172,6 +3214,12 @@
                         "type": "integer",
                         "description": "Máximo de resultados (padrão 10)",
                         "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
                         "in": "query"
                     }
                 ],
@@ -3311,6 +3359,12 @@
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3615,6 +3669,12 @@
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3866,6 +3926,12 @@
                         "name": "organization_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ID da Fazenda",
+                        "name": "farm_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -4266,6 +4332,9 @@
                 "due_date": {
                     "type": "string"
                 },
+                "farm_id": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -4555,6 +4624,9 @@
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
@@ -4594,6 +4666,9 @@
                     "type": "string"
                 },
                 "expiry_date": {
+                    "type": "string"
+                },
+                "farm_id": {
                     "type": "string"
                 },
                 "id": {
@@ -4755,6 +4830,9 @@
                     "type": "string"
                 },
                 "created_at": {
+                    "type": "string"
+                },
+                "farm_id": {
                     "type": "string"
                 },
                 "id": {
@@ -5497,6 +5575,9 @@
                 "due_date": {
                     "type": "string"
                 },
+                "farm_id": {
+                    "type": "string"
+                },
                 "notes": {
                     "type": "string"
                 },
@@ -5689,6 +5770,9 @@
                 "expiry_date": {
                     "type": "string"
                 },
+                "farm_id": {
+                    "type": "string"
+                },
                 "location": {
                     "type": "string"
                 },
@@ -5747,6 +5831,9 @@
             "type": "object",
             "properties": {
                 "brand": {
+                    "type": "string"
+                },
+                "farm_id": {
                     "type": "string"
                 },
                 "model": {

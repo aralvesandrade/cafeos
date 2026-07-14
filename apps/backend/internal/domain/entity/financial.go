@@ -14,6 +14,7 @@ type FinancialTransaction struct {
 	OrganizationID string          `json:"organization_id" gorm:"type:uuid;not null;index"`
 	Type           TransactionType `json:"type" gorm:"not null"`
 	CostCenterID   *string         `json:"cost_center_id" gorm:"type:uuid;index"`
+	FarmID         *string         `json:"farm_id" gorm:"type:uuid;index"`
 	Description    string          `json:"description" gorm:"not null"`
 	Amount         float64         `json:"amount" gorm:"type:numeric(12,2);not null"`
 	Date           time.Time       `json:"date" gorm:"not null;index"`

@@ -11,20 +11,39 @@ import (
 )
 
 type FleetHandler struct {
-	svc *service.FleetService
+	svc     *service.FleetService
+	farmSvc *service.FarmService
 }
 
-func NewFleetHandler(svc *service.FleetService) *FleetHandler {
-	return &FleetHandler{svc: svc}
+func NewFleetHandler(svc *service.FleetService, farmSvc *service.FarmService) *FleetHandler {
+	return &FleetHandler{svc: svc, farmSvc: farmSvc}
 }
 
 type createVehicleRequest struct {
-	Name  string `json:"name"`
-	Type  string `json:"type"`
-	Plate string `json:"plate"`
-	Brand string `json:"brand"`
-	Model string `json:"model"`
-	Year  int    `json:"year"`
+	Name   string  `json:"name"`
+	FarmID *string `json:"farm_id"`
+	Type   string  `json:"type"`
+	Plate  string  `json:"plate"`
+	Brand  string  `json:"brand"`
+	Model  string  `json:"model"`
+	Year   int     `json:"year"`
+}
+
+// canAccessVehicle: proprietario may only see/edit vehicles linked to farms
+// it owns, or vehicles with no farm link (shared/organization-wide equipment).
+func (h *FleetHandler) canAccessVehicle(r *http.Request, organizationID string, v *entity.Vehicle) bool {
+	if v.FarmID == nil {
+		return true
+	}
+	userID, restricted := restrictedOwnerID(r)
+	if !restricted {
+		return true
+	}
+	owned, err := h.farmSvc.OwnedFarmIDs(organizationID, userID)
+	if err != nil {
+		return false
+	}
+	return owned[*v.FarmID]
 }
 
 // CreateVehicle registra um novo veículo para a organização autenticada
@@ -46,7 +65,7 @@ func (h *FleetHandler) CreateVehicle(w http.ResponseWriter, r *http.Request) {
 		writeError(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
-	v, err := h.svc.CreateVehicle(organizationID, req.Name, req.Type, req.Plate, req.Brand, req.Model, req.Year)
+	v, err := h.svc.CreateVehicle(organizationID, req.Name, req.Type, req.Plate, req.Brand, req.Model, req.FarmID, req.Year)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -60,6 +79,7 @@ func (h *FleetHandler) CreateVehicle(w http.ResponseWriter, r *http.Request) {
 // @Tags fleet (Frota)
 // @Produce json
 // @Param organization_id path string true "ID da Organização"
+// @Param farm_id query string false "Filtrar por ID da Fazenda"
 // @Success 200 {array} entity.Vehicle
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -71,6 +91,32 @@ func (h *FleetHandler) ListVehicles(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if userID, restricted := restrictedOwnerID(r); restricted {
+		owned, err := h.farmSvc.OwnedFarmIDs(organizationID, userID)
+		if err != nil {
+			writeError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		filtered := vehicles[:0]
+		for _, v := range vehicles {
+			if v.FarmID == nil || owned[*v.FarmID] {
+				filtered = append(filtered, v)
+			}
+		}
+		vehicles = filtered
+	}
+
+	if farmID := r.URL.Query().Get("farm_id"); farmID != "" {
+		filtered := vehicles[:0]
+		for _, v := range vehicles {
+			if v.FarmID != nil && *v.FarmID == farmID {
+				filtered = append(filtered, v)
+			}
+		}
+		vehicles = filtered
+	}
+
 	writeJSON(w, vehicles, http.StatusOK)
 }
 
@@ -86,9 +132,14 @@ func (h *FleetHandler) ListVehicles(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/fleet/vehicles/{id} [get]
 func (h *FleetHandler) GetVehicleByID(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
 	v, err := h.svc.GetVehicleByID(id)
 	if err != nil {
+		writeError(w, "vehicle not found", http.StatusNotFound)
+		return
+	}
+	if !h.canAccessVehicle(r, organizationID, v) {
 		writeError(w, "vehicle not found", http.StatusNotFound)
 		return
 	}
@@ -109,14 +160,20 @@ func (h *FleetHandler) GetVehicleByID(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/fleet/vehicles/{id} [put]
 func (h *FleetHandler) UpdateVehicle(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
 	existing, err := h.svc.GetVehicleByID(id)
 	if err != nil {
 		writeError(w, "vehicle not found", http.StatusNotFound)
 		return
 	}
+	if !h.canAccessVehicle(r, organizationID, existing) {
+		writeError(w, "vehicle not found", http.StatusNotFound)
+		return
+	}
 	var req struct {
 		Name   *string `json:"name"`
+		FarmID *string `json:"farm_id"`
 		Type   *string `json:"type"`
 		Plate  *string `json:"plate"`
 		Brand  *string `json:"brand"`
@@ -130,6 +187,9 @@ func (h *FleetHandler) UpdateVehicle(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.Name != nil {
 		existing.Name = *req.Name
+	}
+	if req.FarmID != nil {
+		existing.FarmID = req.FarmID
 	}
 	if req.Type != nil {
 		existing.Type = entity.VehicleType(*req.Type)
@@ -167,7 +227,17 @@ func (h *FleetHandler) UpdateVehicle(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/fleet/vehicles/{id} [delete]
 func (h *FleetHandler) DeleteVehicle(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
+	existing, err := h.svc.GetVehicleByID(id)
+	if err != nil {
+		writeError(w, "vehicle not found", http.StatusNotFound)
+		return
+	}
+	if !h.canAccessVehicle(r, organizationID, existing) {
+		writeError(w, "vehicle not found", http.StatusNotFound)
+		return
+	}
 	if err := h.svc.DeleteVehicle(id); err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -219,6 +289,7 @@ func (h *FleetHandler) CreateMaintenance(w http.ResponseWriter, r *http.Request)
 // @Tags fleet (Frota)
 // @Produce json
 // @Param organization_id path string true "ID da Organização"
+// @Param farm_id query string false "Filtrar por ID da Fazenda"
 // @Success 200 {array} entity.Maintenance
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -230,6 +301,48 @@ func (h *FleetHandler) ListMaintenance(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	userID, restricted := restrictedOwnerID(r)
+	farmID := r.URL.Query().Get("farm_id")
+	if restricted || farmID != "" {
+		vehicles, err := h.svc.ListVehicles(organizationID)
+		if err != nil {
+			writeError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		vehicleFarm := make(map[string]*string, len(vehicles))
+		for _, v := range vehicles {
+			vehicleFarm[v.ID] = v.FarmID
+		}
+
+		if restricted {
+			owned, err := h.farmSvc.OwnedFarmIDs(organizationID, userID)
+			if err != nil {
+				writeError(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			filtered := items[:0]
+			for _, m := range items {
+				fid := vehicleFarm[m.VehicleID]
+				if fid == nil || owned[*fid] {
+					filtered = append(filtered, m)
+				}
+			}
+			items = filtered
+		}
+
+		if farmID != "" {
+			filtered := items[:0]
+			for _, m := range items {
+				fid := vehicleFarm[m.VehicleID]
+				if fid != nil && *fid == farmID {
+					filtered = append(filtered, m)
+				}
+			}
+			items = filtered
+		}
+	}
+
 	writeJSON(w, items, http.StatusOK)
 }
 
@@ -245,13 +358,27 @@ func (h *FleetHandler) ListMaintenance(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/fleet/maintenance/{id} [get]
 func (h *FleetHandler) GetMaintenanceByID(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
 	m, err := h.svc.GetMaintenanceByID(id)
 	if err != nil {
 		writeError(w, "maintenance not found", http.StatusNotFound)
 		return
 	}
+	if !h.canAccessMaintenance(r, organizationID, m) {
+		writeError(w, "maintenance not found", http.StatusNotFound)
+		return
+	}
 	writeJSON(w, m, http.StatusOK)
+}
+
+// canAccessMaintenance resolves the maintenance's vehicle to check farm ownership.
+func (h *FleetHandler) canAccessMaintenance(r *http.Request, organizationID string, m *entity.Maintenance) bool {
+	v, err := h.svc.GetVehicleByID(m.VehicleID)
+	if err != nil {
+		return false
+	}
+	return h.canAccessVehicle(r, organizationID, v)
 }
 
 // DeleteMaintenance remove um registro de manutenção pelo seu ID
@@ -265,7 +392,17 @@ func (h *FleetHandler) GetMaintenanceByID(w http.ResponseWriter, r *http.Request
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/fleet/maintenance/{id} [delete]
 func (h *FleetHandler) DeleteMaintenance(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
+	m, err := h.svc.GetMaintenanceByID(id)
+	if err != nil {
+		writeError(w, "maintenance not found", http.StatusNotFound)
+		return
+	}
+	if !h.canAccessMaintenance(r, organizationID, m) {
+		writeError(w, "maintenance not found", http.StatusNotFound)
+		return
+	}
 	if err := h.svc.DeleteMaintenance(id); err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -6,19 +6,22 @@ import (
 	"time"
 
 	"github.com/aralvesandrade/cafeos/internal/api/middleware"
+	"github.com/aralvesandrade/cafeos/internal/domain/entity"
 	"github.com/aralvesandrade/cafeos/internal/domain/service"
 )
 
 type StockHandler struct {
-	svc *service.StockService
+	svc     *service.StockService
+	farmSvc *service.FarmService
 }
 
-func NewStockHandler(svc *service.StockService) *StockHandler {
-	return &StockHandler{svc: svc}
+func NewStockHandler(svc *service.StockService, farmSvc *service.FarmService) *StockHandler {
+	return &StockHandler{svc: svc, farmSvc: farmSvc}
 }
 
 type createStockItemRequest struct {
 	ProductID  string  `json:"product_id"`
+	FarmID     *string `json:"farm_id"`
 	Quantity   float64 `json:"quantity"`
 	Unit       string  `json:"unit"`
 	Batch      string  `json:"batch"`
@@ -26,6 +29,23 @@ type createStockItemRequest struct {
 	MinStock   float64 `json:"min_stock"`
 	Location   string  `json:"location"`
 	Notes      string  `json:"notes"`
+}
+
+// canAccessStockItem mirrors FinancialHandler.canAccessFinancial: proprietario
+// may only see/edit items linked to farms it owns, or items with no farm link.
+func (h *StockHandler) canAccessStockItem(r *http.Request, organizationID string, item *entity.StockItem) bool {
+	if item.FarmID == nil {
+		return true
+	}
+	userID, restricted := restrictedOwnerID(r)
+	if !restricted {
+		return true
+	}
+	owned, err := h.farmSvc.OwnedFarmIDs(organizationID, userID)
+	if err != nil {
+		return false
+	}
+	return owned[*item.FarmID]
 }
 
 // CreateItem registra um novo item de estoque para a organização autenticada
@@ -54,7 +74,7 @@ func (h *StockHandler) CreateItem(w http.ResponseWriter, r *http.Request) {
 			expiry = &t
 		}
 	}
-	item, err := h.svc.CreateItem(organizationID, req.ProductID, req.Unit, req.Batch, req.Location, req.Notes, req.Quantity, req.MinStock, expiry)
+	item, err := h.svc.CreateItem(organizationID, req.ProductID, req.Unit, req.Batch, req.Location, req.Notes, req.FarmID, req.Quantity, req.MinStock, expiry)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -68,6 +88,7 @@ func (h *StockHandler) CreateItem(w http.ResponseWriter, r *http.Request) {
 // @Tags stock (Estoque)
 // @Produce json
 // @Param organization_id path string true "ID da Organização"
+// @Param farm_id query string false "Filtrar por ID da Fazenda"
 // @Success 200 {array} entity.StockItem
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -79,6 +100,32 @@ func (h *StockHandler) ListItems(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if userID, restricted := restrictedOwnerID(r); restricted {
+		owned, err := h.farmSvc.OwnedFarmIDs(organizationID, userID)
+		if err != nil {
+			writeError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		filtered := items[:0]
+		for _, it := range items {
+			if it.FarmID == nil || owned[*it.FarmID] {
+				filtered = append(filtered, it)
+			}
+		}
+		items = filtered
+	}
+
+	if farmID := r.URL.Query().Get("farm_id"); farmID != "" {
+		filtered := items[:0]
+		for _, it := range items {
+			if it.FarmID != nil && *it.FarmID == farmID {
+				filtered = append(filtered, it)
+			}
+		}
+		items = filtered
+	}
+
 	writeJSON(w, items, http.StatusOK)
 }
 
@@ -94,9 +141,14 @@ func (h *StockHandler) ListItems(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/stock/items/{id} [get]
 func (h *StockHandler) GetItemByID(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
 	item, err := h.svc.GetItemByID(id)
 	if err != nil {
+		writeError(w, "item not found", http.StatusNotFound)
+		return
+	}
+	if !h.canAccessStockItem(r, organizationID, item) {
 		writeError(w, "item not found", http.StatusNotFound)
 		return
 	}
@@ -117,9 +169,14 @@ func (h *StockHandler) GetItemByID(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/stock/items/{id} [put]
 func (h *StockHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
 	existing, err := h.svc.GetItemByID(id)
 	if err != nil {
+		writeError(w, "item not found", http.StatusNotFound)
+		return
+	}
+	if !h.canAccessStockItem(r, organizationID, existing) {
 		writeError(w, "item not found", http.StatusNotFound)
 		return
 	}
@@ -127,6 +184,7 @@ func (h *StockHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 		Quantity *float64 `json:"quantity"`
 		Location *string  `json:"location"`
 		MinStock *float64 `json:"min_stock"`
+		FarmID   *string  `json:"farm_id"`
 		Notes    *string  `json:"notes"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -135,6 +193,9 @@ func (h *StockHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.Quantity != nil {
 		existing.Quantity = *req.Quantity
+	}
+	if req.FarmID != nil {
+		existing.FarmID = req.FarmID
 	}
 	if req.Location != nil {
 		existing.Location = *req.Location
@@ -163,7 +224,17 @@ func (h *StockHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/stock/items/{id} [delete]
 func (h *StockHandler) DeleteItem(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
+	existing, err := h.svc.GetItemByID(id)
+	if err != nil {
+		writeError(w, "item not found", http.StatusNotFound)
+		return
+	}
+	if !h.canAccessStockItem(r, organizationID, existing) {
+		writeError(w, "item not found", http.StatusNotFound)
+		return
+	}
 	if err := h.svc.DeleteItem(id); err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -214,6 +285,7 @@ func (h *StockHandler) RecordMovement(w http.ResponseWriter, r *http.Request) {
 // @Tags stock (Estoque)
 // @Produce json
 // @Param organization_id path string true "ID da Organização"
+// @Param farm_id query string false "Filtrar por ID da Fazenda"
 // @Success 200 {array} entity.StockMovement
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -225,5 +297,47 @@ func (h *StockHandler) ListMovements(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	userID, restricted := restrictedOwnerID(r)
+	farmID := r.URL.Query().Get("farm_id")
+	if restricted || farmID != "" {
+		items, err := h.svc.ListItems(organizationID)
+		if err != nil {
+			writeError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		itemFarm := make(map[string]*string, len(items))
+		for _, it := range items {
+			itemFarm[it.ID] = it.FarmID
+		}
+
+		if restricted {
+			owned, err := h.farmSvc.OwnedFarmIDs(organizationID, userID)
+			if err != nil {
+				writeError(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			filtered := movs[:0]
+			for _, m := range movs {
+				fid := itemFarm[m.ItemID]
+				if fid == nil || owned[*fid] {
+					filtered = append(filtered, m)
+				}
+			}
+			movs = filtered
+		}
+
+		if farmID != "" {
+			filtered := movs[:0]
+			for _, m := range movs {
+				fid := itemFarm[m.ItemID]
+				if fid != nil && *fid == farmID {
+					filtered = append(filtered, m)
+				}
+			}
+			movs = filtered
+		}
+	}
+
 	writeJSON(w, movs, http.StatusOK)
 }

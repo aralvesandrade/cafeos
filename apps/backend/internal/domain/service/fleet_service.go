@@ -18,7 +18,7 @@ func NewFleetService(vehRepo repository.VehicleRepository, maintRepo repository.
 	return &FleetService{vehRepo: vehRepo, maintRepo: maintRepo}
 }
 
-func (s *FleetService) CreateVehicle(organizationID, name, vehType, plate, brand, model string, year int) (*entity.Vehicle, error) {
+func (s *FleetService) CreateVehicle(organizationID, name, vehType, plate, brand, model string, farmID *string, year int) (*entity.Vehicle, error) {
 	if name == "" {
 		return nil, errors.New("vehicle name is required")
 	}
@@ -26,6 +26,7 @@ func (s *FleetService) CreateVehicle(organizationID, name, vehType, plate, brand
 		ID:             uuid.New().String(),
 		OrganizationID: organizationID,
 		Name:           name,
+		FarmID:         farmID,
 		Type:           entity.VehicleType(vehType),
 		Plate:          plate,
 		Brand:          brand,

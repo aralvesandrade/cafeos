@@ -11,21 +11,41 @@ import (
 )
 
 type FinancialHandler struct {
-	svc *service.FinancialService
+	svc     *service.FinancialService
+	farmSvc *service.FarmService
 }
 
-func NewFinancialHandler(svc *service.FinancialService) *FinancialHandler {
-	return &FinancialHandler{svc: svc}
+func NewFinancialHandler(svc *service.FinancialService, farmSvc *service.FarmService) *FinancialHandler {
+	return &FinancialHandler{svc: svc, farmSvc: farmSvc}
 }
 
 type createFinancialRequest struct {
 	Type         string  `json:"type"`
 	CostCenterID *string `json:"cost_center_id"`
+	FarmID       *string `json:"farm_id"`
 	Description  string  `json:"description"`
 	Amount       float64 `json:"amount"`
 	Date         string  `json:"date"`
 	DueDate      string  `json:"due_date"`
 	Notes        string  `json:"notes"`
+}
+
+// canAccessFinancial reports whether the request may access a transaction:
+// proprietario may only see/edit transactions linked to farms it owns, or
+// transactions with no farm link at all (not attributable to anyone).
+func (h *FinancialHandler) canAccessFinancial(r *http.Request, organizationID string, tx *entity.FinancialTransaction) bool {
+	if tx.FarmID == nil {
+		return true
+	}
+	userID, restricted := restrictedOwnerID(r)
+	if !restricted {
+		return true
+	}
+	owned, err := h.farmSvc.OwnedFarmIDs(organizationID, userID)
+	if err != nil {
+		return false
+	}
+	return owned[*tx.FarmID]
 }
 
 // Create registra uma nova transação financeira para a organização autenticada
@@ -49,7 +69,7 @@ func (h *FinancialHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	date, _ := time.Parse("2006-01-02", req.Date)
 	dueDate, _ := time.Parse("2006-01-02", req.DueDate)
-	tx, err := h.svc.Create(organizationID, req.Type, req.CostCenterID, req.Description, req.Amount, date, dueDate, req.Notes)
+	tx, err := h.svc.Create(organizationID, req.Type, req.CostCenterID, req.FarmID, req.Description, req.Amount, date, dueDate, req.Notes)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -63,6 +83,7 @@ func (h *FinancialHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Tags financial (Financeiro)
 // @Produce json
 // @Param organization_id path string true "ID da Organização"
+// @Param farm_id query string false "Filtrar por ID da Fazenda"
 // @Success 200 {array} entity.FinancialTransaction
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -74,6 +95,32 @@ func (h *FinancialHandler) List(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if userID, restricted := restrictedOwnerID(r); restricted {
+		owned, err := h.farmSvc.OwnedFarmIDs(organizationID, userID)
+		if err != nil {
+			writeError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		filtered := txs[:0]
+		for _, tx := range txs {
+			if tx.FarmID == nil || owned[*tx.FarmID] {
+				filtered = append(filtered, tx)
+			}
+		}
+		txs = filtered
+	}
+
+	if farmID := r.URL.Query().Get("farm_id"); farmID != "" {
+		filtered := txs[:0]
+		for _, tx := range txs {
+			if tx.FarmID != nil && *tx.FarmID == farmID {
+				filtered = append(filtered, tx)
+			}
+		}
+		txs = filtered
+	}
+
 	writeJSON(w, txs, http.StatusOK)
 }
 
@@ -89,9 +136,14 @@ func (h *FinancialHandler) List(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/financial/{id} [get]
 func (h *FinancialHandler) GetByID(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
 	tx, err := h.svc.GetByID(id)
 	if err != nil {
+		writeError(w, "transaction not found", http.StatusNotFound)
+		return
+	}
+	if !h.canAccessFinancial(r, organizationID, tx) {
 		writeError(w, "transaction not found", http.StatusNotFound)
 		return
 	}
@@ -112,15 +164,21 @@ func (h *FinancialHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/financial/{id} [put]
 func (h *FinancialHandler) Update(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
 	existing, err := h.svc.GetByID(id)
 	if err != nil {
 		writeError(w, "transaction not found", http.StatusNotFound)
 		return
 	}
+	if !h.canAccessFinancial(r, organizationID, existing) {
+		writeError(w, "transaction not found", http.StatusNotFound)
+		return
+	}
 	var req struct {
 		Type         *string  `json:"type"`
 		CostCenterID *string  `json:"cost_center_id"`
+		FarmID       *string  `json:"farm_id"`
 		Description  *string  `json:"description"`
 		Amount       *float64 `json:"amount"`
 		Status       *string  `json:"status"`
@@ -135,6 +193,9 @@ func (h *FinancialHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.CostCenterID != nil {
 		existing.CostCenterID = req.CostCenterID
+	}
+	if req.FarmID != nil {
+		existing.FarmID = req.FarmID
 	}
 	if req.Description != nil {
 		existing.Description = *req.Description
@@ -166,7 +227,17 @@ func (h *FinancialHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/financial/{id} [delete]
 func (h *FinancialHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
+	existing, err := h.svc.GetByID(id)
+	if err != nil {
+		writeError(w, "transaction not found", http.StatusNotFound)
+		return
+	}
+	if !h.canAccessFinancial(r, organizationID, existing) {
+		writeError(w, "transaction not found", http.StatusNotFound)
+		return
+	}
 	if err := h.svc.Delete(id); err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return

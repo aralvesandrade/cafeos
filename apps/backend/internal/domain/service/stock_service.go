@@ -18,7 +18,7 @@ func NewStockService(itemRepo repository.StockItemRepository, movRepo repository
 	return &StockService{itemRepo: itemRepo, movRepo: movRepo}
 }
 
-func (s *StockService) CreateItem(organizationID, productID, unit, batch, location, notes string, quantity, minStock float64, expiryDate *time.Time) (*entity.StockItem, error) {
+func (s *StockService) CreateItem(organizationID, productID, unit, batch, location, notes string, farmID *string, quantity, minStock float64, expiryDate *time.Time) (*entity.StockItem, error) {
 	if productID == "" {
 		return nil, errors.New("product is required")
 	}
@@ -26,6 +26,7 @@ func (s *StockService) CreateItem(organizationID, productID, unit, batch, locati
 		ID:             uuid.New().String(),
 		OrganizationID: organizationID,
 		ProductID:      productID,
+		FarmID:         farmID,
 		Quantity:       quantity,
 		Unit:           unit,
 		Batch:          batch,

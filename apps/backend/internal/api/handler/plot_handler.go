@@ -11,11 +11,26 @@ import (
 )
 
 type PlotHandler struct {
-	svc *service.PlotService
+	svc     *service.PlotService
+	farmSvc *service.FarmService
 }
 
-func NewPlotHandler(svc *service.PlotService) *PlotHandler {
-	return &PlotHandler{svc: svc}
+func NewPlotHandler(svc *service.PlotService, farmSvc *service.FarmService) *PlotHandler {
+	return &PlotHandler{svc: svc, farmSvc: farmSvc}
+}
+
+// canAccessPlot mirrors FarmHandler.canAccessFarm: proprietario is restricted
+// to plots on farms it owns, every other role sees all plots in its organization.
+func (h *PlotHandler) canAccessPlot(r *http.Request, organizationID string, plot *entity.Plot) bool {
+	userID, restricted := restrictedOwnerID(r)
+	if !restricted {
+		return true
+	}
+	owned, err := h.farmSvc.OwnedFarmIDs(organizationID, userID)
+	if err != nil {
+		return false
+	}
+	return owned[plot.FarmID]
 }
 
 func parseDateField(s *string) (*time.Time, error) {
@@ -159,9 +174,14 @@ func (h *PlotHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/plots/{id} [get]
 func (h *PlotHandler) GetByID(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
 	plot, err := h.svc.GetByID(id)
 	if err != nil {
+		writeError(w, "plot not found", http.StatusNotFound)
+		return
+	}
+	if !h.canAccessPlot(r, organizationID, plot) {
 		writeError(w, "plot not found", http.StatusNotFound)
 		return
 	}
@@ -198,6 +218,7 @@ func (h *PlotHandler) ListByFarm(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} SwaggerPlot
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
+// @Param farm_id query string false "Filtrar por ID da Fazenda"
 // @Router /api/v1/{organization_id}/plots [get]
 func (h *PlotHandler) List(w http.ResponseWriter, r *http.Request) {
 	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
@@ -206,6 +227,32 @@ func (h *PlotHandler) List(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if userID, restricted := restrictedOwnerID(r); restricted {
+		owned, err := h.farmSvc.OwnedFarmIDs(organizationID, userID)
+		if err != nil {
+			writeError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		filtered := plots[:0]
+		for _, p := range plots {
+			if owned[p.FarmID] {
+				filtered = append(filtered, p)
+			}
+		}
+		plots = filtered
+	}
+
+	if farmID := r.URL.Query().Get("farm_id"); farmID != "" {
+		filtered := plots[:0]
+		for _, p := range plots {
+			if p.FarmID == farmID {
+				filtered = append(filtered, p)
+			}
+		}
+		plots = filtered
+	}
+
 	writeJSON(w, plots, http.StatusOK)
 }
 
@@ -223,10 +270,15 @@ func (h *PlotHandler) List(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/plots/{id} [put]
 func (h *PlotHandler) Update(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
 
 	existing, err := h.svc.GetByID(id)
 	if err != nil {
+		writeError(w, "plot not found", http.StatusNotFound)
+		return
+	}
+	if !h.canAccessPlot(r, organizationID, existing) {
 		writeError(w, "plot not found", http.StatusNotFound)
 		return
 	}
@@ -386,7 +438,17 @@ func (h *PlotHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/plots/{id} [delete]
 func (h *PlotHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
+	existing, err := h.svc.GetByID(id)
+	if err != nil {
+		writeError(w, "plot not found", http.StatusNotFound)
+		return
+	}
+	if !h.canAccessPlot(r, organizationID, existing) {
+		writeError(w, "plot not found", http.StatusNotFound)
+		return
+	}
 	if err := h.svc.Delete(id); err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return

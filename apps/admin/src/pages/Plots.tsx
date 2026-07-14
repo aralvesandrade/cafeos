@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { Select } from '@/components/ui/select'
 import { PlotForm, type PlotData } from '@/components/plots/PlotForm'
 import { Plus, Pencil, Trash2, ExternalLink } from 'lucide-react'
 
@@ -109,6 +110,7 @@ function formDataToPayload(form: PlotData) {
 export function Plots() {
   const [plots, setPlots] = useState<Plot[]>([])
   const [farms, setFarms] = useState<Farm[]>([])
+  const [farmFilter, setFarmFilter] = useState('')
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<Plot | null>(null)
@@ -117,7 +119,7 @@ export function Plots() {
   const loadData = useCallback(async () => {
     try {
       const [plotsData, farmsData] = await Promise.all([
-        apiRequest<Plot[]>('/plots'),
+        apiRequest<Plot[]>('/plots', { params: farmFilter ? { farm_id: farmFilter } : undefined }),
         apiRequest<Farm[]>('/farms'),
       ])
       setPlots(plotsData)
@@ -127,7 +129,7 @@ export function Plots() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [farmFilter])
 
   useEffect(() => { loadData() }, [loadData])
 
@@ -174,12 +176,20 @@ export function Plots() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-primary">Talhões</h1>
           <p className="text-sm text-muted-foreground">Gerencie os talhões das suas fazendas</p>
         </div>
-        <Button onClick={openCreate}><Plus className="h-4 w-4" /> Novo Talhão</Button>
+        <div className="flex gap-3">
+          <Select value={farmFilter} onChange={(e) => setFarmFilter(e.target.value)} className="w-48">
+            <option value="">Todas as fazendas</option>
+            {farms.map((f) => (
+              <option key={f.id} value={f.id}>{f.name}</option>
+            ))}
+          </Select>
+          <Button onClick={openCreate}><Plus className="h-4 w-4" /> Novo Talhão</Button>
+        </div>
       </div>
 
       <Table>

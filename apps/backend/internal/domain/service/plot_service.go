@@ -65,6 +65,36 @@ func (s *PlotService) ListByOrganization(organizationID string) ([]*entity.Plot,
 	return s.repo.ListByOrganization(organizationID)
 }
 
+// PlotIDsForFarm returns the set of plot IDs belonging to a single farm.
+func (s *PlotService) PlotIDsForFarm(organizationID, farmID string) (map[string]bool, error) {
+	plots, err := s.repo.ListByOrganization(organizationID)
+	if err != nil {
+		return nil, err
+	}
+	ids := make(map[string]bool)
+	for _, p := range plots {
+		if p.FarmID == farmID {
+			ids[p.ID] = true
+		}
+	}
+	return ids, nil
+}
+
+// PlotIDsForFarms returns the set of plot IDs belonging to any of the given farms.
+func (s *PlotService) PlotIDsForFarms(organizationID string, farmIDs map[string]bool) (map[string]bool, error) {
+	plots, err := s.repo.ListByOrganization(organizationID)
+	if err != nil {
+		return nil, err
+	}
+	ids := make(map[string]bool)
+	for _, p := range plots {
+		if farmIDs[p.FarmID] {
+			ids[p.ID] = true
+		}
+	}
+	return ids, nil
+}
+
 func (s *PlotService) Update(plot *entity.Plot) error {
 	if err := validatePlot(plot); err != nil {
 		return err

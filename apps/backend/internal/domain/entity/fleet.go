@@ -16,6 +16,7 @@ type Vehicle struct {
 	ID             string       `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	OrganizationID string       `json:"organization_id" gorm:"type:uuid;not null;index"`
 	Name           string       `json:"name" gorm:"not null"`
+	FarmID         *string      `json:"farm_id" gorm:"type:uuid;index"`
 	Type           VehicleType  `json:"type" gorm:"default:'outro'"`
 	Plate          string       `json:"plate" gorm:"default:''"`
 	Brand          string       `json:"brand" gorm:"default:''"`

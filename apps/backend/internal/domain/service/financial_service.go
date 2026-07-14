@@ -17,7 +17,7 @@ func NewFinancialService(repo repository.FinancialRepository) *FinancialService 
 	return &FinancialService{repo: repo}
 }
 
-func (s *FinancialService) Create(organizationID, txType string, costCenterID *string, description string, amount float64, date time.Time, dueDate time.Time, notes string) (*entity.FinancialTransaction, error) {
+func (s *FinancialService) Create(organizationID, txType string, costCenterID, farmID *string, description string, amount float64, date time.Time, dueDate time.Time, notes string) (*entity.FinancialTransaction, error) {
 	if description == "" {
 		return nil, errors.New("description is required")
 	}
@@ -29,6 +29,7 @@ func (s *FinancialService) Create(organizationID, txType string, costCenterID *s
 		OrganizationID: organizationID,
 		Type:           entity.TransactionType(txType),
 		CostCenterID:   costCenterID,
+		FarmID:         farmID,
 		Description:    description,
 		Amount:         amount,
 		Date:           date,

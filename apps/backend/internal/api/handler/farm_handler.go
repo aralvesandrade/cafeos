@@ -212,7 +212,23 @@ func (h *FarmHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		writeError(w, "farm not found", http.StatusNotFound)
 		return
 	}
+	if !h.canAccessFarm(r, id) {
+		writeError(w, "farm not found", http.StatusNotFound)
+		return
+	}
 	writeJSON(w, farm, http.StatusOK)
+}
+
+// canAccessFarm reports whether the authenticated request may access the given
+// farm: proprietario is restricted to farms it owns (via the linked producer),
+// every other role sees all farms in its organization.
+func (h *FarmHandler) canAccessFarm(r *http.Request, farmID string) bool {
+	role, _ := r.Context().Value(middleware.RoleKey).(string)
+	if role != string(entity.RoleProprietario) {
+		return true
+	}
+	userID, _ := r.Context().Value(middleware.UserIDKey).(string)
+	return h.svc.IsOwner(farmID, userID)
 }
 
 // List retorna todas as fazendas da organização autenticada
@@ -227,7 +243,16 @@ func (h *FarmHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 // @Router /api/v1/{organization_id}/farms [get]
 func (h *FarmHandler) List(w http.ResponseWriter, r *http.Request) {
 	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
-	farms, err := h.svc.ListByOrganization(organizationID)
+	role, _ := r.Context().Value(middleware.RoleKey).(string)
+
+	var farms []*entity.Farm
+	var err error
+	if role == string(entity.RoleProprietario) {
+		userID, _ := r.Context().Value(middleware.UserIDKey).(string)
+		farms, err = h.svc.ListByOwner(organizationID, userID)
+	} else {
+		farms, err = h.svc.ListByOrganization(organizationID)
+	}
 	if err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -253,6 +278,10 @@ func (h *FarmHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	existing, err := h.svc.GetByID(id)
 	if err != nil {
+		writeError(w, "farm not found", http.StatusNotFound)
+		return
+	}
+	if !h.canAccessFarm(r, id) {
 		writeError(w, "farm not found", http.StatusNotFound)
 		return
 	}
@@ -454,6 +483,10 @@ func (h *FarmHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Router /api/v1/{organization_id}/farms/{id} [delete]
 func (h *FarmHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
+	if !h.canAccessFarm(r, id) {
+		writeError(w, "farm not found", http.StatusNotFound)
+		return
+	}
 	if err := h.svc.Delete(id); err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return

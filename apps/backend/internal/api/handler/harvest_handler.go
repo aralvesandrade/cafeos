@@ -9,11 +9,13 @@ import (
 )
 
 type HarvestHandler struct {
-	svc *service.HarvestService
+	svc     *service.HarvestService
+	plotSvc *service.PlotService
+	farmSvc *service.FarmService
 }
 
-func NewHarvestHandler(svc *service.HarvestService) *HarvestHandler {
-	return &HarvestHandler{svc: svc}
+func NewHarvestHandler(svc *service.HarvestService, plotSvc *service.PlotService, farmSvc *service.FarmService) *HarvestHandler {
+	return &HarvestHandler{svc: svc, plotSvc: plotSvc, farmSvc: farmSvc}
 }
 
 type createHarvestRequest struct {
@@ -157,16 +159,54 @@ func (h *HarvestHandler) RecordProduction(w http.ResponseWriter, r *http.Request
 // @Produce json
 // @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID da Colheita"
+// @Param farm_id query string false "Filtrar por ID da Fazenda"
 // @Success 200 {array} SwaggerHarvestProduction
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/harvests/{id}/production [get]
 func (h *HarvestHandler) GetProduction(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	harvestID := r.PathValue("id")
 	productions, err := h.svc.GetProductionByHarvest(harvestID)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if userID, restricted := restrictedOwnerID(r); restricted {
+		ownedFarms, err := h.farmSvc.OwnedFarmIDs(organizationID, userID)
+		if err != nil {
+			writeError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		ownedPlots, err := h.plotSvc.PlotIDsForFarms(organizationID, ownedFarms)
+		if err != nil {
+			writeError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		filtered := productions[:0]
+		for _, p := range productions {
+			if ownedPlots[p.PlotID] {
+				filtered = append(filtered, p)
+			}
+		}
+		productions = filtered
+	}
+
+	if farmID := r.URL.Query().Get("farm_id"); farmID != "" {
+		plotIDs, err := h.plotSvc.PlotIDsForFarm(organizationID, farmID)
+		if err != nil {
+			writeError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		filtered := productions[:0]
+		for _, p := range productions {
+			if plotIDs[p.PlotID] {
+				filtered = append(filtered, p)
+			}
+		}
+		productions = filtered
+	}
+
 	writeJSON(w, productions, http.StatusOK)
 }

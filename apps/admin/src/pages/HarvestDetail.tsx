@@ -32,6 +32,8 @@ interface Plot {
   name: string
 }
 
+interface Farm { id: string; name: string }
+
 const statusLabels: Record<string, { label: string; variant: 'default' | 'success' | 'warning' }> = {
   planejada: { label: 'Planejada', variant: 'default' },
   em_andamento: { label: 'Em Andamento', variant: 'warning' },
@@ -44,6 +46,8 @@ export function HarvestDetail() {
   const [harvest, setHarvest] = useState<Harvest | null>(null)
   const [productions, setProductions] = useState<Production[]>([])
   const [plots, setPlots] = useState<Plot[]>([])
+  const [farms, setFarms] = useState<Farm[]>([])
+  const [farmFilter, setFarmFilter] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [finalizing, setFinalizing] = useState(false)
@@ -52,20 +56,22 @@ export function HarvestDetail() {
 
   const load = useCallback(async () => {
     try {
-      const [harvestData, prodData, plotsData] = await Promise.all([
+      const [harvestData, prodData, plotsData, farmsData] = await Promise.all([
         apiRequest<Harvest>(`/harvests/${harvestId}`),
-        apiRequest<Production[]>(`/harvests/${harvestId}/production`),
+        apiRequest<Production[]>(`/harvests/${harvestId}/production`, { params: farmFilter ? { farm_id: farmFilter } : undefined }),
         apiRequest<Plot[]>('/plots'),
+        apiRequest<Farm[]>('/farms'),
       ])
       setHarvest(harvestData)
       setProductions(prodData)
       setPlots(plotsData)
+      setFarms(farmsData)
     } catch (err) {
       console.error(err)
     } finally {
       setLoading(false)
     }
-  }, [harvestId])
+  }, [harvestId, farmFilter])
 
   useEffect(() => { load() }, [load])
 
@@ -179,17 +185,25 @@ export function HarvestDetail() {
       </div>
 
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <h2 className="text-xl font-semibold text-primary flex items-center gap-2">
             <Package className="h-5 w-5" />
             Produção
           </h2>
-          {harvest.status !== 'finalizada' && (
-            <Button onClick={() => setDialogOpen(true)}>
-              <Plus className="h-4 w-4" />
-              Registrar Produção
-            </Button>
-          )}
+          <div className="flex gap-3">
+            <Select value={farmFilter} onChange={(e) => setFarmFilter(e.target.value)} className="w-48">
+              <option value="">Todas as fazendas</option>
+              {farms.map((f) => (
+                <option key={f.id} value={f.id}>{f.name}</option>
+              ))}
+            </Select>
+            {harvest.status !== 'finalizada' && (
+              <Button onClick={() => setDialogOpen(true)}>
+                <Plus className="h-4 w-4" />
+                Registrar Produção
+              </Button>
+            )}
+          </div>
         </div>
 
         <Table>
