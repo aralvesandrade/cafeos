@@ -4,7 +4,7 @@ import { apiRequest } from '@/lib/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
-import { ArrowLeft, Grid3X3, Ruler, HardHat, Map, User, Pencil } from 'lucide-react'
+import { ArrowLeft, Grid3X3, Ruler, HardHat, Map, User, Pencil, FileText, Trees } from 'lucide-react'
 
 interface Producer {
   cpf: string
@@ -27,10 +27,38 @@ interface Farm {
   total_area_ha: number
   planted_area_ha: number
   created_at: string
-  cnpj?: string
+  phone?: string
+  activities?: string
+  main_crop?: string
+  secondary_crop?: string
   state?: string
   city?: string
   address?: string
+  production_system?: string
+  commercialization_product?: string
+  has_no_cnpj?: boolean
+  cnpj?: string
+  has_no_nirf?: boolean
+  nirf?: string
+  has_no_incra?: boolean
+  incra_registration?: string
+  has_no_state_registration?: boolean
+  state_registration?: string
+  has_no_dap?: boolean
+  dap?: string
+  has_no_car?: boolean
+  car?: string
+  fully_leased?: boolean
+  land_value_per_ha?: number
+  dam_area_ha?: number
+  improvements_area_ha?: number
+  roads_area_ha?: number
+  app_area_ha?: number
+  legal_reserve_area_ha?: number
+  native_vegetation_area_ha?: number
+  livestock_area_not_covered_ha?: number
+  agriculture_area_not_covered_ha?: number
+  non_agricultural_area_ha?: number
   producer?: Producer | null
 }
 
@@ -137,6 +165,78 @@ export function FarmDetail() {
         </Card>
       </div>
 
+      <Card>
+        <CardHeader className="flex flex-row items-center gap-2 pb-2">
+          <HardHat className="h-4 w-4 text-primary" />
+          <CardTitle className="text-sm font-medium text-muted-foreground">Dados Gerais</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div><p className="text-muted-foreground">Telefone</p><p className="font-medium text-foreground">{farm.phone || '—'}</p></div>
+            <div><p className="text-muted-foreground">Atividades</p><p className="font-medium text-foreground">{farm.activities || '—'}</p></div>
+            <div><p className="text-muted-foreground">Cultura Principal</p><p className="font-medium text-foreground">{farm.main_crop || '—'}</p></div>
+            <div><p className="text-muted-foreground">Cultura Secundária</p><p className="font-medium text-foreground">{farm.secondary_crop || '—'}</p></div>
+            <div><p className="text-muted-foreground">Estado</p><p className="font-medium text-foreground">{farm.state || '—'}</p></div>
+            <div><p className="text-muted-foreground">Cidade</p><p className="font-medium text-foreground">{farm.city || '—'}</p></div>
+            <div><p className="text-muted-foreground">Endereço</p><p className="font-medium text-foreground">{farm.address || '—'}</p></div>
+            <div><p className="text-muted-foreground">Sistema de Produção</p><p className="font-medium text-foreground">{farm.production_system || '—'}</p></div>
+            <div><p className="text-muted-foreground">Produto de Comercialização</p><p className="font-medium text-foreground">{farm.commercialization_product || '—'}</p></div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center gap-2 pb-2">
+          <FileText className="h-4 w-4 text-primary" />
+          <CardTitle className="text-sm font-medium text-muted-foreground">Documentação</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            <div><p className="text-muted-foreground">CNPJ</p><p className="font-medium text-foreground">{farm.has_no_cnpj ? 'Não possui' : (farm.cnpj || '—')}</p></div>
+            <div><p className="text-muted-foreground">NIRF</p><p className="font-medium text-foreground">{farm.has_no_nirf ? 'Não possui' : (farm.nirf || '—')}</p></div>
+            <div><p className="text-muted-foreground">INCRA</p><p className="font-medium text-foreground">{farm.has_no_incra ? 'Não possui' : (farm.incra_registration || '—')}</p></div>
+            <div><p className="text-muted-foreground">Inscrição Estadual</p><p className="font-medium text-foreground">{farm.has_no_state_registration ? 'Não possui' : (farm.state_registration || '—')}</p></div>
+            <div><p className="text-muted-foreground">DAP</p><p className="font-medium text-foreground">{farm.has_no_dap ? 'Não possui' : (farm.dap || '—')}</p></div>
+            <div><p className="text-muted-foreground">CAR</p><p className="font-medium text-foreground">{farm.has_no_car ? 'Não possui' : (farm.car || '—')}</p></div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center gap-2 pb-2">
+          <Trees className="h-4 w-4 text-primary" />
+          <CardTitle className="text-sm font-medium text-muted-foreground">Divisão de Área</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div><p className="text-muted-foreground">Totalmente Arrendada</p><p className="font-medium text-foreground">{farm.fully_leased ? 'Sim' : 'Não'}</p></div>
+            <div><p className="text-muted-foreground">Valor da Terra/ha</p><p className="font-medium text-foreground">{farm.land_value_per_ha ? `R$ ${farm.land_value_per_ha.toFixed(2)}` : '—'}</p></div>
+            <div><p className="text-muted-foreground">Área Plantada</p><p className="font-medium text-foreground">{farm.planted_area_ha ?? 0} ha</p></div>
+            <div><p className="text-muted-foreground">Área Produtiva Disponível</p><p className="font-medium text-foreground">{(
+              farm.total_area_ha
+              - (farm.dam_area_ha || 0)
+              - (farm.improvements_area_ha || 0)
+              - (farm.roads_area_ha || 0)
+              - (farm.app_area_ha || 0)
+              - (farm.legal_reserve_area_ha || 0)
+              - (farm.native_vegetation_area_ha || 0)
+              - (farm.livestock_area_not_covered_ha || 0)
+              - (farm.agriculture_area_not_covered_ha || 0)
+              - (farm.non_agricultural_area_ha || 0)
+            ).toFixed(2)} ha</p></div>
+            <div><p className="text-muted-foreground">Açude</p><p className="font-medium text-foreground">{farm.dam_area_ha ?? 0} ha</p></div>
+            <div><p className="text-muted-foreground">Benfeitorias</p><p className="font-medium text-foreground">{farm.improvements_area_ha ?? 0} ha</p></div>
+            <div><p className="text-muted-foreground">Estradas</p><p className="font-medium text-foreground">{farm.roads_area_ha ?? 0} ha</p></div>
+            <div><p className="text-muted-foreground">APP</p><p className="font-medium text-foreground">{farm.app_area_ha ?? 0} ha</p></div>
+            <div><p className="text-muted-foreground">Reserva Legal</p><p className="font-medium text-foreground">{farm.legal_reserve_area_ha ?? 0} ha</p></div>
+            <div><p className="text-muted-foreground">Vegetação Nativa</p><p className="font-medium text-foreground">{farm.native_vegetation_area_ha ?? 0} ha</p></div>
+            <div><p className="text-muted-foreground">Pecuária Não Coberta</p><p className="font-medium text-foreground">{farm.livestock_area_not_covered_ha ?? 0} ha</p></div>
+            <div><p className="text-muted-foreground">Agricultura Não Coberta</p><p className="font-medium text-foreground">{farm.agriculture_area_not_covered_ha ?? 0} ha</p></div>
+            <div><p className="text-muted-foreground">Área Não Agrícola</p><p className="font-medium text-foreground">{farm.non_agricultural_area_ha ?? 0} ha</p></div>
+          </div>
+        </CardContent>
+      </Card>
+
       {farm.producer && (
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
@@ -160,6 +260,30 @@ export function FarmDetail() {
               <div>
                 <p className="text-muted-foreground">E-mail</p>
                 <p className="font-medium text-foreground">{farm.producer.email || '—'}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">RG</p>
+                <p className="font-medium text-foreground">{farm.producer.rg || '—'}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Órgão Emissor</p>
+                <p className="font-medium text-foreground">{farm.producer.issuing_body || '—'}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Sexo</p>
+                <p className="font-medium text-foreground">{farm.producer.gender || '—'}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Data de Nascimento</p>
+                <p className="font-medium text-foreground">{farm.producer.birth_date ? new Date(farm.producer.birth_date).toLocaleDateString('pt-BR') : '—'}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Estado Civil</p>
+                <p className="font-medium text-foreground">{farm.producer.marital_status || '—'}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Escolaridade</p>
+                <p className="font-medium text-foreground">{farm.producer.education || '—'}</p>
               </div>
             </div>
           </CardContent>

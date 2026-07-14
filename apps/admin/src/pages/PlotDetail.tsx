@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Grid3X3, Ruler, Sprout, Mountain, CalendarDays, Tractor, Droplets, Pencil } from 'lucide-react'
+import { ArrowLeft, Grid3X3, Ruler, Sprout, Mountain, CalendarDays, Tractor, Droplets, Pencil, Trees } from 'lucide-react'
 
 interface Plot {
   id: string
@@ -32,6 +32,11 @@ interface Plot {
   row_spacing_m: number
   plant_spacing_m: number
   plant_count: number
+  dam_area_ha?: number
+  improvements_area_ha?: number
+  roads_area_ha?: number
+  app_area_ha?: number
+  legal_reserve_area_ha?: number
 }
 
 interface Farm {
@@ -206,6 +211,10 @@ export function PlotDetail() {
               <p className="text-muted-foreground">Data de ativação</p>
               <p className="font-medium text-foreground">{plot.activation_date ? new Date(plot.activation_date).toLocaleDateString('pt-BR') : '—'}</p>
             </div>
+            <div>
+              <p className="text-muted-foreground">Data de desativação</p>
+              <p className="font-medium text-foreground">{plot.deactivation_date ? new Date(plot.deactivation_date).toLocaleDateString('pt-BR') : '—'}</p>
+            </div>
           </div>
           {plot.notes && (
             <div className="mt-4 text-sm">
@@ -213,6 +222,22 @@ export function PlotDetail() {
               <p className="font-medium text-foreground">{plot.notes}</p>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center gap-2 pb-2">
+          <Trees className="h-4 w-4 text-primary" />
+          <CardTitle className="text-sm font-medium text-muted-foreground">Divisão de Área do Talhão</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div><p className="text-muted-foreground">Açude</p><p className="font-medium text-foreground">{plot.dam_area_ha ?? 0} ha</p></div>
+            <div><p className="text-muted-foreground">Benfeitorias</p><p className="font-medium text-foreground">{plot.improvements_area_ha ?? 0} ha</p></div>
+            <div><p className="text-muted-foreground">Estradas</p><p className="font-medium text-foreground">{plot.roads_area_ha ?? 0} ha</p></div>
+            <div><p className="text-muted-foreground">APP</p><p className="font-medium text-foreground">{plot.app_area_ha ?? 0} ha</p></div>
+            <div><p className="text-muted-foreground">Reserva Legal</p><p className="font-medium text-foreground">{plot.legal_reserve_area_ha ?? 0} ha</p></div>
+          </div>
         </CardContent>
       </Card>
 
