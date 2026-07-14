@@ -185,7 +185,7 @@ export function FarmForm({ initial, onSave, onCancel, loading }: FarmFormProps) 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto pr-1">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <Section title="Propriedade">
         <div className="grid grid-cols-2 gap-4">
           <Field label="Nome da Propriedade">
@@ -338,7 +338,7 @@ export function FarmForm({ initial, onSave, onCancel, loading }: FarmFormProps) 
         </div>
       </Section>
 
-      <div className="flex justify-end gap-3 pt-2 sticky bottom-0 bg-background">
+      <div className="flex justify-end gap-3 pt-2 sticky bottom-0 bg-background pb-2">
         <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
         <Button type="submit" disabled={loading}>
           {loading ? 'Salvando...' : 'Salvar'}

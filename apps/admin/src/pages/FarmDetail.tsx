@@ -4,7 +4,7 @@ import { apiRequest } from '@/lib/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
-import { ArrowLeft, Grid3X3, Ruler, HardHat, Map, User } from 'lucide-react'
+import { ArrowLeft, Grid3X3, Ruler, HardHat, Map, User, Pencil } from 'lucide-react'
 
 interface Producer {
   cpf: string
@@ -83,11 +83,19 @@ export function FarmDetail() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/farms')}>
-          <ArrowLeft className="h-4 w-4" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/farms')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl font-bold text-primary">{farm.name}</h1>
+        </div>
+        <Button variant="outline" size="sm" asChild>
+          <Link to={`/farms/${farmId}/edit`}>
+            <Pencil className="h-4 w-4" />
+            Editar
+          </Link>
         </Button>
-        <h1 className="text-2xl font-bold text-primary">{farm.name}</h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

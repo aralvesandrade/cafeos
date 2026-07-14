@@ -5,8 +5,10 @@ import { Login } from '@/pages/Login'
 import { Dashboard } from '@/pages/Dashboard'
 import { Farms } from '@/pages/Farms'
 import { FarmDetail } from '@/pages/FarmDetail'
+import { FarmEdit } from '@/pages/FarmEdit'
 import { Plots } from '@/pages/Plots'
 import { PlotDetail } from '@/pages/PlotDetail'
+import { PlotEdit } from '@/pages/PlotEdit'
 import { Operations } from '@/pages/Operations'
 import { Harvests } from '@/pages/Harvests'
 import { HarvestDetail } from '@/pages/HarvestDetail'
@@ -31,9 +33,13 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: 'farms', element: <Farms /> },
+      { path: 'farms/new', element: <FarmEdit /> },
       { path: 'farms/:farmId', element: <FarmDetail /> },
+      { path: 'farms/:farmId/edit', element: <FarmEdit /> },
       { path: 'plots', element: <Plots /> },
+      { path: 'plots/new', element: <PlotEdit /> },
       { path: 'plots/:plotId', element: <PlotDetail /> },
+      { path: 'plots/:plotId/edit', element: <PlotEdit /> },
       { path: 'operations', element: <Operations /> },
       { path: 'harvests', element: <Harvests /> },
       { path: 'harvests/:harvestId', element: <HarvestDetail /> },

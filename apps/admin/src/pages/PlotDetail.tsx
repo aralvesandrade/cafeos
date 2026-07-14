@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Grid3X3, Ruler, Sprout, Mountain, CalendarDays, Tractor, Droplets } from 'lucide-react'
+import { ArrowLeft, Grid3X3, Ruler, Sprout, Mountain, CalendarDays, Tractor, Droplets, Pencil } from 'lucide-react'
 
 interface Plot {
   id: string
@@ -90,11 +90,19 @@ export function PlotDetail() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/plots')}>
-          <ArrowLeft className="h-4 w-4" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/plots')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl font-bold text-primary">{plot.name}</h1>
+        </div>
+        <Button variant="outline" size="sm" asChild>
+          <Link to={`/plots/${plotId}/edit`}>
+            <Pencil className="h-4 w-4" />
+            Editar
+          </Link>
         </Button>
-        <h1 className="text-2xl font-bold text-primary">{plot.name}</h1>
       </div>
 
       {farm && (
