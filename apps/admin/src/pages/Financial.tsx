@@ -42,7 +42,7 @@ export function Financial() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<Transaction | null>(null)
-  const [form, setForm] = useState({ type: 'despesa', cost_center_id: '', farm_id: '', description: '', amount: '', date: '', due_date: '', notes: '' })
+  const [form, setForm] = useState({ type: 'despesa', cost_center_id: '', farm_id: '', description: '', amount: '', date: '', due_date: '', notes: '', status: 'pending' })
   const [saving, setSaving] = useState(false)
 
   const load = useCallback(async () => {
@@ -91,7 +91,7 @@ export function Financial() {
             <option key={f.id} value={f.id}>{f.name}</option>
           ))}
         </Select>
-        <Button onClick={() => { setEditing(null); setForm({ type: 'despesa', cost_center_id: '', farm_id: '', description: '', amount: '', date: '', due_date: '', notes: '' }); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Nova Transação</Button>
+        <Button onClick={() => { setEditing(null); setForm({ type: 'despesa', cost_center_id: '', farm_id: '', description: '', amount: '', date: '', due_date: '', notes: '', status: 'pending' }); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Nova Transação</Button>
       </div>
     </div>
     <Table>
@@ -108,7 +108,7 @@ export function Financial() {
         <TableCell>{t.date}</TableCell>
         <TableCell><Badge variant={t.status === 'paid' ? 'success' : t.status === 'cancelled' ? 'danger' : 'default'}>{statusLabels[t.status] || t.status}</Badge></TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
-          <Button variant="ghost" size="sm" onClick={() => { setEditing(t); setForm({ type: t.type, cost_center_id: t.cost_center_id || '', farm_id: t.farm_id || '', description: t.description, amount: String(t.amount), date: t.date, due_date: t.due_date, notes: t.notes }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="sm" onClick={() => { setEditing(t); setForm({ type: t.type, cost_center_id: t.cost_center_id || '', farm_id: t.farm_id || '', description: t.description, amount: String(t.amount), date: t.date, due_date: t.due_date, notes: t.notes, status: t.status }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
           <Button variant="ghost" size="sm" onClick={() => handleDelete(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
         </div></TableCell>
       </TableRow>)})}
@@ -139,7 +139,7 @@ export function Financial() {
         <div><label className="block text-sm font-medium text-foreground mb-1">Valor (R$)</label><Input type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} required /></div>
         <div><label className="block text-sm font-medium text-foreground mb-1">Data</label><Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></div>
         {editing && <div><label className="block text-sm font-medium text-foreground mb-1">Status</label>
-          <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.type === 'status' ? '' : ''} onChange={(e) => {/* handled separately in update */}}>
+          <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
             <option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option>
           </select></div>}
         <div className="flex justify-end gap-3 pt-2">

@@ -22,7 +22,7 @@ export function Organizations() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<Organization | null>(null)
-  const [form, setForm] = useState({ name: '', plan: 'free' })
+  const [form, setForm] = useState({ name: '', plan: 'free', status: 'active' })
   const [saving, setSaving] = useState(false)
 
   const load = useCallback(async () => {
@@ -64,7 +64,7 @@ export function Organizations() {
           <h1 className="text-2xl font-bold text-primary">Organizações</h1>
           <p className="text-sm text-muted-foreground">Gerenciar clientes da plataforma</p>
         </div>
-        <Button onClick={() => { setEditing(null); setForm({ name: '', plan: 'free' }); setDialogOpen(true) }}>
+        <Button onClick={() => { setEditing(null); setForm({ name: '', plan: 'free', status: 'active' }); setDialogOpen(true) }}>
           <Plus className="h-4 w-4" /> Nova Organização
         </Button>
       </div>
@@ -96,7 +96,7 @@ export function Organizations() {
                 </Badge>
               </TableCell>
               <TableCell className="text-right">
-                <Button variant="ghost" size="sm" onClick={() => { setEditing(o); setForm({ name: o.name, plan: o.plan }); setDialogOpen(true) }}>
+                <Button variant="ghost" size="sm" onClick={() => { setEditing(o); setForm({ name: o.name, plan: o.plan, status: o.status }); setDialogOpen(true) }}>
                   <Pencil className="h-4 w-4" />
                 </Button>
               </TableCell>
@@ -123,6 +123,15 @@ export function Organizations() {
               <option value="consultoria">Consultoria</option>
             </select>
           </div>
+          {editing && (
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">Status</label>
+              <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+                <option value="active">Ativo</option>
+                <option value="inactive">Inativo</option>
+              </select>
+            </div>
+          )}
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="outline" onClick={() => { setDialogOpen(false); setEditing(null) }}>Cancelar</Button>
             <Button onClick={handleSave} disabled={saving}>{saving ? 'Salvando...' : 'Salvar'}</Button>

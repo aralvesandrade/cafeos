@@ -40,7 +40,7 @@ export function Users() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<AppUser | null>(null)
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: '', organization_id: '' })
+  const [form, setForm] = useState({ name: '', email: '', password: '', role: '', organization_id: '', status: 'active' })
   const [saving, setSaving] = useState(false)
 
   const load = useCallback(async () => {
@@ -64,7 +64,7 @@ export function Users() {
     setSaving(true)
     try {
       if (editing) {
-        await apiRequest(`/admin/users/${editing.id}`, { method: 'PUT', body: { name: form.name, email: form.email, role: form.role }, admin: true })
+        await apiRequest(`/admin/users/${editing.id}`, { method: 'PUT', body: { name: form.name, email: form.email, role: form.role, is_active: form.status === 'active' }, admin: true })
       } else {
         await apiRequest('/admin/users', { method: 'POST', body: { name: form.name, email: form.email, password: form.password, role: form.role, organization_id: form.organization_id }, admin: true })
       }
@@ -94,7 +94,7 @@ export function Users() {
           <h1 className="text-2xl font-bold text-primary">Usuários</h1>
           <p className="text-sm text-muted-foreground">Gerenciar usuários do sistema</p>
         </div>
-        <Button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: '', role: '', organization_id: '' }); setDialogOpen(true) }}>
+        <Button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: '', role: '', organization_id: '', status: 'active' }); setDialogOpen(true) }}>
           <Plus className="h-4 w-4" /> Novo Usuário
         </Button>
       </div>
@@ -136,7 +136,7 @@ export function Users() {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => { setEditing(u); setForm({ name: u.name, email: u.email, password: '', role: u.role, organization_id: u.organization_id }); setDialogOpen(true) }}>
+                    <Button variant="ghost" size="sm" onClick={() => { setEditing(u); setForm({ name: u.name, email: u.email, password: '', role: u.role, organization_id: u.organization_id, status: u.status }); setDialogOpen(true) }}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => handleDelete(u.id)}>
@@ -177,6 +177,15 @@ export function Users() {
               ))}
             </select>
           </div>
+          {editing && (
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">Status</label>
+              <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+                <option value="active">Ativo</option>
+                <option value="inactive">Inativo</option>
+              </select>
+            </div>
+          )}
           {!editing && (
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">Organização</label>

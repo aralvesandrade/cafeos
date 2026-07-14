@@ -159,6 +159,7 @@ export function Stock() {
         <div><label className="block text-sm font-medium text-foreground mb-1">Quantidade</label><Input type="number" step="0.01" value={movForm.quantity} onChange={(e) => setMovForm({ ...movForm, quantity: e.target.value })} /></div>
         <div><label className="block text-sm font-medium text-foreground mb-1">Data</label><Input type="date" value={movForm.date} onChange={(e) => setMovForm({ ...movForm, date: e.target.value })} /></div>
         <div><label className="block text-sm font-medium text-foreground mb-1">Referência</label><Input value={movForm.reference} onChange={(e) => setMovForm({ ...movForm, reference: e.target.value })} placeholder="Nota fiscal, operação..." /></div>
+        <div><label className="block text-sm font-medium text-foreground mb-1">Observações</label><Input value={movForm.notes} onChange={(e) => setMovForm({ ...movForm, notes: e.target.value })} /></div>
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="outline" onClick={() => setMovDialogOpen(false)}>Cancelar</Button>
           <Button onClick={handleMovement} disabled={saving}>{saving ? 'Salvando...' : 'Registrar'}</Button>

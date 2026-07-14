@@ -28,9 +28,10 @@ type createUserRequest struct {
 }
 
 type updateUserRequest struct {
-	Name  *string `json:"name"`
-	Email *string `json:"email"`
-	Role  *string `json:"role"`
+	Name     *string `json:"name"`
+	Email    *string `json:"email"`
+	Role     *string `json:"role"`
+	IsActive *bool   `json:"is_active"`
 }
 
 // List retorna todos os usuários
@@ -165,6 +166,9 @@ func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.Role != nil {
 		existing.Role = entity.UserRole(*req.Role)
+	}
+	if req.IsActive != nil {
+		existing.IsActive = *req.IsActive
 	}
 	existing.UpdatedAt = time.Now()
 

@@ -24,7 +24,7 @@ export function Labor() {
   const [editingTeam, setEditingTeam] = useState<Team | null>(null)
   const [editingWorker, setEditingWorker] = useState<Worker | null>(null)
   const [teamForm, setTeamForm] = useState({ name: '', leader: '', description: '' })
-  const [workerForm, setWorkerForm] = useState({ team_id: '', name: '', role: '', phone: '', hourly_rate: '' })
+  const [workerForm, setWorkerForm] = useState({ team_id: '', name: '', role: '', phone: '', hourly_rate: '', is_active: true })
   const [shiftForm, setShiftForm] = useState({ worker_id: '', hours: '', cost: '', date: '', notes: '' })
   const [saving, setSaving] = useState(false)
 
@@ -78,7 +78,7 @@ export function Labor() {
     <div className="flex items-center justify-between">
       <div><h1 className="text-2xl font-bold text-primary">Equipes</h1><p className="text-sm text-muted-foreground">Gestão de mão de obra</p></div>
       {tab === 'teams' && <Button onClick={() => { setEditingTeam(null); setTeamForm({ name: '', leader: '', description: '' }); setTeamDialog(true) }}><Plus className="h-4 w-4" /> Nova Equipe</Button>}
-      {tab === 'workers' && <Button onClick={() => { setEditingWorker(null); setWorkerForm({ team_id: '', name: '', role: '', phone: '', hourly_rate: '' }); setWorkerDialog(true) }}><Plus className="h-4 w-4" /> Novo Trabalhador</Button>}
+      {tab === 'workers' && <Button onClick={() => { setEditingWorker(null); setWorkerForm({ team_id: '', name: '', role: '', phone: '', hourly_rate: '', is_active: true }); setWorkerDialog(true) }}><Plus className="h-4 w-4" /> Novo Trabalhador</Button>}
       {tab === 'shifts' && <Button onClick={() => { setShiftForm({ worker_id: '', hours: '', cost: '', date: '', notes: '' }); setShiftDialog(true) }}><Plus className="h-4 w-4" /> Registrar Hora</Button>}
     </div>
     <div className="flex gap-2 mb-2">
@@ -109,7 +109,7 @@ export function Labor() {
         <TableCell>R$ {w.hourly_rate.toFixed(2)}</TableCell>
         <TableCell><Badge variant={w.is_active ? 'success' : 'default'}>{w.is_active ? 'Ativo' : 'Inativo'}</Badge></TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
-          <Button variant="ghost" size="sm" onClick={() => { setEditingWorker(w); setWorkerForm({ team_id: w.team_id, name: w.name, role: w.role, phone: w.phone, hourly_rate: String(w.hourly_rate) }); setWorkerDialog(true) }}><Pencil className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="sm" onClick={() => { setEditingWorker(w); setWorkerForm({ team_id: w.team_id, name: w.name, role: w.role, phone: w.phone, hourly_rate: String(w.hourly_rate), is_active: w.is_active }); setWorkerDialog(true) }}><Pencil className="h-4 w-4" /></Button>
           <Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover trabalhador?')) apiRequest(`/labor/workers/${w.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
         </div></TableCell>
       </TableRow>))}
@@ -155,6 +155,10 @@ export function Labor() {
           <div><label className="block text-sm font-medium text-foreground mb-1">Telefone</label><Input value={workerForm.phone} onChange={(e) => setWorkerForm({ ...workerForm, phone: e.target.value })} /></div>
           <div><label className="block text-sm font-medium text-foreground mb-1">Valor Hora (R$)</label><Input type="number" step="0.01" value={workerForm.hourly_rate} onChange={(e) => setWorkerForm({ ...workerForm, hourly_rate: e.target.value })} /></div>
         </div>
+        {editingWorker && <div><label className="block text-sm font-medium text-foreground mb-1">Status</label>
+          <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={workerForm.is_active ? 'true' : 'false'} onChange={(e) => setWorkerForm({ ...workerForm, is_active: e.target.value === 'true' })}>
+            <option value="true">Ativo</option><option value="false">Inativo</option>
+          </select></div>}
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="outline" onClick={() => { setWorkerDialog(false); setEditingWorker(null) }}>Cancelar</Button>
           <Button onClick={saveWorker} disabled={saving}>{saving ? 'Salvando...' : 'Salvar'}</Button>
