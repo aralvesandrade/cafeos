@@ -103,7 +103,7 @@ func processMessage(msg messaging.SyncMessage) error {
 
 type operationPayload struct {
 	PlotID      string  `json:"plot_id"`
-	Type        string  `json:"type"`
+	TypeID      string  `json:"type_id"`
 	Date        string  `json:"date"`
 	Responsible string  `json:"responsible"`
 	ProductUsed string  `json:"product_used"`
@@ -122,7 +122,7 @@ func processOperationCreated(organizationID string, payload []byte) error {
 		ID:             uuid.New().String(),
 		OrganizationID: organizationID,
 		PlotID:         p.PlotID,
-		Type:           entity.OperationType(p.Type),
+		TypeID:         p.TypeID,
 		Date:           parseTime(p.Date),
 		Responsible:    p.Responsible,
 		ProductUsed:    p.ProductUsed,

@@ -15,6 +15,7 @@ import {
   Truck,
   UserCog,
   CircleDollarSign,
+  Tags,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 
@@ -23,6 +24,7 @@ const navItems = [
   { to: '/farms', icon: MapPin, label: 'Fazendas' },
   { to: '/plots', icon: Grid3X3, label: 'Talhões' },
   { to: '/operations', icon: Tractor, label: 'Operações' },
+  { to: '/operation-types', icon: Tags, label: 'Tipos de Operação' },
   { to: '/harvests', icon: Calendar, label: 'Safras' },
 ]
 

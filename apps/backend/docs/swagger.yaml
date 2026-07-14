@@ -191,19 +191,22 @@ definitions:
         type: string
     type: object
   entity.OperationType:
-    enum:
-    - adubacao
-    - pulverizacao
-    - irrigacao
-    - poda
-    - colheita
-    type: string
-    x-enum-varnames:
-    - OpAdubacao
-    - OpPulverizacao
-    - OpIrrigacao
-    - OpPoda
-    - OpColheita
+    properties:
+      code:
+        type: string
+      color:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
   entity.Organization:
     properties:
       brand_name:
@@ -769,8 +772,12 @@ definitions:
         type: number
       responsible:
         type: string
-      type:
-        $ref: '#/definitions/entity.OperationType'
+      type_color:
+        type: string
+      type_id:
+        type: string
+      type_name:
+        type: string
     type: object
   handler.SwaggerPlot:
     properties:
@@ -1025,7 +1032,16 @@ definitions:
         type: number
       responsible:
         type: string
-      type:
+      type_id:
+        type: string
+    type: object
+  handler.createOperationTypeRequest:
+    properties:
+      code:
+        type: string
+      color:
+        type: string
+      name:
         type: string
     type: object
   handler.createOrganizationRequest:
@@ -1286,6 +1302,27 @@ definitions:
         items:
           $ref: '#/definitions/handler.syncErrorItem'
         type: array
+    type: object
+  handler.updateOperationRequest:
+    properties:
+      cost:
+        type: number
+      cost_center_id:
+        type: string
+      date:
+        type: string
+      harvest_id:
+        type: string
+      notes:
+        type: string
+      product_used:
+        type: string
+      quantity:
+        type: number
+      responsible:
+        type: string
+      type_id:
+        type: string
     type: object
   handler.updateOrganizationRequest:
     properties:
@@ -3068,6 +3105,168 @@ paths:
       summary: Atualizar trabalhador
       tags:
       - labor (Mão de Obra)
+  /api/v1/{organization_id}/operation-types:
+    get:
+      description: Lista todos os tipos de operação pertencentes à organização
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.OperationType'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar tipos de operação
+      tags:
+      - operation-types (Tipos de Operação)
+    post:
+      consumes:
+      - application/json
+      description: Registra um novo tipo de operação agrícola na organização
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: Dados do tipo de operação
+        in: body
+        name: operation_type
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createOperationTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.OperationType'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar tipo de operação
+      tags:
+      - operation-types (Tipos de Operação)
+  /api/v1/{organization_id}/operation-types/{id}:
+    delete:
+      description: Exclui um tipo de operação por ID
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: ID do Tipo de Operação
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Excluir tipo de operação
+      tags:
+      - operation-types (Tipos de Operação)
+    get:
+      description: Retorna um único tipo de operação
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: ID do Tipo de Operação
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.OperationType'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obter tipo de operação por ID
+      tags:
+      - operation-types (Tipos de Operação)
+    put:
+      consumes:
+      - application/json
+      description: Atualiza dados do tipo de operação por ID (atualização parcial
+        - somente os campos informados são alterados)
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: ID do Tipo de Operação
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados atualizados do tipo de operação
+        in: body
+        name: operation_type
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createOperationTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.OperationType'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar tipo de operação
+      tags:
+      - operation-types (Tipos de Operação)
   /api/v1/{organization_id}/operations:
     get:
       description: Lista todas as operações de todos os talhões da organização
@@ -3193,6 +3392,51 @@ paths:
       security:
       - BearerAuth: []
       summary: Obter operação por ID
+      tags:
+      - operations (Operações)
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma operação agrícola
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: ID da Operação
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados atualizados da operação
+        in: body
+        name: operation
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateOperationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.SwaggerOperation'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar operação
       tags:
       - operations (Operações)
   /api/v1/{organization_id}/operations/recent:

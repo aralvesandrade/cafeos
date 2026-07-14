@@ -166,7 +166,7 @@ func (h *DashboardHandler) buildUnscopedDashboard(organizationID string, harvest
 	recentOps := make([]RecentOperationItem, 0, len(operations))
 	for _, op := range operations {
 		recentOps = append(recentOps, RecentOperationItem{
-			ID: op.ID, Type: string(op.Type), Date: op.Date.Format("2006-01-02"),
+			ID: op.ID, Type: op.TypeName, Date: op.Date.Format("2006-01-02"),
 			PlotName: plotMap[op.PlotID], Cost: op.Cost,
 		})
 	}
@@ -271,7 +271,7 @@ func (h *DashboardHandler) buildScopedDashboard(scopeFarmIDs map[string]bool, ha
 	recentOps := make([]RecentOperationItem, 0, len(filteredOps))
 	for _, op := range filteredOps {
 		recentOps = append(recentOps, RecentOperationItem{
-			ID: op.ID, Type: string(op.Type), Date: op.Date.Format("2006-01-02"),
+			ID: op.ID, Type: op.TypeName, Date: op.Date.Format("2006-01-02"),
 			PlotName: plotMap[op.PlotID], Cost: op.Cost,
 		})
 	}

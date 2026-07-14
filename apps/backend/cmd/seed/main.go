@@ -144,16 +144,32 @@ func seed(db *gorm.DB) error {
 	}
 	fmt.Printf("  ✓ Talhões: %d criados\n", len(plots))
 
+	// Operation Types
+	operationTypes := []entity.OperationType{
+		{OrganizationID: organization.ID, Name: "Adubação", Code: "adubacao", Color: "info"},
+		{OrganizationID: organization.ID, Name: "Pulverização", Code: "pulverizacao", Color: "warning"},
+		{OrganizationID: organization.ID, Name: "Irrigação", Code: "irrigacao", Color: "success"},
+		{OrganizationID: organization.ID, Name: "Poda", Code: "poda", Color: "default"},
+		{OrganizationID: organization.ID, Name: "Colheita", Code: "colheita", Color: "danger"},
+	}
+	for i := range operationTypes {
+		if err := db.Create(&operationTypes[i]).Error; err != nil {
+			return fmt.Errorf("create operation type %s: %w", operationTypes[i].Name, err)
+		}
+	}
+	fmt.Printf("  ✓ Tipos de Operação: %d criados\n", len(operationTypes))
+	otAdubacao, otPulverizacao, otIrrigacao, otPoda := operationTypes[0].ID, operationTypes[1].ID, operationTypes[2].ID, operationTypes[3].ID
+
 	// Operations
 	now := time.Now()
 	operations := []entity.Operation{
-		{OrganizationID: organization.ID, PlotID: plots[0].ID, Type: entity.OpAdubacao, Date: now.AddDate(0, -3, 0), Responsible: "Ana Costa", ProductUsed: "NPK 20-05-20", Quantity: 600, Cost: 4800, Notes: "Adubação de cobertura"},
-		{OrganizationID: organization.ID, PlotID: plots[1].ID, Type: entity.OpAdubacao, Date: now.AddDate(0, -3, -2), Responsible: "Ana Costa", ProductUsed: "NPK 20-05-20", Quantity: 700, Cost: 5600, Notes: ""},
-		{OrganizationID: organization.ID, PlotID: plots[0].ID, Type: entity.OpPulverizacao, Date: now.AddDate(0, -2, 0), Responsible: "Carlos Santos", ProductUsed: "Glyphosate", Quantity: 30, Cost: 1200, Notes: "Controle de plantas daninhas"},
-		{OrganizationID: organization.ID, PlotID: plots[3].ID, Type: entity.OpPoda, Date: now.AddDate(0, -1, -15), Responsible: "Maria Oliveira", ProductUsed: "", Quantity: 0, Cost: 2500, Notes: "Poda de formação"},
-		{OrganizationID: organization.ID, PlotID: plots[2].ID, Type: entity.OpIrrigacao, Date: now.AddDate(0, -1, -5), Responsible: "Ana Costa", ProductUsed: "", Quantity: 0, Cost: 1800, Notes: "Irrigação de salvamento"},
-		{OrganizationID: organization.ID, PlotID: plots[4].ID, Type: entity.OpPulverizacao, Date: now.AddDate(0, 0, -10), Responsible: "Carlos Santos", ProductUsed: "Óleo Mineral", Quantity: 50, Cost: 2000, Notes: "Controle de ácaros"},
-		{OrganizationID: organization.ID, PlotID: plots[0].ID, Type: entity.OpAdubacao, Date: now.AddDate(0, 0, -5), Responsible: "Ana Costa", ProductUsed: "Calcário Dolomítico", Quantity: 1500, Cost: 3000, Notes: "Calagem"},
+		{OrganizationID: organization.ID, PlotID: plots[0].ID, TypeID: otAdubacao, Date: now.AddDate(0, -3, 0), Responsible: "Ana Costa", ProductUsed: "NPK 20-05-20", Quantity: 600, Cost: 4800, Notes: "Adubação de cobertura"},
+		{OrganizationID: organization.ID, PlotID: plots[1].ID, TypeID: otAdubacao, Date: now.AddDate(0, -3, -2), Responsible: "Ana Costa", ProductUsed: "NPK 20-05-20", Quantity: 700, Cost: 5600, Notes: ""},
+		{OrganizationID: organization.ID, PlotID: plots[0].ID, TypeID: otPulverizacao, Date: now.AddDate(0, -2, 0), Responsible: "Carlos Santos", ProductUsed: "Glyphosate", Quantity: 30, Cost: 1200, Notes: "Controle de plantas daninhas"},
+		{OrganizationID: organization.ID, PlotID: plots[3].ID, TypeID: otPoda, Date: now.AddDate(0, -1, -15), Responsible: "Maria Oliveira", ProductUsed: "", Quantity: 0, Cost: 2500, Notes: "Poda de formação"},
+		{OrganizationID: organization.ID, PlotID: plots[2].ID, TypeID: otIrrigacao, Date: now.AddDate(0, -1, -5), Responsible: "Ana Costa", ProductUsed: "", Quantity: 0, Cost: 1800, Notes: "Irrigação de salvamento"},
+		{OrganizationID: organization.ID, PlotID: plots[4].ID, TypeID: otPulverizacao, Date: now.AddDate(0, 0, -10), Responsible: "Carlos Santos", ProductUsed: "Óleo Mineral", Quantity: 50, Cost: 2000, Notes: "Controle de ácaros"},
+		{OrganizationID: organization.ID, PlotID: plots[0].ID, TypeID: otAdubacao, Date: now.AddDate(0, 0, -5), Responsible: "Ana Costa", ProductUsed: "Calcário Dolomítico", Quantity: 1500, Cost: 3000, Notes: "Calagem"},
 	}
 	for i := range operations {
 		if err := db.Create(&operations[i]).Error; err != nil {

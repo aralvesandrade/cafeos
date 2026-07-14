@@ -19,11 +19,11 @@ func NewOperationService(repo repository.OperationRepository, eventBus event.Bus
 	return &OperationService{repo: repo, eventBus: eventBus}
 }
 
-func (s *OperationService) Create(organizationID, plotID string, opType entity.OperationType, date time.Time, responsible, productUsed string, quantity, cost float64, notes string, harvestID, costCenterID *string) (*entity.Operation, error) {
+func (s *OperationService) Create(organizationID, plotID, typeID string, date time.Time, responsible, productUsed string, quantity, cost float64, notes string, harvestID, costCenterID *string) (*entity.Operation, error) {
 	if plotID == "" {
 		return nil, errors.New("plot is required")
 	}
-	if opType == "" {
+	if typeID == "" {
 		return nil, errors.New("operation type is required")
 	}
 	if cost < 0 {
@@ -36,7 +36,7 @@ func (s *OperationService) Create(organizationID, plotID string, opType entity.O
 		PlotID:         plotID,
 		HarvestID:      harvestID,
 		CostCenterID:   costCenterID,
-		Type:           opType,
+		TypeID:         typeID,
 		Date:           date,
 		Responsible:    responsible,
 		ProductUsed:    productUsed,
@@ -54,10 +54,40 @@ func (s *OperationService) Create(organizationID, plotID string, opType entity.O
 		OperationID:    op.ID,
 		OrganizationID: organizationID,
 		PlotID:         plotID,
-		Type:           string(op.Type),
+		Type:           op.TypeID,
 		Cost:           cost,
 		Date:           date,
 	})
+
+	return op, nil
+}
+
+func (s *OperationService) Update(id, typeID string, date time.Time, responsible, productUsed string, quantity, cost float64, notes string, harvestID, costCenterID *string) (*entity.Operation, error) {
+	if typeID == "" {
+		return nil, errors.New("operation type is required")
+	}
+	if cost < 0 {
+		return nil, errors.New("cost cannot be negative")
+	}
+
+	op, err := s.repo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	op.HarvestID = harvestID
+	op.CostCenterID = costCenterID
+	op.TypeID = typeID
+	op.Date = date
+	op.Responsible = responsible
+	op.ProductUsed = productUsed
+	op.Quantity = quantity
+	op.Cost = cost
+	op.Notes = notes
+
+	if err := s.repo.Update(op); err != nil {
+		return nil, err
+	}
 
 	return op, nil
 }

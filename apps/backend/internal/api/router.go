@@ -40,6 +40,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	shiftRepo := infraRepo.NewWorkShiftRepository(db)
 	prodRepo := infraRepo.NewAgriculturalProductRepository(db)
 	ccRepo := infraRepo.NewCostCenterRepository(db)
+	otRepo := infraRepo.NewOperationTypeRepository(db)
 	budgetRepo := infraRepo.NewBudgetRepository(db)
 	allocRepo := infraRepo.NewCostAllocationRepository(db)
 	transactor := postgres.NewTransactor(db)
@@ -53,6 +54,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	fleetSvc := domainSvc.NewFleetService(vehRepo, maintRepo)
 	laborSvc := domainSvc.NewLaborService(teamRepo, workerRepo, shiftRepo)
 	ccSvc := domainSvc.NewCostCenterService(ccRepo)
+	otSvc := domainSvc.NewOperationTypeService(otRepo)
 	budgetSvc := domainSvc.NewBudgetService(budgetRepo)
 	allocSvc := domainSvc.NewCostAllocationService(allocRepo, plotRepo)
 
@@ -70,6 +72,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	laborH := handler.NewLaborHandler(laborSvc)
 	prodH := handler.NewProductHandler(prodRepo)
 	ccH := handler.NewCostCenterHandler(ccSvc)
+	otH := handler.NewOperationTypeHandler(otSvc)
 	budgetH := handler.NewBudgetHandler(budgetSvc)
 	allocH := handler.NewCostAllocationHandler(allocSvc)
 
@@ -113,8 +116,16 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	mux.Handle("GET /api/v1/{organization_id}/operations", chain(opH.List))
 	mux.Handle("GET /api/v1/{organization_id}/operations/recent", chain(opH.ListRecent))
 	mux.Handle("GET /api/v1/{organization_id}/operations/{id}", chain(opH.GetByID))
+	mux.Handle("PUT /api/v1/{organization_id}/operations/{id}", chain(opH.Update))
 	mux.Handle("DELETE /api/v1/{organization_id}/operations/{id}", chain(opH.Delete))
 	mux.Handle("GET /api/v1/{organization_id}/plots/{plot_id}/operations", chain(opH.ListByPlot))
+
+	// Operation Types
+	mux.Handle("POST /api/v1/{organization_id}/operation-types", chain(otH.Create))
+	mux.Handle("GET /api/v1/{organization_id}/operation-types", chain(otH.List))
+	mux.Handle("GET /api/v1/{organization_id}/operation-types/{id}", chain(otH.GetByID))
+	mux.Handle("PUT /api/v1/{organization_id}/operation-types/{id}", chain(otH.Update))
+	mux.Handle("DELETE /api/v1/{organization_id}/operation-types/{id}", chain(otH.Delete))
 
 	// Harvests
 	mux.Handle("POST /api/v1/{organization_id}/harvests", chain(harvestH.Create))

@@ -35,6 +35,7 @@ func NewConnection(databaseURL string, log *slog.Logger, gormLevel slog.Level) (
 		&entity.Farm{},
 		&entity.Producer{},
 		&entity.Plot{},
+		&entity.OperationType{},
 		&entity.Operation{},
 		&entity.Harvest{},
 		&entity.HarvestProduction{},

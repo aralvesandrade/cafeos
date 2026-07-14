@@ -43,7 +43,7 @@ type createOperationRequest struct {
 	PlotID       string  `json:"plot_id"`
 	HarvestID    *string `json:"harvest_id"`
 	CostCenterID *string `json:"cost_center_id"`
-	Type         string  `json:"type"`
+	TypeID       string  `json:"type_id"`
 	Date         string  `json:"date"`
 	Responsible  string  `json:"responsible"`
 	ProductUsed  string  `json:"product_used"`
@@ -78,13 +78,73 @@ func (h *OperationHandler) Create(w http.ResponseWriter, r *http.Request) {
 		date = time.Now()
 	}
 
-	op, err := h.svc.Create(organizationID, req.PlotID, entity.OperationType(req.Type), date, req.Responsible, req.ProductUsed, req.Quantity, req.Cost, req.Notes, req.HarvestID, req.CostCenterID)
+	op, err := h.svc.Create(organizationID, req.PlotID, req.TypeID, date, req.Responsible, req.ProductUsed, req.Quantity, req.Cost, req.Notes, req.HarvestID, req.CostCenterID)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	writeJSON(w, op, http.StatusCreated)
+}
+
+type updateOperationRequest struct {
+	HarvestID    *string `json:"harvest_id"`
+	CostCenterID *string `json:"cost_center_id"`
+	TypeID       string  `json:"type_id"`
+	Date         string  `json:"date"`
+	Responsible  string  `json:"responsible"`
+	ProductUsed  string  `json:"product_used"`
+	Quantity     float64 `json:"quantity"`
+	Cost         float64 `json:"cost"`
+	Notes        string  `json:"notes"`
+}
+
+// Update atualiza uma operação existente
+// @Summary Atualizar operação
+// @Description Atualiza os dados de uma operação agrícola
+// @Tags operations (Operações)
+// @Accept json
+// @Produce json
+// @Param organization_id path string true "ID da Organização"
+// @Param id path string true "ID da Operação"
+// @Param operation body updateOperationRequest true "Dados atualizados da operação"
+// @Success 200 {object} SwaggerOperation
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{organization_id}/operations/{id} [put]
+func (h *OperationHandler) Update(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	id := r.PathValue("id")
+
+	existing, err := h.svc.GetByID(id)
+	if err != nil {
+		writeError(w, "operation not found", http.StatusNotFound)
+		return
+	}
+	if !h.canAccessOperation(r, organizationID, existing) {
+		writeError(w, "operation not found", http.StatusNotFound)
+		return
+	}
+
+	var req updateOperationRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	date, err := time.Parse(time.RFC3339, req.Date)
+	if err != nil {
+		date = existing.Date
+	}
+
+	op, err := h.svc.Update(id, req.TypeID, date, req.Responsible, req.ProductUsed, req.Quantity, req.Cost, req.Notes, req.HarvestID, req.CostCenterID)
+	if err != nil {
+		writeError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	writeJSON(w, op, http.StatusOK)
 }
 
 // GetByID retorna uma operação pelo seu ID

@@ -184,6 +184,13 @@ func (r *InMemoryOperationRepo) Create(op *entity.Operation) error {
 	return nil
 }
 
+func (r *InMemoryOperationRepo) Update(op *entity.Operation) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.operations[op.ID] = op
+	return nil
+}
+
 func (r *InMemoryOperationRepo) GetByID(id string) (*entity.Operation, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()

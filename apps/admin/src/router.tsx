@@ -10,6 +10,8 @@ import { Plots } from '@/pages/Plots'
 import { PlotDetail } from '@/pages/PlotDetail'
 import { PlotEdit } from '@/pages/PlotEdit'
 import { Operations } from '@/pages/Operations'
+import { OperationDetail } from '@/pages/OperationDetail'
+import { OperationTypes } from '@/pages/OperationTypes'
 import { Harvests } from '@/pages/Harvests'
 import { HarvestDetail } from '@/pages/HarvestDetail'
 import { Organizations } from '@/pages/Organizations'
@@ -41,6 +43,8 @@ export const router = createBrowserRouter([
       { path: 'plots/:plotId', element: <PlotDetail /> },
       { path: 'plots/:plotId/edit', element: <PlotEdit /> },
       { path: 'operations', element: <Operations /> },
+      { path: 'operations/:operationId', element: <OperationDetail /> },
+      { path: 'operation-types', element: <OperationTypes /> },
       { path: 'harvests', element: <Harvests /> },
       { path: 'harvests/:harvestId', element: <HarvestDetail /> },
       { path: 'financial', element: <Financial /> },

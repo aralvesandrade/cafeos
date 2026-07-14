@@ -3085,6 +3085,257 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/{organization_id}/operation-types": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todos os tipos de operação pertencentes à organização",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "operation-types (Tipos de Operação)"
+                ],
+                "summary": "Listar tipos de operação",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.OperationType"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registra um novo tipo de operação agrícola na organização",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "operation-types (Tipos de Operação)"
+                ],
+                "summary": "Criar tipo de operação",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do tipo de operação",
+                        "name": "operation_type",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createOperationTypeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.OperationType"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{organization_id}/operation-types/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna um único tipo de operação",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "operation-types (Tipos de Operação)"
+                ],
+                "summary": "Obter tipo de operação por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Tipo de Operação",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.OperationType"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza dados do tipo de operação por ID (atualização parcial - somente os campos informados são alterados)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "operation-types (Tipos de Operação)"
+                ],
+                "summary": "Atualizar tipo de operação",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Tipo de Operação",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados do tipo de operação",
+                        "name": "operation_type",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createOperationTypeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.OperationType"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui um tipo de operação por ID",
+                "tags": [
+                    "operation-types (Tipos de Operação)"
+                ],
+                "summary": "Excluir tipo de operação",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Tipo de Operação",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/{organization_id}/operations": {
             "get": {
                 "security": [
@@ -3284,6 +3535,75 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/handler.SwaggerOperation"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza os dados de uma operação agrícola",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "operations (Operações)"
+                ],
+                "summary": "Atualizar operação",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID da Operação",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados da operação",
+                        "name": "operation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.updateOperationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.SwaggerOperation"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "404": {
@@ -4417,21 +4737,30 @@ const docTemplate = `{
             }
         },
         "entity.OperationType": {
-            "type": "string",
-            "enum": [
-                "adubacao",
-                "pulverizacao",
-                "irrigacao",
-                "poda",
-                "colheita"
-            ],
-            "x-enum-varnames": [
-                "OpAdubacao",
-                "OpPulverizacao",
-                "OpIrrigacao",
-                "OpPoda",
-                "OpColheita"
-            ]
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "color": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "organization_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
         },
         "entity.Organization": {
             "type": "object",
@@ -5271,8 +5600,14 @@ const docTemplate = `{
                 "responsible": {
                     "type": "string"
                 },
-                "type": {
-                    "$ref": "#/definitions/entity.OperationType"
+                "type_color": {
+                    "type": "string"
+                },
+                "type_id": {
+                    "type": "string"
+                },
+                "type_name": {
+                    "type": "string"
                 }
             }
         },
@@ -5659,7 +5994,21 @@ const docTemplate = `{
                 "responsible": {
                     "type": "string"
                 },
-                "type": {
+                "type_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.createOperationTypeRequest": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "color": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -6058,6 +6407,38 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/handler.syncErrorItem"
                     }
+                }
+            }
+        },
+        "handler.updateOperationRequest": {
+            "type": "object",
+            "properties": {
+                "cost": {
+                    "type": "number"
+                },
+                "cost_center_id": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "harvest_id": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "product_used": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "number"
+                },
+                "responsible": {
+                    "type": "string"
+                },
+                "type_id": {
+                    "type": "string"
                 }
             }
         },
