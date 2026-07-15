@@ -78,21 +78,21 @@ export function Hero() {
                 <Sprout className="h-48 w-48 text-coffee-green/30" />
               </div>
               <div className="absolute -top-4 -right-4 bg-white rounded-xl shadow-lg p-4">
-                <BarChart3 className="h-8 w-8 text-coffee-green" />
-              </div>
-              <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-4">
                 <Leaf className="h-8 w-8 text-coffee-green" />
               </div>
-              <div className="absolute -top-4 -left-4 bg-white rounded-xl shadow-lg p-4">
-                <Wallet className="h-8 w-8 text-coffee-green" />
+              <div className="absolute top-1/2 -translate-y-1/2 -right-8 bg-white rounded-xl shadow-lg p-4">
+                <BarChart3 className="h-8 w-8 text-coffee-green" />
               </div>
               <div className="absolute -bottom-4 -right-4 bg-white rounded-xl shadow-lg p-4">
+                <Wallet className="h-8 w-8 text-coffee-green" />
+              </div>
+              <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-4">
                 <Bell className="h-8 w-8 text-coffee-green" />
               </div>
               <div className="absolute top-1/2 -translate-y-1/2 -left-8 bg-white rounded-xl shadow-lg p-4">
                 <Tractor className="h-8 w-8 text-coffee-green" />
               </div>
-              <div className="absolute top-1/2 -translate-y-1/2 -right-8 bg-white rounded-xl shadow-lg p-4">
+              <div className="absolute -top-4 -left-4 bg-white rounded-xl shadow-lg p-4">
                 <SplitSquareHorizontal className="h-8 w-8 text-coffee-green" />
               </div>
             </div>
