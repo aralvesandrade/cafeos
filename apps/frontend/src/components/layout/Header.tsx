@@ -3,7 +3,10 @@ import { Sprout, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 
 const navLinks = [
+  { label: 'Por que o CafeOS?', href: '#about' },
   { label: 'Funcionalidades', href: '#features' },
+  { label: 'Ciclo do Café', href: '#coffee-cycle' },
+  { label: 'Indicadores Estratégicos', href: '#indicators' },
   { label: 'Planos', href: '#plans' },
 ]
 

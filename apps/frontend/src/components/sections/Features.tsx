@@ -1,52 +1,62 @@
-import { MapPin, Grid3X3, Tractor, Calendar, DollarSign, LayoutDashboard, Wallet, SplitSquareHorizontal, Bell } from 'lucide-react'
+import {
+  MapPin,
+  Grid3X3,
+  Tractor,
+  Calendar,
+  DollarSign,
+  LayoutDashboard,
+  Wallet,
+  SplitSquareHorizontal,
+  Bell,
+} from "lucide-react";
 
 const features = [
   {
     icon: MapPin,
-    title: 'Gestão de Fazendas',
-    desc: 'Cadastro completo com dados agronômicos, área total e plantada, georreferenciamento.',
+    title: "Gestão de Fazendas",
+    desc: "Cadastro completo com dados agronômicos, área total e plantada, georreferenciamento.",
   },
   {
     icon: Grid3X3,
-    title: 'Gestão de Talhões',
-    desc: 'Talhões por fazenda com cultivar, solo, altitude, ano de plantio e área.',
+    title: "Gestão de Talhões",
+    desc: "Talhões por fazenda com cultivar, solo, altitude, ano de plantio e área.",
   },
   {
     icon: Tractor,
-    title: 'Operações Agrícolas',
-    desc: 'Registro de adubação, pulverização, irrigação, poda e colheita com custos.',
+    title: "Operações Agrícolas",
+    desc: "Registro de adubação, pulverização, irrigação, poda e colheita com custos.",
   },
   {
     icon: Calendar,
-    title: 'Gestão de Safras',
-    desc: 'Estimativa e produção realizada por talhão, histórico comparativo entre safras.',
+    title: "Gestão de Safras",
+    desc: "Estimativa e produção realizada por talhão, histórico comparativo entre safras.",
   },
   {
     icon: DollarSign,
-    title: 'Custos Agrícolas',
-    desc: 'Custos por operação, talhão e safra. Cálculo de custo por hectare e por saca.',
+    title: "Custos Agrícolas",
+    desc: "Custos por operação, talhão e safra. Cálculo de custo por hectare e por saca.",
   },
   {
     icon: LayoutDashboard,
-    title: 'Dashboard',
-    desc: 'Visão consolidada de produção, custos, evolução da safra e operações recentes.',
+    title: "Dashboard",
+    desc: "Visão consolidada de produção, custos, evolução da safra e operações recentes.",
   },
   {
     icon: Wallet,
-    title: 'Orçamento',
-    desc: 'Orçado x realizado por centro de custo e safra, com variação e execução.',
+    title: "Orçamento",
+    desc: "Orçado x realizado por centro de custo e safra, com variação e execução.",
   },
   {
     icon: SplitSquareHorizontal,
-    title: 'Rateio de Custo',
-    desc: 'Distribuição de custos por talhão, proporcional por área ou percentual customizado.',
+    title: "Rateio de Custo",
+    desc: "Distribuição de custos por talhão, proporcional por área ou percentual customizado.",
   },
   {
     icon: Bell,
-    title: 'Alertas Inteligentes',
-    desc: 'Motor de regras identifica baixa produtividade e custo elevado automaticamente.',
+    title: "Alertas Inteligentes",
+    desc: "Motor de regras identifica baixa produtividade e custo elevado automaticamente.",
   },
-]
+];
 
 export function Features() {
   return (
@@ -54,10 +64,11 @@ export function Features() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-coffee-green-dark mb-4">
-            Funcionalidades do MVP
+            Funcionalidades
           </h2>
           <p className="text-lg text-coffee-text-light">
-            Tudo que você precisa para gerenciar sua propriedade cafeeira do plantio à colheita.
+            Tudo que você precisa para gerenciar sua propriedade cafeeira do
+            plantio à colheita.
           </p>
         </div>
 
@@ -70,12 +81,14 @@ export function Features() {
               <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-coffee-green text-white mb-4">
                 <feature.icon className="h-5 w-5" />
               </div>
-              <h3 className="font-semibold text-coffee-green-dark mb-2">{feature.title}</h3>
+              <h3 className="font-semibold text-coffee-green-dark mb-2">
+                {feature.title}
+              </h3>
               <p className="text-sm text-coffee-text-light">{feature.desc}</p>
             </div>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

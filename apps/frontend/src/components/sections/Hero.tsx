@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Sprout, Leaf, BarChart3 } from 'lucide-react'
+import { ArrowRight, Sprout, Leaf, BarChart3, Wallet, Bell, Tractor, SplitSquareHorizontal } from 'lucide-react'
 import { LeadModal } from '@/components/ui/LeadModal'
 
 export function Hero() {
@@ -44,7 +44,7 @@ export function Hero() {
               </a>
             </div>
 
-            <div className="flex items-center gap-6 mt-10 text-sm text-coffee-text-light">
+            <div className="flex flex-wrap items-center gap-6 mt-10 text-sm text-coffee-text-light">
               <div className="flex items-center gap-2">
                 <Leaf className="h-5 w-5 text-coffee-green" />
                 Gestão completa
@@ -52,6 +52,22 @@ export function Hero() {
               <div className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-coffee-green" />
                 Indicadores em tempo real
+              </div>
+              <div className="flex items-center gap-2">
+                <Wallet className="h-5 w-5 text-coffee-green" />
+                Controle financeiro
+              </div>
+              <div className="flex items-center gap-2">
+                <Bell className="h-5 w-5 text-coffee-green" />
+                Alertas inteligentes
+              </div>
+              <div className="flex items-center gap-2">
+                <Tractor className="h-5 w-5 text-coffee-green" />
+                Operações agrícolas
+              </div>
+              <div className="flex items-center gap-2">
+                <SplitSquareHorizontal className="h-5 w-5 text-coffee-green" />
+                Rateio de custo
               </div>
             </div>
           </div>
@@ -66,6 +82,18 @@ export function Hero() {
               </div>
               <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-4">
                 <Leaf className="h-8 w-8 text-coffee-green" />
+              </div>
+              <div className="absolute -top-4 -left-4 bg-white rounded-xl shadow-lg p-4">
+                <Wallet className="h-8 w-8 text-coffee-green" />
+              </div>
+              <div className="absolute -bottom-4 -right-4 bg-white rounded-xl shadow-lg p-4">
+                <Bell className="h-8 w-8 text-coffee-green" />
+              </div>
+              <div className="absolute top-1/2 -translate-y-1/2 -left-8 bg-white rounded-xl shadow-lg p-4">
+                <Tractor className="h-8 w-8 text-coffee-green" />
+              </div>
+              <div className="absolute top-1/2 -translate-y-1/2 -right-8 bg-white rounded-xl shadow-lg p-4">
+                <SplitSquareHorizontal className="h-8 w-8 text-coffee-green" />
               </div>
             </div>
           </div>
