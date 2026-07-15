@@ -72,6 +72,24 @@ export function Labor() {
     finally { setSaving(false) }
   }
 
+  const workerTotals: Record<string, { hours: number; cost: number }> = {}
+  for (const s of shifts) {
+    const t = workerTotals[s.worker_id] || { hours: 0, cost: 0 }
+    t.hours += s.hours
+    t.cost += s.cost
+    workerTotals[s.worker_id] = t
+  }
+
+  const teamTotals: Record<string, { hours: number; cost: number }> = {}
+  for (const w of workers) {
+    if (!w.team_id) continue
+    const wt = workerTotals[w.id] || { hours: 0, cost: 0 }
+    const t = teamTotals[w.team_id] || { hours: 0, cost: 0 }
+    t.hours += wt.hours
+    t.cost += wt.cost
+    teamTotals[w.team_id] = t
+  }
+
   if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
 
   return (<div className="space-y-6">
@@ -88,32 +106,36 @@ export function Labor() {
     </div>
 
     {tab === 'teams' && (<Table>
-      <TableHead><TableRow><TableHeader>Nome</TableHeader><TableHeader>Líder</TableHeader><TableHeader>Descrição</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
+      <TableHead><TableRow><TableHeader>Nome</TableHeader><TableHeader>Líder</TableHeader><TableHeader>Descrição</TableHeader><TableHeader className="text-right">Horas</TableHeader><TableHeader className="text-right">Custo Total</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
       <TableBody>{teams.map((t) => (<TableRow key={t.id}>
         <TableCell className="font-medium"><div className="flex items-center gap-2"><Users className="h-4 w-4 text-primary" />{t.name}</div></TableCell>
         <TableCell>{t.leader || '-'}</TableCell><TableCell className="text-sm text-muted-foreground">{t.description || '-'}</TableCell>
+        <TableCell className="text-right">{(teamTotals[t.id]?.hours || 0)}h</TableCell>
+        <TableCell className="text-right">R$ {(teamTotals[t.id]?.cost || 0).toFixed(2)}</TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
           <Button variant="ghost" size="sm" onClick={() => { setEditingTeam(t); setTeamForm({ name: t.name, leader: t.leader, description: t.description }); setTeamDialog(true) }}><Pencil className="h-4 w-4" /></Button>
           <Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover equipe?')) apiRequest(`/labor/teams/${t.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
         </div></TableCell>
       </TableRow>))}
-      {teams.length === 0 && <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">Nenhuma equipe cadastrada.</TableCell></TableRow>}
+      {teams.length === 0 && <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Nenhuma equipe cadastrada.</TableCell></TableRow>}
       </TableBody>
     </Table>)}
 
     {tab === 'workers' && (<Table>
-      <TableHead><TableRow><TableHeader>Nome</TableHeader><TableHeader>Equipe</TableHeader><TableHeader>Função</TableHeader><TableHeader>Telefone</TableHeader><TableHeader>Valor Hora</TableHeader><TableHeader>Status</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
+      <TableHead><TableRow><TableHeader>Nome</TableHeader><TableHeader>Equipe</TableHeader><TableHeader>Função</TableHeader><TableHeader>Telefone</TableHeader><TableHeader>Valor Hora</TableHeader><TableHeader className="text-right">Horas</TableHeader><TableHeader className="text-right">Custo Total</TableHeader><TableHeader>Status</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
       <TableBody>{workers.map((w) => (<TableRow key={w.id}>
         <TableCell className="font-medium"><div className="flex items-center gap-2"><User className="h-4 w-4 text-primary" />{w.name}</div></TableCell>
         <TableCell>{w.team?.name || '-'}</TableCell><TableCell>{w.role || '-'}</TableCell><TableCell>{w.phone || '-'}</TableCell>
         <TableCell>R$ {w.hourly_rate.toFixed(2)}</TableCell>
+        <TableCell className="text-right">{(workerTotals[w.id]?.hours || 0)}h</TableCell>
+        <TableCell className="text-right">R$ {(workerTotals[w.id]?.cost || 0).toFixed(2)}</TableCell>
         <TableCell><Badge variant={w.is_active ? 'success' : 'default'}>{w.is_active ? 'Ativo' : 'Inativo'}</Badge></TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
           <Button variant="ghost" size="sm" onClick={() => { setEditingWorker(w); setWorkerForm({ team_id: w.team_id, name: w.name, role: w.role, phone: w.phone, hourly_rate: String(w.hourly_rate), is_active: w.is_active }); setWorkerDialog(true) }}><Pencil className="h-4 w-4" /></Button>
           <Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover trabalhador?')) apiRequest(`/labor/workers/${w.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
         </div></TableCell>
       </TableRow>))}
-      {workers.length === 0 && <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Nenhum trabalhador cadastrado.</TableCell></TableRow>}
+      {workers.length === 0 && <TableRow><TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Nenhum trabalhador cadastrado.</TableCell></TableRow>}
       </TableBody>
     </Table>)}
 

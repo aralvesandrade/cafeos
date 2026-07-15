@@ -69,6 +69,11 @@ export function Fleet() {
     finally { setSaving(false) }
   }
 
+  const maintenanceCostByVehicle: Record<string, number> = {}
+  for (const m of maintenance) {
+    maintenanceCostByVehicle[m.vehicle_id] = (maintenanceCostByVehicle[m.vehicle_id] || 0) + m.cost
+  }
+
   if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
 
   return (<div className="space-y-6">
@@ -90,7 +95,7 @@ export function Fleet() {
       <Button variant={tab === 'maintenance' ? 'primary' : 'outline'} size="sm" onClick={() => setTab('maintenance')}>Manutenções</Button>
     </div>
     {tab === 'vehicles' ? (<Table>
-      <TableHead><TableRow><TableHeader>Nome</TableHeader><TableHeader>Fazenda</TableHeader><TableHeader>Tipo</TableHeader><TableHeader>Placa</TableHeader><TableHeader>Marca/Modelo</TableHeader><TableHeader>Ano</TableHeader><TableHeader>Status</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
+      <TableHead><TableRow><TableHeader>Nome</TableHeader><TableHeader>Fazenda</TableHeader><TableHeader>Tipo</TableHeader><TableHeader>Placa</TableHeader><TableHeader>Marca/Modelo</TableHeader><TableHeader>Ano</TableHeader><TableHeader>Status</TableHeader><TableHeader className="text-right">Custo Manutenção</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
       <TableBody>{vehicles.map((v) => (<TableRow key={v.id}>
         <TableCell className="font-medium"><div className="flex items-center gap-2"><Truck className="h-4 w-4 text-primary" />{v.name}</div></TableCell>
         <TableCell className="text-muted-foreground text-sm">{farms.find(f => f.id === v.farm_id)?.name || '-'}</TableCell>
@@ -98,12 +103,13 @@ export function Fleet() {
         <TableCell className="text-sm">{(v.brand || '') + ' ' + (v.model || '')}</TableCell>
         <TableCell>{v.year || '-'}</TableCell>
         <TableCell><Badge variant={v.status === 'maintenance' ? 'warning' : 'success'}>{statusLabels[v.status] || v.status}</Badge></TableCell>
+        <TableCell className="text-right">R$ {(maintenanceCostByVehicle[v.id] || 0).toFixed(2)}</TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
           <Button variant="ghost" size="sm" onClick={() => { setEditing(v); setForm({ name: v.name, farm_id: v.farm_id || '', type: v.type, plate: v.plate, brand: v.brand, model: v.model, year: String(v.year), status: v.status }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
           <Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover veículo?')) apiRequest(`/fleet/vehicles/${v.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
         </div></TableCell>
       </TableRow>))}
-      {vehicles.length === 0 && <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">Nenhum veículo cadastrado.</TableCell></TableRow>}
+      {vehicles.length === 0 && <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">Nenhum veículo cadastrado.</TableCell></TableRow>}
       </TableBody>
     </Table>) : (<Table>
       <TableHead><TableRow><TableHeader>Veículo</TableHeader><TableHeader>Data</TableHeader><TableHeader>Tipo</TableHeader><TableHeader>Descrição</TableHeader><TableHeader>Custo</TableHeader><TableHeader>Horímetro</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
