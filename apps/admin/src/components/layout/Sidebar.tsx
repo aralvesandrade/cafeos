@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import {
@@ -18,8 +19,13 @@ import {
   Tags,
   Wallet,
   SplitSquareHorizontal,
+  Sun,
+  Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
+import { useTheme } from '@/lib/theme'
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -50,9 +56,31 @@ interface SidebarProps {
   onClose: () => void
 }
 
+const COLLAPSED_KEY = 'cafeos-sidebar-collapsed'
+
 export function Sidebar({ open, onClose }: SidebarProps) {
   const { user } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const isAdmin = user?.role === 'platform_owner'
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem(COLLAPSED_KEY) === 'true')
+
+  const toggleCollapsed = () => {
+    setCollapsed((prev) => {
+      const next = !prev
+      localStorage.setItem(COLLAPSED_KEY, String(next))
+      return next
+    })
+  }
+
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    cn(
+      'flex items-center gap-3 rounded-lg text-sm transition-colors',
+      collapsed ? 'justify-center px-2 py-2' : 'px-3 py-2',
+      isActive
+        ? 'bg-sidebar-active-bg text-sidebar-active-foreground font-medium'
+        : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50'
+    )
+
   return (
     <>
       {open && (
@@ -64,93 +92,105 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
       <aside
         className={cn(
-          'fixed top-0 left-0 z-50 h-full w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col transition-transform lg:translate-x-0 lg:static lg:z-auto',
-          open ? 'translate-x-0' : '-translate-x-full'
+          'fixed top-0 left-0 z-50 h-full w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col transition-all lg:translate-x-0 lg:static lg:z-auto',
+          open ? 'translate-x-0' : '-translate-x-full',
+          collapsed ? 'lg:w-16' : 'lg:w-64'
         )}
       >
-        <div className="flex items-center justify-between px-4 h-16 border-b border-sidebar-border">
+        <div className={cn('flex items-center h-16 border-b border-sidebar-border', collapsed ? 'justify-center px-2' : 'justify-between px-4')}>
           <NavLink to="/" className="flex items-center gap-2 font-bold text-lg text-foreground">
-            <span className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
+            <span className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0">
               <Sprout className="h-4 w-4" />
             </span>
-            CafeOS
+            {!collapsed && 'CafeOS'}
           </NavLink>
           <button onClick={onClose} className="lg:hidden text-sidebar-foreground/60 hover:text-sidebar-foreground">
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <nav className="flex-1 py-4 space-y-1 px-3">
+        <nav className="flex-1 py-4 space-y-1 px-3 overflow-y-auto overflow-x-hidden">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.to === '/'}
               onClick={onClose}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
-                  isActive
-                    ? 'bg-sidebar-active-bg text-sidebar-active-foreground font-medium'
-                    : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50'
-                )
-              }
+              title={collapsed ? item.label : undefined}
+              className={linkClass}
             >
-              <item.icon className="h-5 w-5" />
-              {item.label}
+              <item.icon className="h-5 w-5 shrink-0" />
+              {!collapsed && item.label}
             </NavLink>
           ))}
 
           <div className="pt-4 mt-4 border-t border-sidebar-border">
-            <p className="px-3 text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider mb-2">
-              Gestão
-            </p>
+            {!collapsed && (
+              <p className="px-3 text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider mb-2">
+                Gestão
+              </p>
+            )}
             {phase2Items.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 onClick={onClose}
-                className={({ isActive }) =>
-                  cn(
-                    'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
-                    isActive
-                      ? 'bg-sidebar-active-bg text-sidebar-active-foreground font-medium'
-                      : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50'
-                  )
-                }
+                title={collapsed ? item.label : undefined}
+                className={linkClass}
               >
-                <item.icon className="h-5 w-5" />
-                {item.label}
+                <item.icon className="h-5 w-5 shrink-0" />
+                {!collapsed && item.label}
               </NavLink>
             ))}
           </div>
 
           {isAdmin && (
             <div className="pt-4 mt-4 border-t border-sidebar-border">
-              <p className="px-3 text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider mb-2">
-                Administração
-              </p>
+              {!collapsed && (
+                <p className="px-3 text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider mb-2">
+                  Administração
+                </p>
+              )}
               {adminItems.map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
                   onClick={onClose}
-                  className={({ isActive }) =>
-                    cn(
-                      'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
-                      isActive
-                        ? 'bg-sidebar-active-bg text-sidebar-active-foreground font-medium'
-                        : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50'
-                    )
-                  }
+                  title={collapsed ? item.label : undefined}
+                  className={linkClass}
                 >
-                  <item.icon className="h-5 w-5" />
-                  {item.label}
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  {!collapsed && item.label}
                 </NavLink>
               ))}
             </div>
           )}
         </nav>
+
+        <div className="px-3 py-4 border-t border-sidebar-border space-y-1">
+          <button
+            onClick={toggleTheme}
+            title={collapsed ? (theme === 'dark' ? 'Modo Claro' : 'Modo Escuro') : undefined}
+            className={cn(
+              'flex items-center gap-3 rounded-lg text-sm w-full text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50 transition-colors',
+              collapsed ? 'justify-center px-2 py-2' : 'px-3 py-2'
+            )}
+          >
+            {theme === 'dark' ? <Sun className="h-5 w-5 shrink-0" /> : <Moon className="h-5 w-5 shrink-0" />}
+            {!collapsed && (theme === 'dark' ? 'Modo Claro' : 'Modo Escuro')}
+          </button>
+          <button
+            onClick={toggleCollapsed}
+            title={collapsed ? 'Expandir menu' : undefined}
+            className={cn(
+              'hidden lg:flex items-center gap-3 rounded-lg text-sm w-full text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50 transition-colors',
+              collapsed ? 'justify-center px-2 py-2' : 'px-3 py-2'
+            )}
+          >
+            {collapsed ? <PanelLeftOpen className="h-5 w-5 shrink-0" /> : <PanelLeftClose className="h-5 w-5 shrink-0" />}
+            {!collapsed && 'Recolher menu'}
+          </button>
+        </div>
       </aside>
     </>
   )
