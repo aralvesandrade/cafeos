@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/aralvesandrade/cafeos/internal/api/middleware"
 	"github.com/aralvesandrade/cafeos/internal/domain/entity"
 	"github.com/aralvesandrade/cafeos/internal/domain/repository"
 	"github.com/google/uuid"
@@ -48,31 +49,9 @@ func (h *UserHandler) List(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	// Strip password hashes from response
-	type userResponse struct {
-		ID             string `json:"id"`
-		OrganizationID string `json:"organization_id"`
-		Name           string `json:"name"`
-		Email          string `json:"email"`
-		Role           string `json:"role"`
-		IsActive       bool   `json:"is_active"`
-		Status         string `json:"status"`
-	}
 	resp := make([]userResponse, 0, len(users))
 	for _, u := range users {
-		status := "active"
-		if !u.IsActive {
-			status = "inactive"
-		}
-		resp = append(resp, userResponse{
-			ID:             u.ID,
-			OrganizationID: u.OrganizationID,
-			Name:           u.Name,
-			Email:          u.Email,
-			Role:           string(u.Role),
-			IsActive:       u.IsActive,
-			Status:         status,
-		})
+		resp = append(resp, toUserResponse(u))
 	}
 	writeJSON(w, resp, http.StatusOK)
 }
@@ -190,6 +169,190 @@ func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Router /api/v1/admin/users/{id} [delete]
 func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
+	if err := h.repo.Delete(id); err != nil {
+		writeError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+type userResponse struct {
+	ID             string `json:"id"`
+	OrganizationID string `json:"organization_id"`
+	Name           string `json:"name"`
+	Email          string `json:"email"`
+	Role           string `json:"role"`
+	IsActive       bool   `json:"is_active"`
+	Status         string `json:"status"`
+}
+
+func toUserResponse(u *entity.User) userResponse {
+	status := "active"
+	if !u.IsActive {
+		status = "inactive"
+	}
+	return userResponse{
+		ID:             u.ID,
+		OrganizationID: u.OrganizationID,
+		Name:           u.Name,
+		Email:          u.Email,
+		Role:           string(u.Role),
+		IsActive:       u.IsActive,
+		Status:         status,
+	}
+}
+
+// ListForOrg retorna os usuários da própria organização
+// @Summary Listar usuários da organização
+// @Description Lista os usuários da organização autenticada (requer acesso ao módulo "users")
+// @Tags users (Usuários)
+// @Produce json
+// @Param organization_id path string true "ID da Organização"
+// @Success 200 {array} entity.User
+// @Security BearerAuth
+// @Router /api/v1/{organization_id}/users [get]
+func (h *UserHandler) ListForOrg(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	users, err := h.repo.ListByOrganization(organizationID)
+	if err != nil {
+		writeError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	resp := make([]userResponse, 0, len(users))
+	for _, u := range users {
+		resp = append(resp, toUserResponse(u))
+	}
+	writeJSON(w, resp, http.StatusOK)
+}
+
+// CreateForOrg cria um usuário na própria organização
+// @Summary Criar usuário na organização
+// @Description Cria um usuário na organização autenticada (requer write no módulo "users")
+// @Tags users (Usuários)
+// @Accept json
+// @Produce json
+// @Param organization_id path string true "ID da Organização"
+// @Param user body createUserRequest true "Dados do usuário"
+// @Success 201 {object} entity.User
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{organization_id}/users [post]
+func (h *UserHandler) CreateForOrg(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+
+	var req createUserRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+	if req.Name == "" || req.Email == "" || req.Password == "" {
+		writeError(w, "name, email, and password are required", http.StatusBadRequest)
+		return
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		writeError(w, "failed to hash password", http.StatusInternalServerError)
+		return
+	}
+
+	role := entity.UserRole(req.Role)
+	if role == "" {
+		role = entity.RoleOperador
+	}
+
+	user := &entity.User{
+		ID:             uuid.New().String(),
+		OrganizationID: organizationID,
+		Name:           req.Name,
+		Email:          req.Email,
+		PasswordHash:   string(hash),
+		Role:           role,
+		IsActive:       true,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
+	}
+
+	if err := h.repo.Create(user); err != nil {
+		writeError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	writeJSON(w, toUserResponse(user), http.StatusCreated)
+}
+
+// UpdateForOrg atualiza um usuário da própria organização
+// @Summary Atualizar usuário da organização
+// @Description Atualiza um usuário, restrito à organização autenticada (requer write no módulo "users")
+// @Tags users (Usuários)
+// @Accept json
+// @Produce json
+// @Param organization_id path string true "ID da Organização"
+// @Param id path string true "ID do Usuário"
+// @Param user body updateUserRequest true "Dados atualizados do usuário"
+// @Success 200 {object} entity.User
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{organization_id}/users/{id} [put]
+func (h *UserHandler) UpdateForOrg(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	id := r.PathValue("id")
+
+	existing, err := h.repo.GetByID(id)
+	if err != nil || existing.OrganizationID != organizationID {
+		writeError(w, "user not found", http.StatusNotFound)
+		return
+	}
+
+	var req updateUserRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if req.Name != nil {
+		existing.Name = *req.Name
+	}
+	if req.Email != nil {
+		existing.Email = *req.Email
+	}
+	if req.Role != nil {
+		existing.Role = entity.UserRole(*req.Role)
+	}
+	if req.IsActive != nil {
+		existing.IsActive = *req.IsActive
+	}
+	existing.UpdatedAt = time.Now()
+
+	if err := h.repo.Update(existing); err != nil {
+		writeError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	writeJSON(w, toUserResponse(existing), http.StatusOK)
+}
+
+// DeleteForOrg remove um usuário da própria organização
+// @Summary Excluir usuário da organização
+// @Description Exclui um usuário, restrito à organização autenticada (requer write no módulo "users")
+// @Tags users (Usuários)
+// @Param organization_id path string true "ID da Organização"
+// @Param id path string true "ID do Usuário"
+// @Success 204 "No Content"
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{organization_id}/users/{id} [delete]
+func (h *UserHandler) DeleteForOrg(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	id := r.PathValue("id")
+
+	existing, err := h.repo.GetByID(id)
+	if err != nil || existing.OrganizationID != organizationID {
+		writeError(w, "user not found", http.StatusNotFound)
+		return
+	}
+
 	if err := h.repo.Delete(id); err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return

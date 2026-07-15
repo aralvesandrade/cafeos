@@ -389,3 +389,47 @@ func (r *InMemoryIndicatorRepo) ListByOrganizationAndType(organizationID string,
 	}
 	return result, nil
 }
+
+type InMemoryPermissionRepo struct {
+	mu          sync.RWMutex
+	permissions map[string]*entity.RolePermission
+}
+
+func NewInMemoryPermissionRepo() *InMemoryPermissionRepo {
+	return &InMemoryPermissionRepo{permissions: make(map[string]*entity.RolePermission)}
+}
+
+func (r *InMemoryPermissionRepo) key(organizationID string, role entity.UserRole, module entity.Module) string {
+	return organizationID + "|" + string(role) + "|" + string(module)
+}
+
+func (r *InMemoryPermissionRepo) ListByOrganization(organizationID string) ([]*entity.RolePermission, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var result []*entity.RolePermission
+	for _, p := range r.permissions {
+		if p.OrganizationID == organizationID {
+			result = append(result, p)
+		}
+	}
+	return result, nil
+}
+
+func (r *InMemoryPermissionRepo) Upsert(p *entity.RolePermission) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.permissions[r.key(p.OrganizationID, p.Role, p.Module)] = p
+	return nil
+}
+
+func (r *InMemoryPermissionRepo) CountByOrganization(organizationID string) (int64, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var count int64
+	for _, p := range r.permissions {
+		if p.OrganizationID == organizationID {
+			count++
+		}
+	}
+	return count, nil
+}

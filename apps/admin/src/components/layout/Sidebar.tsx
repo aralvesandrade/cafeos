@@ -23,27 +23,30 @@ import {
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
+  ShieldCheck,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { useTheme } from '@/lib/theme'
+import { usePermissions, type Module } from '@/lib/permissions'
 
-const navItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/farms', icon: MapPin, label: 'Fazendas' },
-  { to: '/plots', icon: Grid3X3, label: 'Talhões' },
-  { to: '/operations', icon: Tractor, label: 'Operações' },
-  { to: '/operation-types', icon: Tags, label: 'Tipos de Operação' },
-  { to: '/harvests', icon: Calendar, label: 'Safras' },
+const navItems: { to: string; icon: typeof LayoutDashboard; label: string; module: Module }[] = [
+  { to: '/', icon: LayoutDashboard, label: 'Dashboard', module: 'dashboard' },
+  { to: '/farms', icon: MapPin, label: 'Fazendas', module: 'farms' },
+  { to: '/plots', icon: Grid3X3, label: 'Talhões', module: 'farms' },
+  { to: '/operations', icon: Tractor, label: 'Operações', module: 'operations' },
+  { to: '/operation-types', icon: Tags, label: 'Tipos de Operação', module: 'farms' },
+  { to: '/harvests', icon: Calendar, label: 'Safras', module: 'harvests' },
 ]
 
-const phase2Items = [
-  { to: '/financial', icon: DollarSign, label: 'Financeiro' },
-  { to: '/cost-centers', icon: CircleDollarSign, label: 'Centros de Custo' },
-  { to: '/budgets', icon: Wallet, label: 'Orçamento' },
-  { to: '/cost-allocations', icon: SplitSquareHorizontal, label: 'Rateio de Custo' },
-  { to: '/stock', icon: Package, label: 'Estoque' },
-  { to: '/fleet', icon: Truck, label: 'Frota' },
-  { to: '/labor', icon: UserCog, label: 'Equipes' },
+const phase2Items: { to: string; icon: typeof LayoutDashboard; label: string; module: Module }[] = [
+  { to: '/financial', icon: DollarSign, label: 'Financeiro', module: 'financial' },
+  { to: '/cost-centers', icon: CircleDollarSign, label: 'Centros de Custo', module: 'financial' },
+  { to: '/budgets', icon: Wallet, label: 'Orçamento', module: 'financial' },
+  { to: '/cost-allocations', icon: SplitSquareHorizontal, label: 'Rateio de Custo', module: 'financial' },
+  { to: '/stock', icon: Package, label: 'Estoque', module: 'resources' },
+  { to: '/fleet', icon: Truck, label: 'Frota', module: 'resources' },
+  { to: '/labor', icon: UserCog, label: 'Equipes', module: 'resources' },
+  { to: '/team', icon: Users, label: 'Minha Equipe', module: 'users' },
 ]
 
 const adminItems = [
@@ -62,7 +65,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const { user } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const isAdmin = user?.role === 'platform_owner'
+  const { access } = usePermissions()
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem(COLLAPSED_KEY) === 'true')
+  const visibleNavItems = navItems.filter((item) => (access?.[item.module] ?? 'none') !== 'none')
+  const visiblePhase2Items = phase2Items.filter((item) => (access?.[item.module] ?? 'none') !== 'none')
+  const canConfigurePermissions = (access?.permissions ?? 'none') !== 'none'
 
   const toggleCollapsed = () => {
     setCollapsed((prev) => {
@@ -110,7 +117,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         </div>
 
         <nav className="flex-1 py-4 space-y-1 px-3 overflow-y-auto overflow-x-hidden">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -124,34 +131,14 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             </NavLink>
           ))}
 
-          <div className="pt-4 mt-4 border-t border-sidebar-border">
-            {!collapsed && (
-              <p className="px-3 text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider mb-2">
-                Gestão
-              </p>
-            )}
-            {phase2Items.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                onClick={onClose}
-                title={collapsed ? item.label : undefined}
-                className={linkClass}
-              >
-                <item.icon className="h-5 w-5 shrink-0" />
-                {!collapsed && item.label}
-              </NavLink>
-            ))}
-          </div>
-
-          {isAdmin && (
+          {visiblePhase2Items.length > 0 && (
             <div className="pt-4 mt-4 border-t border-sidebar-border">
               {!collapsed && (
                 <p className="px-3 text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider mb-2">
-                  Administração
+                  Gestão
                 </p>
               )}
-              {adminItems.map((item) => (
+              {visiblePhase2Items.map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
@@ -163,6 +150,39 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   {!collapsed && item.label}
                 </NavLink>
               ))}
+            </div>
+          )}
+
+          {(isAdmin || canConfigurePermissions) && (
+            <div className="pt-4 mt-4 border-t border-sidebar-border">
+              {!collapsed && (
+                <p className="px-3 text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider mb-2">
+                  Administração
+                </p>
+              )}
+              {isAdmin && adminItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={onClose}
+                  title={collapsed ? item.label : undefined}
+                  className={linkClass}
+                >
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  {!collapsed && item.label}
+                </NavLink>
+              ))}
+              {canConfigurePermissions && (
+                <NavLink
+                  to="/permissions"
+                  onClick={onClose}
+                  title={collapsed ? 'Permissões' : undefined}
+                  className={linkClass}
+                >
+                  <ShieldCheck className="h-5 w-5 shrink-0" />
+                  {!collapsed && 'Permissões'}
+                </NavLink>
+              )}
             </div>
           )}
         </nav>

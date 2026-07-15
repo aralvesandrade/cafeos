@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { useAuth } from '@/lib/auth'
 import { apiRequest } from '@/lib/api'
 import { useToast } from '@/lib/toast'
+import type { UserRole } from '@/lib/roles'
 
 const profiles = [
   { label: 'Admin Plataforma', email: 'admin@cafeos.com.br', password: 'admin123', role: 'platform_owner' },
@@ -33,7 +34,7 @@ export function Login() {
       const data = await apiRequest<{
         token: string
         organization_id: string
-        user: { id: string; email: string; name: string; role: string }
+        user: { id: string; email: string; name: string; role: UserRole }
       }>('/auth/login', {
         method: 'POST',
         body: { email, password },

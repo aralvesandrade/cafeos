@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Calendar, ExternalLink } from 'lucide-react'
+import { useModuleAccess } from '@/lib/permissions'
 
 interface Harvest {
   id: string
@@ -27,6 +28,7 @@ export function Harvests() {
   const [saving, setSaving] = useState(false)
   const toast = useToast()
   const confirm = useConfirm()
+  const canEdit = useModuleAccess('harvests') === 'write'
 
   const load = useCallback(async () => {
     try {
@@ -82,7 +84,7 @@ export function Harvests() {
           <h1 className="font-display text-2xl font-semibold text-foreground">Safras</h1>
           <p className="text-sm text-muted-foreground">Gerencie as safras da sua propriedade</p>
         </div>
-        <Button onClick={() => setDialogOpen(true)}><Plus className="h-4 w-4" /> Nova Safra</Button>
+        {canEdit && <Button onClick={() => setDialogOpen(true)}><Plus className="h-4 w-4" /> Nova Safra</Button>}
       </div>
 
       <Table>
@@ -118,7 +120,7 @@ export function Harvests() {
                       <ExternalLink className="h-4 w-4" />
                     </Link>
                   </Button>
-                  {h.status !== 'finalized' && (
+                  {canEdit && h.status !== 'finalized' && (
                     <Button variant="outline" size="sm" onClick={() => handleFinalize(h.id)}>
                       Finalizar
                     </Button>

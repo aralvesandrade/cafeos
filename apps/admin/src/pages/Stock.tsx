@@ -9,6 +9,7 @@ import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@
 import { Badge } from '@/components/ui/badge'
 import { Select } from '@/components/ui/select'
 import { Plus, Pencil, Trash2, Package, ArrowUpDown } from 'lucide-react'
+import { useModuleAccess } from '@/lib/permissions'
 
 interface StockItem {
   id: string
@@ -46,6 +47,7 @@ export function Stock() {
   const [saving, setSaving] = useState(false)
   const toast = useToast()
   const confirm = useConfirm()
+  const canEdit = useModuleAccess('resources') === 'write'
 
   const load = useCallback(async () => {
     try {
@@ -104,8 +106,10 @@ export function Stock() {
             <option key={f.id} value={f.id}>{f.name}</option>
           ))}
         </Select>
-        <Button variant="outline" onClick={() => { setMovForm({ item_id: '', type: 'in', quantity: '', date: '', reference: '', notes: '' }); setMovDialogOpen(true) }}><ArrowUpDown className="h-4 w-4" /> Movimentar</Button>
-        <Button onClick={() => { setEditing(null); setForm({ product_id: '', farm_id: '', quantity: '', unit: '', batch: '', expiry_date: '', min_stock: '', location: '', notes: '' }); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Novo Item</Button>
+        {canEdit && (<>
+          <Button variant="outline" onClick={() => { setMovForm({ item_id: '', type: 'in', quantity: '', date: '', reference: '', notes: '' }); setMovDialogOpen(true) }}><ArrowUpDown className="h-4 w-4" /> Movimentar</Button>
+          <Button onClick={() => { setEditing(null); setForm({ product_id: '', farm_id: '', quantity: '', unit: '', batch: '', expiry_date: '', min_stock: '', location: '', notes: '' }); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Novo Item</Button>
+        </>)}
       </div>
     </div>
     <Table>
@@ -124,8 +128,10 @@ export function Stock() {
           <TableCell>{i.min_stock}</TableCell>
           <TableCell className="text-sm">{i.location || '-'}</TableCell>
           <TableCell className="text-right"><div className="flex justify-end gap-1">
-            <Button variant="ghost" size="sm" onClick={() => { setEditing(i); setForm({ product_id: i.product_id, farm_id: i.farm_id || '', quantity: String(i.quantity), unit: i.unit, batch: i.batch, expiry_date: i.expiry_date || '', min_stock: String(i.min_stock), location: i.location, notes: i.notes }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="sm" onClick={() => handleDeleteItem(i.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+            {canEdit && (<>
+              <Button variant="ghost" size="sm" onClick={() => { setEditing(i); setForm({ product_id: i.product_id, farm_id: i.farm_id || '', quantity: String(i.quantity), unit: i.unit, batch: i.batch, expiry_date: i.expiry_date || '', min_stock: String(i.min_stock), location: i.location, notes: i.notes }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="sm" onClick={() => handleDeleteItem(i.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+            </>)}
           </div></TableCell>
         </TableRow>)
       })}

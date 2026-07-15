@@ -6,6 +6,7 @@ import { FarmList } from '@/components/farms/FarmList'
 import { Plus } from 'lucide-react'
 import { useToast } from '@/lib/toast'
 import { useConfirm } from '@/lib/confirm'
+import { useModuleAccess } from '@/lib/permissions'
 
 interface Producer {
   cpf: string
@@ -72,6 +73,7 @@ export function Farms() {
   const [loading, setLoading] = useState(true)
   const toast = useToast()
   const confirm = useConfirm()
+  const canEdit = useModuleAccess('farms') === 'write'
 
   const loadFarms = useCallback(async () => {
     try {
@@ -111,15 +113,17 @@ export function Farms() {
           <h1 className="font-display text-2xl font-semibold text-foreground">Fazendas</h1>
           <p className="text-sm text-muted-foreground">Gerencie suas propriedades rurais</p>
         </div>
-        <Button asChild>
-          <Link to="/farms/new">
-            <Plus className="h-4 w-4" />
-            Nova Fazenda
-          </Link>
-        </Button>
+        {canEdit && (
+          <Button asChild>
+            <Link to="/farms/new">
+              <Plus className="h-4 w-4" />
+              Nova Fazenda
+            </Link>
+          </Button>
+        )}
       </div>
 
-      <FarmList farms={farms} onDelete={handleDelete} />
+      <FarmList farms={farms} onDelete={handleDelete} canEdit={canEdit} />
     </div>
   )
 }

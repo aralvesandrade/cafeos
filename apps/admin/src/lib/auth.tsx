@@ -1,11 +1,12 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import { setAuthData, clearAuthData } from './api'
+import type { UserRole } from './roles'
 
 interface User {
   id: string
   email: string
   name: string
-  role: string
+  role: UserRole
 }
 
 interface AuthContextType {

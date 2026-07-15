@@ -44,6 +44,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	budgetRepo := infraRepo.NewBudgetRepository(db)
 	allocRepo := infraRepo.NewCostAllocationRepository(db)
 	alertRepo := infraRepo.NewAlertRepository(db)
+	permRepo := infraRepo.NewPermissionRepository(db)
 	transactor := postgres.NewTransactor(db)
 	ruleEngine := domainSvc.NewRuleEngine()
 
@@ -59,6 +60,17 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	otSvc := domainSvc.NewOperationTypeService(otRepo)
 	budgetSvc := domainSvc.NewBudgetService(budgetRepo, harvestRepo, opRepo, maintRepo, shiftRepo, finRepo, allocRepo)
 	allocSvc := domainSvc.NewCostAllocationService(allocRepo, plotRepo)
+	permSvc := domainSvc.NewPermissionService(permRepo)
+
+	if organizations, err := organizationRepo.List(); err != nil {
+		log.Error("failed to list organizations for permission backfill", "error", err)
+	} else {
+		for _, org := range organizations {
+			if err := permSvc.SeedDefaultsIfMissing(org.ID); err != nil {
+				log.Error("failed to backfill default permissions", "organization_id", org.ID, "error", err)
+			}
+		}
+	}
 
 	farmH := handler.NewFarmHandler(farmSvc)
 	plotH := handler.NewPlotHandler(plotSvc, farmSvc)
@@ -66,7 +78,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	harvestH := handler.NewHarvestHandler(harvestSvc, plotSvc, farmSvc, indicatorRepo)
 	dashboardH := handler.NewDashboardHandler(harvestRepo, indicatorRepo, opRepo, plotRepo, farmRepo, hpRepo, farmSvc)
 	authH := handler.NewAuthHandler(userRepo, organizationRepo, jwtSecret)
-	organizationH := handler.NewOrganizationHandler(organizationRepo)
+	organizationH := handler.NewOrganizationHandler(organizationRepo, permSvc)
 	userH := handler.NewUserHandler(userRepo)
 	finH := handler.NewFinancialHandler(finSvc, farmSvc)
 	stockH := handler.NewStockHandler(stockSvc, farmSvc)
@@ -78,6 +90,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	budgetH := handler.NewBudgetHandler(budgetSvc)
 	allocH := handler.NewCostAllocationHandler(allocSvc)
 	alertH := handler.NewAlertHandler(alertRepo)
+	permH := handler.NewPermissionHandler(permSvc)
 
 	authMw := middleware.Auth(jwtSecret)
 	adminMw := middleware.RequireRole(entity.RolePlatformOwner)
@@ -98,92 +111,97 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	chain := func(h http.HandlerFunc) http.Handler {
 		return authMw(http.HandlerFunc(h))
 	}
+	mchain := func(module entity.Module, access entity.AccessLevel, h http.HandlerFunc) http.Handler {
+		return authMw(middleware.RequireModule(permSvc, module, access)(http.HandlerFunc(h)))
+	}
+	read := entity.AccessRead
+	write := entity.AccessWrite
 
 	// Farms
-	mux.Handle("POST /api/v1/{organization_id}/farms", chain(farmH.Create))
-	mux.Handle("GET /api/v1/{organization_id}/farms", chain(farmH.List))
-	mux.Handle("GET /api/v1/{organization_id}/farms/{id}", chain(farmH.GetByID))
-	mux.Handle("PUT /api/v1/{organization_id}/farms/{id}", chain(farmH.Update))
-	mux.Handle("DELETE /api/v1/{organization_id}/farms/{id}", chain(farmH.Delete))
+	mux.Handle("POST /api/v1/{organization_id}/farms", mchain(entity.ModuleFarms, write, farmH.Create))
+	mux.Handle("GET /api/v1/{organization_id}/farms", mchain(entity.ModuleFarms, read, farmH.List))
+	mux.Handle("GET /api/v1/{organization_id}/farms/{id}", mchain(entity.ModuleFarms, read, farmH.GetByID))
+	mux.Handle("PUT /api/v1/{organization_id}/farms/{id}", mchain(entity.ModuleFarms, write, farmH.Update))
+	mux.Handle("DELETE /api/v1/{organization_id}/farms/{id}", mchain(entity.ModuleFarms, write, farmH.Delete))
 
 	// Plots
-	mux.Handle("POST /api/v1/{organization_id}/plots", chain(plotH.Create))
-	mux.Handle("GET /api/v1/{organization_id}/plots", chain(plotH.List))
-	mux.Handle("GET /api/v1/{organization_id}/plots/{id}", chain(plotH.GetByID))
-	mux.Handle("PUT /api/v1/{organization_id}/plots/{id}", chain(plotH.Update))
-	mux.Handle("DELETE /api/v1/{organization_id}/plots/{id}", chain(plotH.Delete))
-	mux.Handle("GET /api/v1/{organization_id}/farms/{farm_id}/plots", chain(plotH.ListByFarm))
+	mux.Handle("POST /api/v1/{organization_id}/plots", mchain(entity.ModuleFarms, write, plotH.Create))
+	mux.Handle("GET /api/v1/{organization_id}/plots", mchain(entity.ModuleFarms, read, plotH.List))
+	mux.Handle("GET /api/v1/{organization_id}/plots/{id}", mchain(entity.ModuleFarms, read, plotH.GetByID))
+	mux.Handle("PUT /api/v1/{organization_id}/plots/{id}", mchain(entity.ModuleFarms, write, plotH.Update))
+	mux.Handle("DELETE /api/v1/{organization_id}/plots/{id}", mchain(entity.ModuleFarms, write, plotH.Delete))
+	mux.Handle("GET /api/v1/{organization_id}/farms/{farm_id}/plots", mchain(entity.ModuleFarms, read, plotH.ListByFarm))
 
 	// Operations
-	mux.Handle("POST /api/v1/{organization_id}/operations", chain(opH.Create))
-	mux.Handle("GET /api/v1/{organization_id}/operations", chain(opH.List))
-	mux.Handle("GET /api/v1/{organization_id}/operations/recent", chain(opH.ListRecent))
-	mux.Handle("GET /api/v1/{organization_id}/operations/{id}", chain(opH.GetByID))
-	mux.Handle("PUT /api/v1/{organization_id}/operations/{id}", chain(opH.Update))
-	mux.Handle("DELETE /api/v1/{organization_id}/operations/{id}", chain(opH.Delete))
-	mux.Handle("GET /api/v1/{organization_id}/plots/{plot_id}/operations", chain(opH.ListByPlot))
+	mux.Handle("POST /api/v1/{organization_id}/operations", mchain(entity.ModuleOperations, write, opH.Create))
+	mux.Handle("GET /api/v1/{organization_id}/operations", mchain(entity.ModuleOperations, read, opH.List))
+	mux.Handle("GET /api/v1/{organization_id}/operations/recent", mchain(entity.ModuleOperations, read, opH.ListRecent))
+	mux.Handle("GET /api/v1/{organization_id}/operations/{id}", mchain(entity.ModuleOperations, read, opH.GetByID))
+	mux.Handle("PUT /api/v1/{organization_id}/operations/{id}", mchain(entity.ModuleOperations, write, opH.Update))
+	mux.Handle("DELETE /api/v1/{organization_id}/operations/{id}", mchain(entity.ModuleOperations, write, opH.Delete))
+	mux.Handle("GET /api/v1/{organization_id}/plots/{plot_id}/operations", mchain(entity.ModuleOperations, read, opH.ListByPlot))
 
 	// Operation Types
-	mux.Handle("POST /api/v1/{organization_id}/operation-types", chain(otH.Create))
-	mux.Handle("GET /api/v1/{organization_id}/operation-types", chain(otH.List))
-	mux.Handle("GET /api/v1/{organization_id}/operation-types/{id}", chain(otH.GetByID))
-	mux.Handle("PUT /api/v1/{organization_id}/operation-types/{id}", chain(otH.Update))
-	mux.Handle("DELETE /api/v1/{organization_id}/operation-types/{id}", chain(otH.Delete))
+	mux.Handle("POST /api/v1/{organization_id}/operation-types", mchain(entity.ModuleFarms, write, otH.Create))
+	mux.Handle("GET /api/v1/{organization_id}/operation-types", mchain(entity.ModuleFarms, read, otH.List))
+	mux.Handle("GET /api/v1/{organization_id}/operation-types/{id}", mchain(entity.ModuleFarms, read, otH.GetByID))
+	mux.Handle("PUT /api/v1/{organization_id}/operation-types/{id}", mchain(entity.ModuleFarms, write, otH.Update))
+	mux.Handle("DELETE /api/v1/{organization_id}/operation-types/{id}", mchain(entity.ModuleFarms, write, otH.Delete))
 
 	// Harvests
-	mux.Handle("POST /api/v1/{organization_id}/harvests", chain(harvestH.Create))
-	mux.Handle("GET /api/v1/{organization_id}/harvests", chain(harvestH.List))
-	mux.Handle("GET /api/v1/{organization_id}/harvests/{id}", chain(harvestH.GetByID))
-	mux.Handle("PUT /api/v1/{organization_id}/harvests/{id}/finalize", chain(harvestH.Finalize))
-	mux.Handle("POST /api/v1/{organization_id}/harvests/{id}/production", chain(harvestH.RecordProduction))
-	mux.Handle("GET /api/v1/{organization_id}/harvests/{id}/production", chain(harvestH.GetProduction))
-	mux.Handle("GET /api/v1/{organization_id}/harvests/{id}/indicators", chain(harvestH.GetIndicators))
+	mux.Handle("POST /api/v1/{organization_id}/harvests", mchain(entity.ModuleHarvests, write, harvestH.Create))
+	mux.Handle("GET /api/v1/{organization_id}/harvests", mchain(entity.ModuleHarvests, read, harvestH.List))
+	mux.Handle("GET /api/v1/{organization_id}/harvests/{id}", mchain(entity.ModuleHarvests, read, harvestH.GetByID))
+	mux.Handle("PUT /api/v1/{organization_id}/harvests/{id}/finalize", mchain(entity.ModuleHarvests, write, harvestH.Finalize))
+	mux.Handle("POST /api/v1/{organization_id}/harvests/{id}/production", mchain(entity.ModuleHarvests, write, harvestH.RecordProduction))
+	mux.Handle("GET /api/v1/{organization_id}/harvests/{id}/production", mchain(entity.ModuleHarvests, read, harvestH.GetProduction))
+	mux.Handle("GET /api/v1/{organization_id}/harvests/{id}/indicators", mchain(entity.ModuleHarvests, read, harvestH.GetIndicators))
 
 	// Dashboard
-	mux.Handle("GET /api/v1/{organization_id}/dashboard", chain(dashboardH.GetDashboard))
+	mux.Handle("GET /api/v1/{organization_id}/dashboard", mchain(entity.ModuleDashboard, read, dashboardH.GetDashboard))
 
 	// Agricultural Products
-	mux.Handle("GET /api/v1/{organization_id}/agricultural-products", chain(prodH.List))
+	mux.Handle("GET /api/v1/{organization_id}/agricultural-products", mchain(entity.ModuleFarms, read, prodH.List))
 
 	// Financial (Phase 2)
-	mux.Handle("POST /api/v1/{organization_id}/financial", chain(finH.Create))
-	mux.Handle("GET /api/v1/{organization_id}/financial", chain(finH.List))
-	mux.Handle("GET /api/v1/{organization_id}/financial/{id}", chain(finH.GetByID))
-	mux.Handle("PUT /api/v1/{organization_id}/financial/{id}", chain(finH.Update))
-	mux.Handle("DELETE /api/v1/{organization_id}/financial/{id}", chain(finH.Delete))
+	mux.Handle("POST /api/v1/{organization_id}/financial", mchain(entity.ModuleFinancial, write, finH.Create))
+	mux.Handle("GET /api/v1/{organization_id}/financial", mchain(entity.ModuleFinancial, read, finH.List))
+	mux.Handle("GET /api/v1/{organization_id}/financial/{id}", mchain(entity.ModuleFinancial, read, finH.GetByID))
+	mux.Handle("PUT /api/v1/{organization_id}/financial/{id}", mchain(entity.ModuleFinancial, write, finH.Update))
+	mux.Handle("DELETE /api/v1/{organization_id}/financial/{id}", mchain(entity.ModuleFinancial, write, finH.Delete))
 
 	// Stock (Phase 2)
-	mux.Handle("POST /api/v1/{organization_id}/stock/items", chain(stockH.CreateItem))
-	mux.Handle("GET /api/v1/{organization_id}/stock/items", chain(stockH.ListItems))
-	mux.Handle("GET /api/v1/{organization_id}/stock/items/{id}", chain(stockH.GetItemByID))
-	mux.Handle("PUT /api/v1/{organization_id}/stock/items/{id}", chain(stockH.UpdateItem))
-	mux.Handle("DELETE /api/v1/{organization_id}/stock/items/{id}", chain(stockH.DeleteItem))
-	mux.Handle("POST /api/v1/{organization_id}/stock/movements", chain(stockH.RecordMovement))
-	mux.Handle("GET /api/v1/{organization_id}/stock/movements", chain(stockH.ListMovements))
+	mux.Handle("POST /api/v1/{organization_id}/stock/items", mchain(entity.ModuleResources, write, stockH.CreateItem))
+	mux.Handle("GET /api/v1/{organization_id}/stock/items", mchain(entity.ModuleResources, read, stockH.ListItems))
+	mux.Handle("GET /api/v1/{organization_id}/stock/items/{id}", mchain(entity.ModuleResources, read, stockH.GetItemByID))
+	mux.Handle("PUT /api/v1/{organization_id}/stock/items/{id}", mchain(entity.ModuleResources, write, stockH.UpdateItem))
+	mux.Handle("DELETE /api/v1/{organization_id}/stock/items/{id}", mchain(entity.ModuleResources, write, stockH.DeleteItem))
+	mux.Handle("POST /api/v1/{organization_id}/stock/movements", mchain(entity.ModuleResources, write, stockH.RecordMovement))
+	mux.Handle("GET /api/v1/{organization_id}/stock/movements", mchain(entity.ModuleResources, read, stockH.ListMovements))
 
 	// Fleet (Phase 2)
-	mux.Handle("POST /api/v1/{organization_id}/fleet/vehicles", chain(fleetH.CreateVehicle))
-	mux.Handle("GET /api/v1/{organization_id}/fleet/vehicles", chain(fleetH.ListVehicles))
-	mux.Handle("GET /api/v1/{organization_id}/fleet/vehicles/{id}", chain(fleetH.GetVehicleByID))
-	mux.Handle("PUT /api/v1/{organization_id}/fleet/vehicles/{id}", chain(fleetH.UpdateVehicle))
-	mux.Handle("DELETE /api/v1/{organization_id}/fleet/vehicles/{id}", chain(fleetH.DeleteVehicle))
-	mux.Handle("POST /api/v1/{organization_id}/fleet/maintenance", chain(fleetH.CreateMaintenance))
-	mux.Handle("GET /api/v1/{organization_id}/fleet/maintenance", chain(fleetH.ListMaintenance))
-	mux.Handle("GET /api/v1/{organization_id}/fleet/maintenance/{id}", chain(fleetH.GetMaintenanceByID))
-	mux.Handle("DELETE /api/v1/{organization_id}/fleet/maintenance/{id}", chain(fleetH.DeleteMaintenance))
+	mux.Handle("POST /api/v1/{organization_id}/fleet/vehicles", mchain(entity.ModuleResources, write, fleetH.CreateVehicle))
+	mux.Handle("GET /api/v1/{organization_id}/fleet/vehicles", mchain(entity.ModuleResources, read, fleetH.ListVehicles))
+	mux.Handle("GET /api/v1/{organization_id}/fleet/vehicles/{id}", mchain(entity.ModuleResources, read, fleetH.GetVehicleByID))
+	mux.Handle("PUT /api/v1/{organization_id}/fleet/vehicles/{id}", mchain(entity.ModuleResources, write, fleetH.UpdateVehicle))
+	mux.Handle("DELETE /api/v1/{organization_id}/fleet/vehicles/{id}", mchain(entity.ModuleResources, write, fleetH.DeleteVehicle))
+	mux.Handle("POST /api/v1/{organization_id}/fleet/maintenance", mchain(entity.ModuleResources, write, fleetH.CreateMaintenance))
+	mux.Handle("GET /api/v1/{organization_id}/fleet/maintenance", mchain(entity.ModuleResources, read, fleetH.ListMaintenance))
+	mux.Handle("GET /api/v1/{organization_id}/fleet/maintenance/{id}", mchain(entity.ModuleResources, read, fleetH.GetMaintenanceByID))
+	mux.Handle("DELETE /api/v1/{organization_id}/fleet/maintenance/{id}", mchain(entity.ModuleResources, write, fleetH.DeleteMaintenance))
 
 	// Labor — Teams, Workers, Shifts (Phase 2)
-	mux.Handle("POST /api/v1/{organization_id}/labor/teams", chain(laborH.CreateTeam))
-	mux.Handle("GET /api/v1/{organization_id}/labor/teams", chain(laborH.ListTeams))
-	mux.Handle("PUT /api/v1/{organization_id}/labor/teams/{id}", chain(laborH.UpdateTeam))
-	mux.Handle("DELETE /api/v1/{organization_id}/labor/teams/{id}", chain(laborH.DeleteTeam))
-	mux.Handle("POST /api/v1/{organization_id}/labor/workers", chain(laborH.CreateWorker))
-	mux.Handle("GET /api/v1/{organization_id}/labor/workers", chain(laborH.ListWorkers))
-	mux.Handle("PUT /api/v1/{organization_id}/labor/workers/{id}", chain(laborH.UpdateWorker))
-	mux.Handle("DELETE /api/v1/{organization_id}/labor/workers/{id}", chain(laborH.DeleteWorker))
-	mux.Handle("POST /api/v1/{organization_id}/labor/shifts", chain(laborH.CreateWorkShift))
-	mux.Handle("GET /api/v1/{organization_id}/labor/shifts", chain(laborH.ListWorkShifts))
-	mux.Handle("DELETE /api/v1/{organization_id}/labor/shifts/{id}", chain(laborH.DeleteWorkShift))
+	mux.Handle("POST /api/v1/{organization_id}/labor/teams", mchain(entity.ModuleResources, write, laborH.CreateTeam))
+	mux.Handle("GET /api/v1/{organization_id}/labor/teams", mchain(entity.ModuleResources, read, laborH.ListTeams))
+	mux.Handle("PUT /api/v1/{organization_id}/labor/teams/{id}", mchain(entity.ModuleResources, write, laborH.UpdateTeam))
+	mux.Handle("DELETE /api/v1/{organization_id}/labor/teams/{id}", mchain(entity.ModuleResources, write, laborH.DeleteTeam))
+	mux.Handle("POST /api/v1/{organization_id}/labor/workers", mchain(entity.ModuleResources, write, laborH.CreateWorker))
+	mux.Handle("GET /api/v1/{organization_id}/labor/workers", mchain(entity.ModuleResources, read, laborH.ListWorkers))
+	mux.Handle("PUT /api/v1/{organization_id}/labor/workers/{id}", mchain(entity.ModuleResources, write, laborH.UpdateWorker))
+	mux.Handle("DELETE /api/v1/{organization_id}/labor/workers/{id}", mchain(entity.ModuleResources, write, laborH.DeleteWorker))
+	mux.Handle("POST /api/v1/{organization_id}/labor/shifts", mchain(entity.ModuleResources, write, laborH.CreateWorkShift))
+	mux.Handle("GET /api/v1/{organization_id}/labor/shifts", mchain(entity.ModuleResources, read, laborH.ListWorkShifts))
+	mux.Handle("DELETE /api/v1/{organization_id}/labor/shifts/{id}", mchain(entity.ModuleResources, write, laborH.DeleteWorkShift))
 
 	// Admin — Organization management (platform_owner only)
 	adminChain := func(h http.HandlerFunc) http.Handler {
@@ -203,29 +221,40 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	mux.Handle("DELETE /api/v1/admin/users/{id}", adminChain(userH.Delete))
 
 	// Cost Centers
-	mux.Handle("POST /api/v1/{organization_id}/cost-centers", chain(ccH.Create))
-	mux.Handle("GET /api/v1/{organization_id}/cost-centers", chain(ccH.List))
-	mux.Handle("GET /api/v1/{organization_id}/cost-centers/senar-categories", chain(ccH.SenarCategories))
-	mux.Handle("GET /api/v1/{organization_id}/cost-centers/{id}", chain(ccH.GetByID))
-	mux.Handle("PUT /api/v1/{organization_id}/cost-centers/{id}", chain(ccH.Update))
-	mux.Handle("DELETE /api/v1/{organization_id}/cost-centers/{id}", chain(ccH.Delete))
+	mux.Handle("POST /api/v1/{organization_id}/cost-centers", mchain(entity.ModuleFinancial, write, ccH.Create))
+	mux.Handle("GET /api/v1/{organization_id}/cost-centers", mchain(entity.ModuleFinancial, read, ccH.List))
+	mux.Handle("GET /api/v1/{organization_id}/cost-centers/senar-categories", mchain(entity.ModuleFinancial, read, ccH.SenarCategories))
+	mux.Handle("GET /api/v1/{organization_id}/cost-centers/{id}", mchain(entity.ModuleFinancial, read, ccH.GetByID))
+	mux.Handle("PUT /api/v1/{organization_id}/cost-centers/{id}", mchain(entity.ModuleFinancial, write, ccH.Update))
+	mux.Handle("DELETE /api/v1/{organization_id}/cost-centers/{id}", mchain(entity.ModuleFinancial, write, ccH.Delete))
 
 	// Budgets
-	mux.Handle("POST /api/v1/{organization_id}/budgets", chain(budgetH.Create))
-	mux.Handle("GET /api/v1/{organization_id}/harvests/{harvest_id}/budgets", chain(budgetH.ListByHarvest))
-	mux.Handle("GET /api/v1/{organization_id}/budgets/{id}", chain(budgetH.GetByID))
-	mux.Handle("PUT /api/v1/{organization_id}/budgets/{id}", chain(budgetH.Update))
-	mux.Handle("DELETE /api/v1/{organization_id}/budgets/{id}", chain(budgetH.Delete))
+	mux.Handle("POST /api/v1/{organization_id}/budgets", mchain(entity.ModuleFinancial, write, budgetH.Create))
+	mux.Handle("GET /api/v1/{organization_id}/harvests/{harvest_id}/budgets", mchain(entity.ModuleFinancial, read, budgetH.ListByHarvest))
+	mux.Handle("GET /api/v1/{organization_id}/budgets/{id}", mchain(entity.ModuleFinancial, read, budgetH.GetByID))
+	mux.Handle("PUT /api/v1/{organization_id}/budgets/{id}", mchain(entity.ModuleFinancial, write, budgetH.Update))
+	mux.Handle("DELETE /api/v1/{organization_id}/budgets/{id}", mchain(entity.ModuleFinancial, write, budgetH.Delete))
 
 	// Cost Allocations
-	mux.Handle("POST /api/v1/{organization_id}/cost-allocations", chain(allocH.Create))
-	mux.Handle("GET /api/v1/{organization_id}/harvests/{harvest_id}/cost-allocations", chain(allocH.ListByHarvest))
-	mux.Handle("GET /api/v1/{organization_id}/cost-allocations/{id}", chain(allocH.GetByID))
-	mux.Handle("DELETE /api/v1/{organization_id}/cost-allocations/{id}", chain(allocH.Delete))
+	mux.Handle("POST /api/v1/{organization_id}/cost-allocations", mchain(entity.ModuleFinancial, write, allocH.Create))
+	mux.Handle("GET /api/v1/{organization_id}/harvests/{harvest_id}/cost-allocations", mchain(entity.ModuleFinancial, read, allocH.ListByHarvest))
+	mux.Handle("GET /api/v1/{organization_id}/cost-allocations/{id}", mchain(entity.ModuleFinancial, read, allocH.GetByID))
+	mux.Handle("DELETE /api/v1/{organization_id}/cost-allocations/{id}", mchain(entity.ModuleFinancial, write, allocH.Delete))
 
 	// Alerts
-	mux.Handle("GET /api/v1/{organization_id}/alerts", chain(alertH.List))
-	mux.Handle("PUT /api/v1/{organization_id}/alerts/{id}", chain(alertH.Update))
+	mux.Handle("GET /api/v1/{organization_id}/alerts", mchain(entity.ModuleDashboard, read, alertH.List))
+	mux.Handle("PUT /api/v1/{organization_id}/alerts/{id}", mchain(entity.ModuleDashboard, write, alertH.Update))
+
+	// Permissions
+	mux.Handle("GET /api/v1/{organization_id}/permissions", mchain(entity.ModulePermissions, write, permH.List))
+	mux.Handle("PUT /api/v1/{organization_id}/permissions", mchain(entity.ModulePermissions, write, permH.Update))
+	mux.Handle("GET /api/v1/{organization_id}/permissions/me", chain(permH.Mine))
+
+	// Users — org-scoped roster (distinct from the cross-tenant /admin/users)
+	mux.Handle("POST /api/v1/{organization_id}/users", mchain(entity.ModuleUsers, write, userH.CreateForOrg))
+	mux.Handle("GET /api/v1/{organization_id}/users", mchain(entity.ModuleUsers, read, userH.ListForOrg))
+	mux.Handle("PUT /api/v1/{organization_id}/users/{id}", mchain(entity.ModuleUsers, write, userH.UpdateForOrg))
+	mux.Handle("DELETE /api/v1/{organization_id}/users/{id}", mchain(entity.ModuleUsers, write, userH.DeleteForOrg))
 
 	// Sync — offline mobile (requires RabbitMQ publisher)
 	if publisher != nil {

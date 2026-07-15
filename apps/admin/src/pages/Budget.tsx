@@ -10,6 +10,7 @@ import { Select } from '@/components/ui/select'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Pencil, Trash2, Wallet } from 'lucide-react'
+import { useModuleAccess } from '@/lib/permissions'
 
 interface BudgetItem {
   id: string
@@ -40,6 +41,7 @@ export function Budget() {
   const [saving, setSaving] = useState(false)
   const toast = useToast()
   const confirm = useConfirm()
+  const canEdit = useModuleAccess('financial') === 'write'
 
   const load = useCallback(async () => {
     try {
@@ -101,9 +103,11 @@ export function Budget() {
           <h1 className="font-display text-2xl font-semibold text-foreground">Orçamento</h1>
           <p className="text-sm text-muted-foreground">Orçado x realizado por centro de custo</p>
         </div>
-        <Button onClick={() => { setEditing(null); setForm({ ...emptyForm, harvest_id: harvestId }); setDialogOpen(true) }}>
-          <Plus className="h-4 w-4" /> Novo Orçamento
-        </Button>
+        {canEdit && (
+          <Button onClick={() => { setEditing(null); setForm({ ...emptyForm, harvest_id: harvestId }); setDialogOpen(true) }}>
+            <Plus className="h-4 w-4" /> Novo Orçamento
+          </Button>
+        )}
       </div>
 
       <Select value={harvestId} onChange={(e) => setHarvestId(e.target.value)} className="w-64">
@@ -136,8 +140,10 @@ export function Budget() {
                 <TableCell className="text-right">{pct.toFixed(0)}%</TableCell>
                 <TableCell className="text-muted-foreground text-sm">{b.description || '-'}</TableCell>
                 <TableCell className="text-right"><div className="flex justify-end gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => { setEditing(b); setForm({ harvest_id: b.harvest_id, cost_center_id: b.cost_center_id, planned_amount: String(b.planned_amount), description: b.description }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleDelete(b.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  {canEdit && (<>
+                    <Button variant="ghost" size="sm" onClick={() => { setEditing(b); setForm({ harvest_id: b.harvest_id, cost_center_id: b.cost_center_id, planned_amount: String(b.planned_amount), description: b.description }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => handleDelete(b.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  </>)}
                 </div></TableCell>
               </TableRow>
             )

@@ -3827,6 +3827,139 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/{organization_id}/permissions": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista o acesso configurado de cada papel em cada módulo (requer write em \"permissions\")",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "permissions (Permissões)"
+                ],
+                "summary": "Listar matriz de permissões",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.RolePermission"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza o acesso (none|read|write) de papéis por módulo (requer write em \"permissions\")",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "permissions (Permissões)"
+                ],
+                "summary": "Atualizar matriz de permissões",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Lista de alterações",
+                        "name": "permissions",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.updatePermissionEntry"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{organization_id}/permissions/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna o mapa módulo -\u003e acesso do papel do usuário autenticado",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "permissions (Permissões)"
+                ],
+                "summary": "Meus acessos",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/{organization_id}/plots": {
             "get": {
                 "security": [
@@ -4554,6 +4687,209 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/{organization_id}/users": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista os usuários da organização autenticada (requer acesso ao módulo \"users\")",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users (Usuários)"
+                ],
+                "summary": "Listar usuários da organização",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.User"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cria um usuário na organização autenticada (requer write no módulo \"users\")",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users (Usuários)"
+                ],
+                "summary": "Criar usuário na organização",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do usuário",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{organization_id}/users/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza um usuário, restrito à organização autenticada (requer write no módulo \"users\")",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users (Usuários)"
+                ],
+                "summary": "Atualizar usuário da organização",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Usuário",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados do usuário",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.updateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui um usuário, restrito à organização autenticada (requer write no módulo \"users\")",
+                "tags": [
+                    "users (Usuários)"
+                ],
+                "summary": "Excluir usuário da organização",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Usuário",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "Autentica com e-mail e senha",
@@ -4622,6 +4958,19 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "entity.AccessLevel": {
+            "type": "string",
+            "enum": [
+                "none",
+                "read",
+                "write"
+            ],
+            "x-enum-varnames": [
+                "AccessNone",
+                "AccessRead",
+                "AccessWrite"
+            ]
+        },
         "entity.AgriculturalProduct": {
             "type": "object",
             "properties": {
@@ -5011,6 +5360,29 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.Module": {
+            "type": "string",
+            "enum": [
+                "dashboard",
+                "farms",
+                "operations",
+                "harvests",
+                "resources",
+                "financial",
+                "users",
+                "permissions"
+            ],
+            "x-enum-varnames": [
+                "ModuleDashboard",
+                "ModuleFarms",
+                "ModuleOperations",
+                "ModuleHarvests",
+                "ModuleResources",
+                "ModuleFinancial",
+                "ModuleUsers",
+                "ModulePermissions"
+            ]
+        },
         "entity.OperationType": {
             "type": "object",
             "properties": {
@@ -5251,6 +5623,32 @@ const docTemplate = `{
                 "ProdCombustivel",
                 "ProdOutro"
             ]
+        },
+        "entity.RolePermission": {
+            "type": "object",
+            "properties": {
+                "access": {
+                    "$ref": "#/definitions/entity.AccessLevel"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "module": {
+                    "$ref": "#/definitions/entity.Module"
+                },
+                "organization_id": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/entity.UserRole"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
         },
         "entity.SenarCostCategory": {
             "type": "object",
@@ -6740,6 +7138,20 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string"
+                }
+            }
+        },
+        "handler.updatePermissionEntry": {
+            "type": "object",
+            "properties": {
+                "access": {
+                    "$ref": "#/definitions/entity.AccessLevel"
+                },
+                "module": {
+                    "$ref": "#/definitions/entity.Module"
+                },
+                "role": {
+                    "$ref": "#/definitions/entity.UserRole"
                 }
             }
         },

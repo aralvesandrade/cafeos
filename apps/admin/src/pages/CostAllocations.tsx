@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Trash2, SplitSquareHorizontal } from 'lucide-react'
+import { useModuleAccess } from '@/lib/permissions'
 
 interface AllocationItem {
   id: string
@@ -57,6 +58,7 @@ export function CostAllocations() {
   const [saving, setSaving] = useState(false)
   const toast = useToast()
   const confirm = useConfirm()
+  const canEdit = useModuleAccess('financial') === 'write'
 
   const load = useCallback(async () => {
     try {
@@ -137,9 +139,11 @@ export function CostAllocations() {
           <h1 className="font-display text-2xl font-semibold text-foreground">Rateio de Custo</h1>
           <p className="text-sm text-muted-foreground">Distribuição de custos por talhão</p>
         </div>
-        <Button onClick={() => { setForm(emptyForm); setPercentages({}); setDialogOpen(true) }}>
-          <Plus className="h-4 w-4" /> Novo Rateio
-        </Button>
+        {canEdit && (
+          <Button onClick={() => { setForm(emptyForm); setPercentages({}); setDialogOpen(true) }}>
+            <Plus className="h-4 w-4" /> Novo Rateio
+          </Button>
+        )}
       </div>
 
       <Select value={harvestId} onChange={(e) => setHarvestId(e.target.value)} className="w-64">
@@ -163,7 +167,7 @@ export function CostAllocations() {
             <div className="flex items-center gap-3">
               <span className="text-sm text-muted-foreground">{new Date(a.date).toLocaleDateString('pt-BR')}</span>
               <span className="font-semibold text-foreground">R$ {a.total_amount.toFixed(2)}</span>
-              <Button variant="ghost" size="sm" onClick={() => handleDelete(a.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+              {canEdit && <Button variant="ghost" size="sm" onClick={() => handleDelete(a.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>}
             </div>
           </CardHeader>
           <CardContent>

@@ -9,6 +9,7 @@ import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@
 import { Badge } from '@/components/ui/badge'
 import { Select } from '@/components/ui/select'
 import { Plus, Pencil, Trash2, DollarSign } from 'lucide-react'
+import { useModuleAccess } from '@/lib/permissions'
 
 interface CostCenter {
   id: string
@@ -48,6 +49,7 @@ export function Financial() {
   const [saving, setSaving] = useState(false)
   const toast = useToast()
   const confirm = useConfirm()
+  const canEdit = useModuleAccess('financial') === 'write'
 
   const load = useCallback(async () => {
     try {
@@ -99,7 +101,7 @@ export function Financial() {
             <option key={f.id} value={f.id}>{f.name}</option>
           ))}
         </Select>
-        <Button onClick={() => { setEditing(null); setForm({ type: 'despesa', cost_center_id: '', farm_id: '', description: '', amount: '', date: '', due_date: '', notes: '', status: 'pending' }); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Nova Transação</Button>
+        {canEdit && <Button onClick={() => { setEditing(null); setForm({ type: 'despesa', cost_center_id: '', farm_id: '', description: '', amount: '', date: '', due_date: '', notes: '', status: 'pending' }); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Nova Transação</Button>}
       </div>
     </div>
     <Table>
@@ -116,8 +118,10 @@ export function Financial() {
         <TableCell>{t.date}</TableCell>
         <TableCell><Badge variant={t.status === 'paid' ? 'success' : t.status === 'cancelled' ? 'danger' : 'default'}>{statusLabels[t.status] || t.status}</Badge></TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
-          <Button variant="ghost" size="sm" onClick={() => { setEditing(t); setForm({ type: t.type, cost_center_id: t.cost_center_id || '', farm_id: t.farm_id || '', description: t.description, amount: String(t.amount), date: t.date, due_date: t.due_date, notes: t.notes, status: t.status }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm" onClick={() => handleDelete(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          {canEdit && (<>
+            <Button variant="ghost" size="sm" onClick={() => { setEditing(t); setForm({ type: t.type, cost_center_id: t.cost_center_id || '', farm_id: t.farm_id || '', description: t.description, amount: String(t.amount), date: t.date, due_date: t.due_date, notes: t.notes, status: t.status }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="sm" onClick={() => handleDelete(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </>)}
         </div></TableCell>
       </TableRow>)})}
       {items.length === 0 && <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">Nenhuma transação cadastrada.</TableCell></TableRow>}

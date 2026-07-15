@@ -9,6 +9,7 @@ import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@
 import { Badge } from '@/components/ui/badge'
 import { Select } from '@/components/ui/select'
 import { Plus, Pencil, Trash2, Truck, Wrench } from 'lucide-react'
+import { useModuleAccess } from '@/lib/permissions'
 
 interface Vehicle {
   id: string; name: string; farm_id: string | null; type: string; plate: string; brand: string; model: string; year: number; status: string
@@ -38,6 +39,7 @@ export function Fleet() {
   const [saving, setSaving] = useState(false)
   const toast = useToast()
   const confirm = useConfirm()
+  const canEdit = useModuleAccess('resources') === 'write'
 
   const load = useCallback(async () => {
     try {
@@ -110,8 +112,10 @@ export function Fleet() {
             <option key={f.id} value={f.id}>{f.name}</option>
           ))}
         </Select>
-        <Button variant="outline" onClick={() => { setMaintForm({ vehicle_id: '', type: 'preventive', description: '', cost: '', odometer: '', date: '', notes: '' }); setMaintDialogOpen(true) }}><Wrench className="h-4 w-4" /> Nova Manutenção</Button>
-        <Button onClick={() => { setEditing(null); setForm({ name: '', farm_id: '', type: 'trator', plate: '', brand: '', model: '', year: '', status: 'active' }); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Novo Veículo</Button>
+        {canEdit && (<>
+          <Button variant="outline" onClick={() => { setMaintForm({ vehicle_id: '', type: 'preventive', description: '', cost: '', odometer: '', date: '', notes: '' }); setMaintDialogOpen(true) }}><Wrench className="h-4 w-4" /> Nova Manutenção</Button>
+          <Button onClick={() => { setEditing(null); setForm({ name: '', farm_id: '', type: 'trator', plate: '', brand: '', model: '', year: '', status: 'active' }); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Novo Veículo</Button>
+        </>)}
       </div>
     </div>
     <div className="flex gap-2 mb-2">
@@ -129,8 +133,10 @@ export function Fleet() {
         <TableCell><Badge variant={v.status === 'maintenance' ? 'warning' : 'success'}>{statusLabels[v.status] || v.status}</Badge></TableCell>
         <TableCell className="text-right">R$ {(maintenanceCostByVehicle[v.id] || 0).toFixed(2)}</TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
-          <Button variant="ghost" size="sm" onClick={() => { setEditing(v); setForm({ name: v.name, farm_id: v.farm_id || '', type: v.type, plate: v.plate, brand: v.brand, model: v.model, year: String(v.year), status: v.status }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm" onClick={() => handleDeleteVehicle(v.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          {canEdit && (<>
+            <Button variant="ghost" size="sm" onClick={() => { setEditing(v); setForm({ name: v.name, farm_id: v.farm_id || '', type: v.type, plate: v.plate, brand: v.brand, model: v.model, year: String(v.year), status: v.status }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="sm" onClick={() => handleDeleteVehicle(v.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </>)}
         </div></TableCell>
       </TableRow>))}
       {vehicles.length === 0 && <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">Nenhum veículo cadastrado.</TableCell></TableRow>}
@@ -144,7 +150,7 @@ export function Fleet() {
         <TableCell className="text-sm">{m.description}</TableCell>
         <TableCell>R$ {m.cost.toFixed(2)}</TableCell>
         <TableCell className="text-sm">{m.odometer}h</TableCell>
-        <TableCell className="text-right"><Button variant="ghost" size="sm" onClick={() => handleDeleteMaintenance(m.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+        <TableCell className="text-right">{canEdit && <Button variant="ghost" size="sm" onClick={() => handleDeleteMaintenance(m.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>}</TableCell>
       </TableRow>))}
       {maintenance.length === 0 && <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhuma manutenção registrada.</TableCell></TableRow>}
       </TableBody>

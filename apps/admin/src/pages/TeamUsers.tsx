@@ -2,47 +2,38 @@ import { useEffect, useState, useCallback } from 'react'
 import { apiRequest } from '@/lib/api'
 import { useToast } from '@/lib/toast'
 import { useConfirm } from '@/lib/confirm'
+import { useModuleAccess } from '@/lib/permissions'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Pencil, Trash2, User, Building2 } from 'lucide-react'
-import { ROLE_LABELS } from '@/lib/roles'
+import { Plus, Pencil, Trash2, User } from 'lucide-react'
+import { ROLE_LABELS, ALL_ROLES } from '@/lib/roles'
 
-interface AppUser {
+interface OrgUser {
   id: string
-  organization_id: string
   name: string
   email: string
   role: string
   status: string
 }
 
-interface Organization {
-  id: string
-  name: string
-}
-
-export function Users() {
-  const [users, setUsers] = useState<AppUser[]>([])
-  const [organizations, setOrganizations] = useState<Organization[]>([])
+export function TeamUsers() {
+  const [users, setUsers] = useState<OrgUser[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editing, setEditing] = useState<AppUser | null>(null)
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: '', organization_id: '', status: 'active' })
+  const [editing, setEditing] = useState<OrgUser | null>(null)
+  const [form, setForm] = useState({ name: '', email: '', password: '', role: '', status: 'active' })
   const [saving, setSaving] = useState(false)
   const toast = useToast()
   const confirm = useConfirm()
+  const canEdit = useModuleAccess('users') === 'write'
 
   const load = useCallback(async () => {
     try {
-      const [userData, organizationData] = await Promise.all([
-        apiRequest<AppUser[]>('/admin/users', { admin: true }),
-        apiRequest<Organization[]>('/admin/organizations', { admin: true }),
-      ])
-      setUsers(userData)
-      setOrganizations(organizationData)
+      const data = await apiRequest<OrgUser[]>('/users')
+      setUsers(data)
     } catch (err) {
       console.error(err)
     } finally {
@@ -56,9 +47,9 @@ export function Users() {
     setSaving(true)
     try {
       if (editing) {
-        await apiRequest(`/admin/users/${editing.id}`, { method: 'PUT', body: { name: form.name, email: form.email, role: form.role, is_active: form.status === 'active' }, admin: true })
+        await apiRequest(`/users/${editing.id}`, { method: 'PUT', body: { name: form.name, email: form.email, role: form.role, is_active: form.status === 'active' } })
       } else {
-        await apiRequest('/admin/users', { method: 'POST', body: { name: form.name, email: form.email, password: form.password, role: form.role, organization_id: form.organization_id }, admin: true })
+        await apiRequest('/users', { method: 'POST', body: { name: form.name, email: form.email, password: form.password, role: form.role } })
       }
       setDialogOpen(false); setEditing(null)
       await load()
@@ -74,7 +65,7 @@ export function Users() {
   const handleDelete = async (id: string) => {
     if (!(await confirm({ title: 'Remover usuário?', variant: 'danger' }))) return
     try {
-      await apiRequest(`/admin/users/${id}`, { method: 'DELETE', admin: true })
+      await apiRequest(`/users/${id}`, { method: 'DELETE' })
       await load()
       toast.success('Usuário removido')
     } catch (err) { console.error(err); toast.error('Erro ao remover usuário') }
@@ -86,12 +77,14 @@ export function Users() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-foreground">Usuários</h1>
-          <p className="text-sm text-muted-foreground">Gerenciar usuários do sistema</p>
+          <h1 className="font-display text-2xl font-semibold text-foreground">Minha Equipe</h1>
+          <p className="text-sm text-muted-foreground">Usuários da sua organização</p>
         </div>
-        <Button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: '', role: '', organization_id: '', status: 'active' }); setDialogOpen(true) }}>
-          <Plus className="h-4 w-4" /> Novo Usuário
-        </Button>
+        {canEdit && (
+          <Button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: '', role: '', status: 'active' }); setDialogOpen(true) }}>
+            <Plus className="h-4 w-4" /> Novo Usuário
+          </Button>
+        )}
       </div>
 
       <Table>
@@ -100,50 +93,42 @@ export function Users() {
             <TableHeader>Nome</TableHeader>
             <TableHeader>Email</TableHeader>
             <TableHeader>Perfil</TableHeader>
-            <TableHeader>Organização</TableHeader>
             <TableHeader>Status</TableHeader>
             <TableHeader className="text-right">Ações</TableHeader>
           </TableRow>
         </TableHead>
         <TableBody>
-          {users.map((u) => {
-            const organizationName = organizations.find((o) => o.id === u.organization_id)?.name || u.organization_id
-            return (
-              <TableRow key={u.id}>
-                <TableCell className="font-medium">
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-primary" />
-                    {u.name}
-                  </div>
-                </TableCell>
-                <TableCell>{u.email}</TableCell>
-                <TableCell><Badge>{ROLE_LABELS[u.role as keyof typeof ROLE_LABELS] || u.role}</Badge></TableCell>
-                <TableCell className="text-muted-foreground text-sm">
-                  <div className="flex items-center gap-1">
-                    <Building2 className="h-3 w-3" />
-                    {organizationName}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={u.status === 'active' ? 'success' : 'default'}>
-                    {u.status === 'active' ? 'Ativo' : 'Inativo'}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
+          {users.map((u) => (
+            <TableRow key={u.id}>
+              <TableCell className="font-medium">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-primary" />
+                  {u.name}
+                </div>
+              </TableCell>
+              <TableCell>{u.email}</TableCell>
+              <TableCell><Badge>{ROLE_LABELS[u.role as keyof typeof ROLE_LABELS] || u.role}</Badge></TableCell>
+              <TableCell>
+                <Badge variant={u.status === 'active' ? 'success' : 'default'}>
+                  {u.status === 'active' ? 'Ativo' : 'Inativo'}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right">
+                {canEdit && (
                   <div className="flex justify-end gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => { setEditing(u); setForm({ name: u.name, email: u.email, password: '', role: u.role, organization_id: u.organization_id, status: u.status }); setDialogOpen(true) }}>
+                    <Button variant="ghost" size="sm" onClick={() => { setEditing(u); setForm({ name: u.name, email: u.email, password: '', role: u.role, status: u.status }); setDialogOpen(true) }}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => handleDelete(u.id)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
-                </TableCell>
-              </TableRow>
-            )
-          })}
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
           {users.length === 0 && (
-            <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhum usuário cadastrado.</TableCell></TableRow>
+            <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhum usuário cadastrado.</TableCell></TableRow>
           )}
         </TableBody>
       </Table>
@@ -167,8 +152,9 @@ export function Users() {
           <div>
             <label className="block text-sm font-medium text-foreground mb-1">Perfil</label>
             <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
-              {Object.entries(ROLE_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
+              <option value="">Selecione...</option>
+              {ALL_ROLES.map((role) => (
+                <option key={role} value={role}>{ROLE_LABELS[role]}</option>
               ))}
             </select>
           </div>
@@ -181,21 +167,9 @@ export function Users() {
               </select>
             </div>
           )}
-          {!editing && (
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Organização</label>
-              <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.organization_id} onChange={(e) => setForm({ ...form, organization_id: e.target.value })}>
-                <option value="">Selecione uma organização</option>
-                {organizations.map((o) => (
-                  <option key={o.id} value={o.id}>{o.name}</option>
-                ))}
-              </select>
-            </div>
-          )}
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="outline" onClick={() => { setDialogOpen(false); setEditing(null) }}>Cancelar</Button>
-            <Button onClick={handleSave} disabled={saving}>{saving ? 'Salvando...' : 'Salvar'}</Button>
-          </div>
+          <Button className="w-full" onClick={handleSave} disabled={saving || !form.name || !form.email || (!editing && !form.password)}>
+            {saving ? 'Salvando...' : 'Salvar'}
+          </Button>
         </div>
       </Dialog>
     </div>

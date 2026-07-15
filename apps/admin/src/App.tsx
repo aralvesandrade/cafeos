@@ -1,5 +1,6 @@
 import { RouterProvider } from 'react-router-dom'
 import { AuthProvider } from '@/lib/auth'
+import { PermissionsProvider } from '@/lib/permissions'
 import { ThemeProvider } from '@/lib/theme'
 import { ToastProvider } from '@/lib/toast'
 import { ConfirmProvider } from '@/lib/confirm'
@@ -9,11 +10,13 @@ export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <ToastProvider>
-          <ConfirmProvider>
-            <RouterProvider router={router} />
-          </ConfirmProvider>
-        </ToastProvider>
+        <PermissionsProvider>
+          <ToastProvider>
+            <ConfirmProvider>
+              <RouterProvider router={router} />
+            </ConfirmProvider>
+          </ToastProvider>
+        </PermissionsProvider>
       </AuthProvider>
     </ThemeProvider>
   )

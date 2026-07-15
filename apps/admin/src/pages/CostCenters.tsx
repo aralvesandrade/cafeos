@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/select'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Pencil, Trash2, CircleDollarSign } from 'lucide-react'
+import { useModuleAccess } from '@/lib/permissions'
 
 interface CostCenter {
   id: string
@@ -46,6 +47,7 @@ export function CostCenters() {
   const [saving, setSaving] = useState(false)
   const toast = useToast()
   const confirm = useConfirm()
+  const canEdit = useModuleAccess('financial') === 'write'
 
   const load = useCallback(async () => {
     try {
@@ -95,7 +97,7 @@ export function CostCenters() {
   return (<div className="space-y-6">
     <div className="flex items-center justify-between">
       <div><h1 className="font-display text-2xl font-semibold text-foreground">Centros de Custo</h1><p className="text-sm text-muted-foreground">Plano de contas para receitas e despesas</p></div>
-      <Button onClick={() => { setEditing(null); setForm(emptyForm); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Novo Centro de Custo</Button>
+      {canEdit && <Button onClick={() => { setEditing(null); setForm(emptyForm); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Novo Centro de Custo</Button>}
     </div>
     <Table>
       <TableHead><TableRow><TableHeader>Código</TableHeader><TableHeader>Nome</TableHeader><TableHeader>Tipo</TableHeader><TableHeader>Classificação SENAR</TableHeader><TableHeader>Descrição</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
@@ -106,8 +108,10 @@ export function CostCenters() {
         <TableCell className="text-sm">{cc.cost_group ? costGroupLabels[cc.cost_group] ?? cc.cost_group : <span className="text-muted-foreground">Não classificado</span>}</TableCell>
         <TableCell className="text-muted-foreground text-sm">{cc.description}</TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
-          <Button variant="ghost" size="sm" onClick={() => { setEditing(cc); setForm({ name: cc.name, code: cc.code, type: cc.type, cost_group: cc.cost_group ?? '', description: cc.description }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm" onClick={() => handleDelete(cc.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          {canEdit && (<>
+            <Button variant="ghost" size="sm" onClick={() => { setEditing(cc); setForm({ name: cc.name, code: cc.code, type: cc.type, cost_group: cc.cost_group ?? '', description: cc.description }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="sm" onClick={() => handleDelete(cc.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </>)}
         </div></TableCell>
       </TableRow>))}
       {items.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhum centro de custo cadastrado.</TableCell></TableRow>}

@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/select'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Pencil, Trash2, Tractor } from 'lucide-react'
+import { useModuleAccess } from '@/lib/permissions'
 
 interface OperationType {
   id: string
@@ -36,6 +37,7 @@ export function OperationTypes() {
   const [saving, setSaving] = useState(false)
   const toast = useToast()
   const confirm = useConfirm()
+  const canEdit = useModuleAccess('farms') === 'write'
 
   const load = useCallback(async () => {
     try {
@@ -72,7 +74,7 @@ export function OperationTypes() {
   return (<div className="space-y-6">
     <div className="flex items-center justify-between">
       <div><h1 className="font-display text-2xl font-semibold text-foreground">Tipos de Operação</h1><p className="text-sm text-muted-foreground">Cadastro de tipos de operações agrícolas</p></div>
-      <Button onClick={() => { setEditing(null); setForm(emptyForm); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Novo Tipo</Button>
+      {canEdit && <Button onClick={() => { setEditing(null); setForm(emptyForm); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Novo Tipo</Button>}
     </div>
     <Table>
       <TableHead><TableRow><TableHeader>Código</TableHeader><TableHeader>Nome</TableHeader><TableHeader>Cor</TableHeader><TableHeader className="text-right">Ações</TableHeader></TableRow></TableHead>
@@ -81,8 +83,10 @@ export function OperationTypes() {
         <TableCell className="font-medium"><div className="flex items-center gap-2"><Tractor className="h-4 w-4 text-primary" />{ot.name}</div></TableCell>
         <TableCell><Badge variant={ot.color || 'default'}>{colorLabels[ot.color] || ot.color}</Badge></TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
-          <Button variant="ghost" size="sm" onClick={() => { setEditing(ot); setForm({ name: ot.name, code: ot.code, color: ot.color }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm" onClick={() => handleDelete(ot.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          {canEdit && (<>
+            <Button variant="ghost" size="sm" onClick={() => { setEditing(ot); setForm({ name: ot.name, code: ot.code, color: ot.color }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="sm" onClick={() => handleDelete(ot.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </>)}
         </div></TableCell>
       </TableRow>))}
       {items.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhum tipo de operação cadastrado.</TableCell></TableRow>}

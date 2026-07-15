@@ -7,9 +7,10 @@ import type { Farm } from '@/pages/Farms'
 interface FarmListProps {
   farms: Farm[]
   onDelete: (id: string) => void
+  canEdit?: boolean
 }
 
-export function FarmList({ farms, onDelete }: FarmListProps) {
+export function FarmList({ farms, onDelete, canEdit = true }: FarmListProps) {
   return (
     <Table>
       <TableHead>
@@ -41,14 +42,18 @@ export function FarmList({ farms, onDelete }: FarmListProps) {
                     <ExternalLink className="h-4 w-4" />
                   </Link>
                 </Button>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to={`/farms/${farm.id}/edit`}>
-                    <Pencil className="h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => onDelete(farm.id)}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                {canEdit && (
+                  <>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link to={`/farms/${farm.id}/edit`}>
+                        <Pencil className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => onDelete(farm.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </>
+                )}
               </div>
             </TableCell>
           </TableRow>

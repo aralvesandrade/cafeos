@@ -2,21 +2,24 @@ package handler
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/aralvesandrade/cafeos/internal/domain/entity"
 	"github.com/aralvesandrade/cafeos/internal/domain/repository"
+	"github.com/aralvesandrade/cafeos/internal/domain/service"
 	"github.com/google/uuid"
 )
 
 type OrganizationHandler struct {
-	repo repository.OrganizationRepository
+	repo    repository.OrganizationRepository
+	permSvc *service.PermissionService
 }
 
-func NewOrganizationHandler(repo repository.OrganizationRepository) *OrganizationHandler {
-	return &OrganizationHandler{repo: repo}
+func NewOrganizationHandler(repo repository.OrganizationRepository, permSvc *service.PermissionService) *OrganizationHandler {
+	return &OrganizationHandler{repo: repo, permSvc: permSvc}
 }
 
 type createOrganizationRequest struct {
@@ -89,6 +92,10 @@ func (h *OrganizationHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if err := h.repo.Create(organization); err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
+	}
+
+	if err := h.permSvc.SeedDefaults(organization.ID); err != nil {
+		slog.Error("failed to seed default permissions for new organization", "organization_id", organization.ID, "error", err)
 	}
 
 	writeJSON(w, organization, http.StatusCreated)

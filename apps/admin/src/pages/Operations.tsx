@@ -24,6 +24,7 @@ import {
   Trash2,
   ExternalLink,
 } from "lucide-react";
+import { useModuleAccess } from "@/lib/permissions";
 
 interface Operation {
   id: string;
@@ -82,6 +83,7 @@ export function Operations() {
   const [saving, setSaving] = useState(false);
   const toast = useToast();
   const confirm = useConfirm();
+  const canEdit = useModuleAccess("operations") === "write";
 
   const load = useCallback(async () => {
     try {
@@ -198,15 +200,17 @@ export function Operations() {
             Histórico de operações agrícolas
           </p>
         </div>
-        <Button
-          onClick={() => {
-            setEditing(null);
-            setForm(emptyForm);
-            setDialogOpen(true);
-          }}
-        >
-          <Plus className="h-4 w-4" /> Nova Operação
-        </Button>
+        {canEdit && (
+          <Button
+            onClick={() => {
+              setEditing(null);
+              setForm(emptyForm);
+              setDialogOpen(true);
+            }}
+          >
+            <Plus className="h-4 w-4" /> Nova Operação
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-3">
@@ -272,20 +276,24 @@ export function Operations() {
                       <ExternalLink className="h-4 w-4" />
                     </Link>
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => openEdit(op)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(op.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+                  {canEdit && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openEdit(op)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(op.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </>
+                  )}
                 </div>
               </TableCell>
             </TableRow>

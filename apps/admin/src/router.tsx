@@ -23,6 +23,8 @@ import { CostAllocations } from '@/pages/CostAllocations'
 import { Stock } from '@/pages/Stock'
 import { Fleet } from '@/pages/Fleet'
 import { Labor } from '@/pages/Labor'
+import { TeamUsers } from '@/pages/TeamUsers'
+import { Permissions } from '@/pages/Permissions'
 import { NotFound } from '@/pages/NotFound'
 
 export const router = createBrowserRouter([
@@ -56,8 +58,10 @@ export const router = createBrowserRouter([
       { path: 'stock', element: <Stock /> },
       { path: 'fleet', element: <Fleet /> },
       { path: 'labor', element: <Labor /> },
+      { path: 'team', element: <TeamUsers /> },
       { path: 'organizations', element: <Organizations /> },
       { path: 'users', element: <Users /> },
+      { path: 'permissions', element: <Permissions /> },
       { path: '404', element: <NotFound /> },
       { path: '*', element: <Navigate to="/404" replace /> },
     ],

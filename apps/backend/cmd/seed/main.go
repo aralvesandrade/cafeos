@@ -7,8 +7,10 @@ import (
 	"time"
 
 	"github.com/aralvesandrade/cafeos/internal/domain/entity"
+	domainSvc "github.com/aralvesandrade/cafeos/internal/domain/service"
 	"github.com/aralvesandrade/cafeos/internal/infra/config"
 	"github.com/aralvesandrade/cafeos/internal/infra/db/postgres"
+	infraRepo "github.com/aralvesandrade/cafeos/internal/infra/db/repository"
 	infraLogger "github.com/aralvesandrade/cafeos/internal/infra/logger"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -67,6 +69,12 @@ func seed(db *gorm.DB) error {
 		return fmt.Errorf("create organization: %w", err)
 	}
 	fmt.Println("  ✓ Organization: CafeOS Padrão (cafeos)")
+
+	permSvc := domainSvc.NewPermissionService(infraRepo.NewPermissionRepository(db))
+	if err := permSvc.SeedDefaults(organization.ID); err != nil {
+		return fmt.Errorf("seed default permissions: %w", err)
+	}
+	fmt.Println("  ✓ Permissões padrão seedadas")
 
 	// Users
 	users := []entity.User{

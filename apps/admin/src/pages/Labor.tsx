@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Pencil, Trash2, Users, User, Clock } from 'lucide-react'
+import { useModuleAccess } from '@/lib/permissions'
 
 interface Team { id: string; name: string; leader: string; description: string }
 interface Worker { id: string; team_id: string; team: { name: string }; name: string; role: string; phone: string; hourly_rate: number; is_active: boolean }
@@ -31,6 +32,7 @@ export function Labor() {
   const [saving, setSaving] = useState(false)
   const toast = useToast()
   const confirm = useConfirm()
+  const canEdit = useModuleAccess('resources') === 'write'
 
   const load = useCallback(async () => {
     try {
@@ -120,9 +122,9 @@ export function Labor() {
   return (<div className="space-y-6">
     <div className="flex items-center justify-between">
       <div><h1 className="font-display text-2xl font-semibold text-foreground">Equipes</h1><p className="text-sm text-muted-foreground">Gestão de mão de obra</p></div>
-      {tab === 'teams' && <Button onClick={() => { setEditingTeam(null); setTeamForm({ name: '', leader: '', description: '' }); setTeamDialog(true) }}><Plus className="h-4 w-4" /> Nova Equipe</Button>}
-      {tab === 'workers' && <Button onClick={() => { setEditingWorker(null); setWorkerForm({ team_id: '', name: '', role: '', phone: '', hourly_rate: '', is_active: true }); setWorkerDialog(true) }}><Plus className="h-4 w-4" /> Novo Trabalhador</Button>}
-      {tab === 'shifts' && <Button onClick={() => { setShiftForm({ worker_id: '', hours: '', cost: '', date: '', notes: '' }); setShiftDialog(true) }}><Plus className="h-4 w-4" /> Registrar Hora</Button>}
+      {canEdit && tab === 'teams' && <Button onClick={() => { setEditingTeam(null); setTeamForm({ name: '', leader: '', description: '' }); setTeamDialog(true) }}><Plus className="h-4 w-4" /> Nova Equipe</Button>}
+      {canEdit && tab === 'workers' && <Button onClick={() => { setEditingWorker(null); setWorkerForm({ team_id: '', name: '', role: '', phone: '', hourly_rate: '', is_active: true }); setWorkerDialog(true) }}><Plus className="h-4 w-4" /> Novo Trabalhador</Button>}
+      {canEdit && tab === 'shifts' && <Button onClick={() => { setShiftForm({ worker_id: '', hours: '', cost: '', date: '', notes: '' }); setShiftDialog(true) }}><Plus className="h-4 w-4" /> Registrar Hora</Button>}
     </div>
     <div className="flex gap-2 mb-2">
       <Button variant={tab === 'teams' ? 'primary' : 'outline'} size="sm" onClick={() => setTab('teams')}><Users className="h-4 w-4" /> Equipes</Button>
@@ -138,8 +140,10 @@ export function Labor() {
         <TableCell className="text-right">{(teamTotals[t.id]?.hours || 0)}h</TableCell>
         <TableCell className="text-right">R$ {(teamTotals[t.id]?.cost || 0).toFixed(2)}</TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
-          <Button variant="ghost" size="sm" onClick={() => { setEditingTeam(t); setTeamForm({ name: t.name, leader: t.leader, description: t.description }); setTeamDialog(true) }}><Pencil className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm" onClick={() => handleDeleteTeam(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          {canEdit && (<>
+            <Button variant="ghost" size="sm" onClick={() => { setEditingTeam(t); setTeamForm({ name: t.name, leader: t.leader, description: t.description }); setTeamDialog(true) }}><Pencil className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="sm" onClick={() => handleDeleteTeam(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </>)}
         </div></TableCell>
       </TableRow>))}
       {teams.length === 0 && <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Nenhuma equipe cadastrada.</TableCell></TableRow>}
@@ -156,8 +160,10 @@ export function Labor() {
         <TableCell className="text-right">R$ {(workerTotals[w.id]?.cost || 0).toFixed(2)}</TableCell>
         <TableCell><Badge variant={w.is_active ? 'success' : 'default'}>{w.is_active ? 'Ativo' : 'Inativo'}</Badge></TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
-          <Button variant="ghost" size="sm" onClick={() => { setEditingWorker(w); setWorkerForm({ team_id: w.team_id, name: w.name, role: w.role, phone: w.phone, hourly_rate: String(w.hourly_rate), is_active: w.is_active }); setWorkerDialog(true) }}><Pencil className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm" onClick={() => handleDeleteWorker(w.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          {canEdit && (<>
+            <Button variant="ghost" size="sm" onClick={() => { setEditingWorker(w); setWorkerForm({ team_id: w.team_id, name: w.name, role: w.role, phone: w.phone, hourly_rate: String(w.hourly_rate), is_active: w.is_active }); setWorkerDialog(true) }}><Pencil className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="sm" onClick={() => handleDeleteWorker(w.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </>)}
         </div></TableCell>
       </TableRow>))}
       {workers.length === 0 && <TableRow><TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Nenhum trabalhador cadastrado.</TableCell></TableRow>}
@@ -170,7 +176,7 @@ export function Labor() {
         <TableCell className="font-medium"><div className="flex items-center gap-2"><User className="h-4 w-4 text-primary" />{s.worker?.name || s.worker_id}</div></TableCell>
         <TableCell className="text-sm">{s.date}</TableCell><TableCell>{s.hours}h</TableCell>
         <TableCell>R$ {s.cost.toFixed(2)}</TableCell><TableCell className="text-sm text-muted-foreground">{s.notes || '-'}</TableCell>
-        <TableCell className="text-right"><Button variant="ghost" size="sm" onClick={() => handleDeleteShift(s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+        <TableCell className="text-right">{canEdit && <Button variant="ghost" size="sm" onClick={() => handleDeleteShift(s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>}</TableCell>
       </TableRow>))}
       {shifts.length === 0 && <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Nenhum apontamento registrado.</TableCell></TableRow>}
       </TableBody>

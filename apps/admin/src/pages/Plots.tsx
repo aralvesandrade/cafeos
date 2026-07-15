@@ -8,6 +8,7 @@ import { Select } from '@/components/ui/select'
 import { Plus, Pencil, Trash2, ExternalLink } from 'lucide-react'
 import { useToast } from '@/lib/toast'
 import { useConfirm } from '@/lib/confirm'
+import { useModuleAccess } from '@/lib/permissions'
 
 export interface Plot {
   id: string
@@ -50,6 +51,7 @@ export function Plots() {
   const [loading, setLoading] = useState(true)
   const toast = useToast()
   const confirm = useConfirm()
+  const canEdit = useModuleAccess('farms') === 'write'
 
   const loadData = useCallback(async () => {
     try {
@@ -93,11 +95,13 @@ export function Plots() {
               <option key={f.id} value={f.id}>{f.name}</option>
             ))}
           </Select>
-          <Button asChild>
-            <Link to="/plots/new">
-              <Plus className="h-4 w-4" /> Novo Talhão
-            </Link>
-          </Button>
+          {canEdit && (
+            <Button asChild>
+              <Link to="/plots/new">
+                <Plus className="h-4 w-4" /> Novo Talhão
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
 
@@ -139,12 +143,16 @@ export function Plots() {
                       <ExternalLink className="h-4 w-4" />
                     </Link>
                   </Button>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link to={`/plots/${plot.id}/edit`}>
-                      <Pencil className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleDelete(plot.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  {canEdit && (
+                    <>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link to={`/plots/${plot.id}/edit`}>
+                          <Pencil className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(plot.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                    </>
+                  )}
                 </div>
               </TableCell>
             </TableRow>
