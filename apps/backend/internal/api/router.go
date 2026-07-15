@@ -43,12 +43,14 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	otRepo := infraRepo.NewOperationTypeRepository(db)
 	budgetRepo := infraRepo.NewBudgetRepository(db)
 	allocRepo := infraRepo.NewCostAllocationRepository(db)
+	alertRepo := infraRepo.NewAlertRepository(db)
 	transactor := postgres.NewTransactor(db)
+	ruleEngine := domainSvc.NewRuleEngine()
 
 	farmSvc := domainSvc.NewFarmService(farmRepo, producerRepo)
 	plotSvc := domainSvc.NewPlotService(plotRepo)
 	opSvc := domainSvc.NewOperationService(opRepo, eventBus)
-	harvestSvc := domainSvc.NewHarvestService(harvestRepo, hpRepo, indicatorRepo, plotRepo, opRepo, maintRepo, shiftRepo, finRepo, allocRepo, transactor, eventBus)
+	harvestSvc := domainSvc.NewHarvestService(harvestRepo, hpRepo, indicatorRepo, plotRepo, opRepo, maintRepo, shiftRepo, finRepo, allocRepo, transactor, eventBus, ruleEngine, alertRepo)
 	finSvc := domainSvc.NewFinancialService(finRepo)
 	stockSvc := domainSvc.NewStockService(stockItemRepo, stockMovRepo)
 	fleetSvc := domainSvc.NewFleetService(vehRepo, maintRepo)
@@ -75,6 +77,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	otH := handler.NewOperationTypeHandler(otSvc)
 	budgetH := handler.NewBudgetHandler(budgetSvc)
 	allocH := handler.NewCostAllocationHandler(allocSvc)
+	alertH := handler.NewAlertHandler(alertRepo)
 
 	authMw := middleware.Auth(jwtSecret)
 	adminMw := middleware.RequireRole(entity.RolePlatformOwner)
@@ -219,6 +222,10 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	mux.Handle("GET /api/v1/{organization_id}/harvests/{harvest_id}/cost-allocations", chain(allocH.ListByHarvest))
 	mux.Handle("GET /api/v1/{organization_id}/cost-allocations/{id}", chain(allocH.GetByID))
 	mux.Handle("DELETE /api/v1/{organization_id}/cost-allocations/{id}", chain(allocH.Delete))
+
+	// Alerts
+	mux.Handle("GET /api/v1/{organization_id}/alerts", chain(alertH.List))
+	mux.Handle("PUT /api/v1/{organization_id}/alerts/{id}", chain(alertH.Update))
 
 	// Sync — offline mobile (requires RabbitMQ publisher)
 	if publisher != nil {

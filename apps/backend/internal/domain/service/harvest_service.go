@@ -22,6 +22,8 @@ type HarvestService struct {
 	allocationRepo  repository.CostAllocationRepository
 	transactor      repository.Transactor
 	eventBus        event.Bus
+	ruleEngine      *RuleEngine
+	alertRepo       repository.AlertRepository
 }
 
 func NewHarvestService(
@@ -36,6 +38,8 @@ func NewHarvestService(
 	allocationRepo repository.CostAllocationRepository,
 	transactor repository.Transactor,
 	eventBus event.Bus,
+	ruleEngine *RuleEngine,
+	alertRepo repository.AlertRepository,
 ) *HarvestService {
 	return &HarvestService{
 		harvestRepo:     harvestRepo,
@@ -49,6 +53,8 @@ func NewHarvestService(
 		allocationRepo:  allocationRepo,
 		transactor:      transactor,
 		eventBus:        eventBus,
+		ruleEngine:      ruleEngine,
+		alertRepo:       alertRepo,
 	}
 }
 
@@ -94,11 +100,14 @@ func (s *HarvestService) Finalize(harvestID string) error {
 	harvest.Status = entity.HarvestFinalizada
 	harvest.UpdatedAt = time.Now()
 
+	var computedIndicators []*entity.Indicator
 	err = s.transactor.RunInTx(func(repos repository.TransactionProvider) error {
 		if err := repos.Harvest().Update(harvest); err != nil {
 			return err
 		}
-		return s.calculateIndicatorsWithRepos(harvest, repos)
+		indicators, err := s.calculateIndicatorsWithRepos(harvest, repos)
+		computedIndicators = indicators
+		return err
 	})
 	if err != nil {
 		return err
@@ -110,7 +119,51 @@ func (s *HarvestService) Finalize(harvestID string) error {
 		Year:           harvest.Year,
 	})
 
+	s.evaluateRules(harvest, computedIndicators)
+
 	return nil
+}
+
+// evaluateRules runs the Rule Engine over the harvest's freshly computed
+// indicators and persists+publishes an Alert for every triggered rule.
+// Best-effort: rule evaluation failures never fail Finalize.
+func (s *HarvestService) evaluateRules(harvest *entity.Harvest, indicators []*entity.Indicator) {
+	values := map[string]float64{}
+	for _, ind := range indicators {
+		switch ind.Type {
+		case entity.IndSacasHA, entity.IndCustoSaca:
+			values[string(ind.Type)] = ind.Value
+		}
+	}
+	if len(values) == 0 {
+		return
+	}
+
+	for _, result := range s.ruleEngine.EvaluateIndicators(values) {
+		if !result.Triggered || result.Alert == nil {
+			continue
+		}
+		alert := &entity.Alert{
+			ID:             uuid.New().String(),
+			OrganizationID: harvest.OrganizationID,
+			HarvestID:      harvest.ID,
+			RuleID:         result.Alert.RuleID,
+			Message:        result.Alert.Message,
+			Severity:       result.Alert.Severity,
+			Status:         "aberto",
+			CreatedAt:      result.Alert.CreatedAt,
+		}
+		if err := s.alertRepo.Create(alert); err != nil {
+			continue
+		}
+		s.eventBus.Publish(event.AlertGenerated{
+			OrganizationID: harvest.OrganizationID,
+			RuleID:         alert.RuleID,
+			Message:        alert.Message,
+			Severity:       alert.Severity,
+			CreatedAt:      alert.CreatedAt,
+		})
+	}
 }
 
 func (s *HarvestService) RecordProduction(organizationID, harvestID, plotID string, quantity float64, notes string) (*entity.HarvestProduction, error) {
@@ -139,10 +192,10 @@ func (s *HarvestService) GetProductionByHarvest(harvestID string) ([]*entity.Har
 	return s.productionRepo.ListByHarvest(harvestID)
 }
 
-func (s *HarvestService) calculateIndicatorsWithRepos(harvest *entity.Harvest, repos repository.TransactionProvider) error {
+func (s *HarvestService) calculateIndicatorsWithRepos(harvest *entity.Harvest, repos repository.TransactionProvider) ([]*entity.Indicator, error) {
 	productions, err := repos.HarvestProduction().ListByHarvest(harvest.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var totalProduction float64
@@ -152,7 +205,7 @@ func (s *HarvestService) calculateIndicatorsWithRepos(harvest *entity.Harvest, r
 
 	plots, err := repos.Plot().ListByOrganization(harvest.OrganizationID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var totalPlantedArea float64
@@ -163,18 +216,18 @@ func (s *HarvestService) calculateIndicatorsWithRepos(harvest *entity.Harvest, r
 	totalCost := s.calculateTotalCostWithRepos(harvest, repos)
 	costByGroup, err := s.calculateCostByGroupWithRepos(harvest, repos)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	indicators := s.buildIndicators(harvest, totalProduction, totalPlantedArea, totalCost, costByGroup)
 
 	for _, ind := range indicators {
 		if err := repos.Indicator().Create(ind); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return nil
+	return indicators, nil
 }
 
 func (s *HarvestService) calculateTotalCostWithRepos(harvest *entity.Harvest, repos repository.TransactionProvider) float64 {

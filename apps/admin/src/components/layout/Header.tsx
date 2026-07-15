@@ -3,6 +3,7 @@ import { useAuth } from '@/lib/auth'
 import { useTheme } from '@/lib/theme'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { NotificationBell } from '@/components/layout/NotificationBell'
 
 interface HeaderProps {
   onMenuClick: () => void
@@ -30,6 +31,7 @@ export function Header({ onMenuClick }: HeaderProps) {
       <div className="hidden lg:block" />
 
       <div className="flex items-center gap-4">
+        <NotificationBell />
         <button
           onClick={toggleTheme}
           className="inline-flex items-center gap-2 h-[34px] px-3 rounded-lg border border-border text-foreground text-sm font-medium hover:bg-muted"
