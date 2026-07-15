@@ -25,3 +25,7 @@ type Operation struct {
 	CostCenter     *CostCenter    `json:"-" gorm:"foreignKey:CostCenterID"`
 	Type           *OperationType `json:"-" gorm:"foreignKey:TypeID"`
 }
+
+func (Operation) TableName() string {
+	return "operations"
+}

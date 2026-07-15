@@ -23,3 +23,7 @@ type Harvest struct {
 	UpdatedAt           time.Time     `json:"updated_at"`
 	Organization        Organization  `json:"-" gorm:"foreignKey:OrganizationID"`
 }
+
+func (Harvest) TableName() string {
+	return "harvests"
+}

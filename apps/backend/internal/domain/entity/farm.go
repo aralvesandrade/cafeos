@@ -55,6 +55,10 @@ type Farm struct {
 	Producer     *Producer    `json:"producer,omitempty" gorm:"foreignKey:FarmID"`
 }
 
+func (Farm) TableName() string {
+	return "farms"
+}
+
 // ProductiveAreaAvailableHA returns the total area minus the non-productive
 // area breakdown (dam, improvements, roads, APP, legal reserve, native
 // vegetation and other non-agricultural areas), mirroring the "Área

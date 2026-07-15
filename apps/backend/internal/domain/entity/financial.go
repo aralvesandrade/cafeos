@@ -28,3 +28,7 @@ type FinancialTransaction struct {
 	Organization   Organization    `json:"-" gorm:"foreignKey:OrganizationID"`
 	CostCenter     *CostCenter     `json:"-" gorm:"foreignKey:CostCenterID"`
 }
+
+func (FinancialTransaction) TableName() string {
+	return "financial_transactions"
+}

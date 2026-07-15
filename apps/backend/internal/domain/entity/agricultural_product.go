@@ -20,3 +20,7 @@ type AgriculturalProduct struct {
 	CreatedAt      time.Time    `json:"created_at"`
 	Organization   Organization `json:"-" gorm:"foreignKey:OrganizationID"`
 }
+
+func (AgriculturalProduct) TableName() string {
+	return "agricultural_products"
+}

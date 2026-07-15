@@ -39,3 +39,7 @@ type Indicator struct {
 	Organization   Organization  `json:"-" gorm:"foreignKey:OrganizationID"`
 	Harvest        Harvest       `json:"-" gorm:"foreignKey:HarvestID"`
 }
+
+func (Indicator) TableName() string {
+	return "indicators"
+}

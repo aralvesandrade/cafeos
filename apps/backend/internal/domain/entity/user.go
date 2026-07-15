@@ -15,3 +15,7 @@ type User struct {
 	Organization   Organization `json:"-" gorm:"foreignKey:OrganizationID"`
 	Role           Role         `json:"role" gorm:"foreignKey:RoleID"`
 }
+
+func (User) TableName() string {
+	return "users"
+}

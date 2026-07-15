@@ -12,6 +12,10 @@ type Team struct {
 	Organization   Organization `json:"-" gorm:"foreignKey:OrganizationID"`
 }
 
+func (Team) TableName() string {
+	return "teams"
+}
+
 type Worker struct {
 	ID             string       `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	OrganizationID string       `json:"organization_id" gorm:"type:uuid;not null;index"`
@@ -25,6 +29,10 @@ type Worker struct {
 	UpdatedAt      time.Time    `json:"updated_at"`
 	Organization   Organization `json:"-" gorm:"foreignKey:OrganizationID"`
 	Team           Team         `json:"-" gorm:"foreignKey:TeamID"`
+}
+
+func (Worker) TableName() string {
+	return "workers"
 }
 
 type WorkShift struct {
@@ -41,4 +49,8 @@ type WorkShift struct {
 	Organization   Organization `json:"-" gorm:"foreignKey:OrganizationID"`
 	Worker         Worker       `json:"-" gorm:"foreignKey:WorkerID"`
 	CostCenter     *CostCenter  `json:"-" gorm:"foreignKey:CostCenterID"`
+}
+
+func (WorkShift) TableName() string {
+	return "work_shifts"
 }

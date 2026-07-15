@@ -28,6 +28,10 @@ type Vehicle struct {
 	Organization   Organization `json:"-" gorm:"foreignKey:OrganizationID"`
 }
 
+func (Vehicle) TableName() string {
+	return "vehicles"
+}
+
 type Maintenance struct {
 	ID             string       `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	OrganizationID string       `json:"organization_id" gorm:"type:uuid;not null;index"`
@@ -43,4 +47,8 @@ type Maintenance struct {
 	Organization   Organization `json:"-" gorm:"foreignKey:OrganizationID"`
 	Vehicle        Vehicle      `json:"-" gorm:"foreignKey:VehicleID"`
 	CostCenter     *CostCenter  `json:"-" gorm:"foreignKey:CostCenterID"`
+}
+
+func (Maintenance) TableName() string {
+	return "maintenances"
 }

@@ -51,3 +51,7 @@ type Plot struct {
 	Organization Organization `json:"-" gorm:"foreignKey:OrganizationID"`
 	Farm         Farm         `json:"-" gorm:"foreignKey:FarmID"`
 }
+
+func (Plot) TableName() string {
+	return "plots"
+}

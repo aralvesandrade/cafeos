@@ -25,3 +25,7 @@ type Producer struct {
 	Farm         Farm         `json:"-" gorm:"foreignKey:FarmID"`
 	User         *User        `json:"-" gorm:"foreignKey:UserID"`
 }
+
+func (Producer) TableName() string {
+	return "producers"
+}

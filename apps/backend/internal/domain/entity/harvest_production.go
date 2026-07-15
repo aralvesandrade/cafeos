@@ -14,3 +14,7 @@ type HarvestProduction struct {
 	Harvest        Harvest      `json:"-" gorm:"foreignKey:HarvestID"`
 	Plot           Plot         `json:"-" gorm:"foreignKey:PlotID"`
 }
+
+func (HarvestProduction) TableName() string {
+	return "harvest_productions"
+}

@@ -20,6 +20,10 @@ type StockItem struct {
 	Product        AgriculturalProduct `json:"-" gorm:"foreignKey:ProductID"`
 }
 
+func (StockItem) TableName() string {
+	return "stock_items"
+}
+
 type StockMovement struct {
 	ID             string       `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	OrganizationID string       `json:"organization_id" gorm:"type:uuid;not null;index"`
@@ -32,4 +36,8 @@ type StockMovement struct {
 	CreatedAt      time.Time    `json:"created_at"`
 	Organization   Organization `json:"-" gorm:"foreignKey:OrganizationID"`
 	Item           StockItem    `json:"-" gorm:"foreignKey:ItemID"`
+}
+
+func (StockMovement) TableName() string {
+	return "stock_movements"
 }
