@@ -4586,6 +4586,9 @@ const docTemplate = `{
                 "cost_center_id": {
                     "type": "string"
                 },
+                "cost_center_name": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -4634,6 +4637,9 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "plot_id": {
+                    "type": "string"
+                },
+                "plot_name": {
                     "type": "string"
                 }
             }

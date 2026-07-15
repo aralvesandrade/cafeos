@@ -8,7 +8,7 @@ import { Select } from '@/components/ui/select'
 import { Dialog } from '@/components/ui/dialog'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Calendar, Package, Plus, TrendingUp, Wallet } from 'lucide-react'
+import { ArrowLeft, Calendar, Package, Plus, TrendingUp, Wallet, SplitSquareHorizontal } from 'lucide-react'
 
 interface Harvest {
   id: string
@@ -197,6 +197,10 @@ export function HarvestDetail() {
           <Button variant="outline" onClick={() => navigate(`/budgets?harvest_id=${harvest.id}`)}>
             <Wallet className="h-4 w-4" />
             Ver Orçamento
+          </Button>
+          <Button variant="outline" onClick={() => navigate(`/cost-allocations?harvest_id=${harvest.id}`)}>
+            <SplitSquareHorizontal className="h-4 w-4" />
+            Ver Rateios
           </Button>
           {harvest.status !== 'finalizada' && (
           <Button

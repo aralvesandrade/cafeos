@@ -19,6 +19,7 @@ type CostAllocation struct {
 	Method         AllocationMethod     `json:"method" gorm:"not null"`
 	Date           time.Time            `json:"date" gorm:"not null;index"`
 	CreatedAt      time.Time            `json:"created_at"`
+	CostCenterName string               `json:"cost_center_name" gorm:"->;-:migration"`
 	Organization   Organization         `json:"-" gorm:"foreignKey:OrganizationID"`
 	Harvest        Harvest              `json:"-" gorm:"foreignKey:HarvestID"`
 	CostCenter     CostCenter           `json:"-" gorm:"foreignKey:CostCenterID"`
@@ -35,6 +36,7 @@ type CostAllocationItem struct {
 	PlotID       string         `json:"plot_id" gorm:"type:uuid;not null;index"`
 	Amount       float64        `json:"amount" gorm:"type:numeric(12,2);not null"`
 	Percentage   float64        `json:"percentage" gorm:"type:numeric(5,2);default:0"`
+	PlotName     string         `json:"plot_name" gorm:"->;-:migration"`
 	Allocation   CostAllocation `json:"-" gorm:"foreignKey:AllocationID"`
 	Plot         Plot           `json:"-" gorm:"foreignKey:PlotID"`
 }

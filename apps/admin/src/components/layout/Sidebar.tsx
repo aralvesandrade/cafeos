@@ -17,6 +17,7 @@ import {
   CircleDollarSign,
   Tags,
   Wallet,
+  SplitSquareHorizontal,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 
@@ -33,6 +34,7 @@ const phase2Items = [
   { to: '/financial', icon: DollarSign, label: 'Financeiro' },
   { to: '/cost-centers', icon: CircleDollarSign, label: 'Centros de Custo' },
   { to: '/budgets', icon: Wallet, label: 'Orçamento' },
+  { to: '/cost-allocations', icon: SplitSquareHorizontal, label: 'Rateio de Custo' },
   { to: '/stock', icon: Package, label: 'Estoque' },
   { to: '/fleet', icon: Truck, label: 'Frota' },
   { to: '/labor', icon: UserCog, label: 'Equipes' },

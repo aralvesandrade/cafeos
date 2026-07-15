@@ -28,13 +28,6 @@ type createAllocationRequest struct {
 	Percentages  map[string]float64 `json:"percentages"`
 }
 
-type allocationItemResponse struct {
-	PlotID     string  `json:"plot_id"`
-	PlotName   string  `json:"plot_name"`
-	Amount     float64 `json:"amount"`
-	Percentage float64 `json:"percentage"`
-}
-
 // Create registra um novo rateio de custo para um centro de custo da colheita
 // @Summary Criar rateio de custo
 // @Description Registra um novo rateio de custo, distribuindo um valor entre talhões
