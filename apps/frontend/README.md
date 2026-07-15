@@ -15,7 +15,7 @@ Landing page do CafeOS, plataforma SaaS especialista em cafeicultura.
 src/
 ├── components/
 │   ├── layout/       # Header, Footer
-│   ├── sections/     # Hero, About, Features, CoffeeCycle, Indicators, Plans, TechStack, Roadmap, CtaSection
+│   ├── sections/     # Hero, About, Features, CoffeeCycle, Indicators, Plans, CtaSection
 │   └── ui/           # Button, Badge (shadcn/ui)
 ├── lib/
 │   └── utils.ts      # cn() utility (class-variance-authority + tailwind-merge)

@@ -16,7 +16,7 @@ Painel administrativo do CafeOS, plataforma SaaS multi-tenant para cafeicultura.
 ```
 src/
 ├── components/
-│   ├── layout/       # Sidebar, Header (theme toggle), AdminLayout, AuthLayout (theme toggle)
+│   ├── layout/       # Sidebar (theme toggle, colapsável), Header (NotificationBell), AdminLayout, AuthLayout (theme toggle)
 │   ├── ui/           # Button, Badge, Card, Table, Dialog, Input, Select
 │   ├── dashboard/    # StatsCards, ProductionChart, CostChart, RecentOperations
 │   └── farms/        # FarmList, FarmForm
@@ -25,7 +25,10 @@ src/
 │   ├── api.ts        # Cliente HTTP com JWT + suporte a rotas admin
 │   ├── auth.tsx       # AuthContext + hook
 │   └── theme.tsx      # ThemeProvider + useTheme (light/dark, persistido em localStorage)
-├── pages/            # Login, Dashboard, Farms, Plots, Operations, Harvests, Organizations, Users, NotFound
+├── pages/            # Login, Dashboard, Farms, FarmDetail, FarmEdit, Plots, PlotDetail, PlotEdit,
+│                     # Operations, OperationDetail, OperationTypes, Harvests, HarvestDetail,
+│                     # Financial, CostCenters, Budget, CostAllocations, Stock, Fleet, Labor,
+│                     # Organizations, Users, NotFound
 ├── router.tsx        # React Router DOM v7 (nested layouts, role-based guards)
 ├── App.tsx
 ├── main.tsx          # aplica classe .dark antes do primeiro render (evita flash)
@@ -34,7 +37,21 @@ src/
 
 ## Tema (light/dark)
 
-Tokens semânticos (`background`, `foreground`, `card`, `primary`, `sidebar`, etc.) definidos em `src/index.css` como variáveis CSS, com overrides em `.dark`. `ThemeProvider` (`src/lib/theme.tsx`) alterna a classe `.dark` no `<html>` e persiste a escolha em `localStorage` (`cafeos_theme`); sem preferência salva, segue `prefers-color-scheme`. Toggle disponível no Header (área logada) e na tela de login (`AuthLayout`).
+Tokens semânticos (`background`, `foreground`, `card`, `primary`, `sidebar`, etc.) definidos em `src/index.css` como variáveis CSS, com overrides em `.dark`. `ThemeProvider` (`src/lib/theme.tsx`) alterna a classe `.dark` no `<html>` e persiste a escolha em `localStorage` (`cafeos_theme`); sem preferência salva, segue `prefers-color-scheme`. Toggle disponível no rodapé do Sidebar (área logada) e na tela de login (`AuthLayout`).
+
+## Sidebar colapsável
+
+Botão no rodapé do Sidebar alterna entre modo expandido (ícone + label) e
+colapsado (só ícones, com tooltip no hover) — desktop apenas (`lg:`), a
+gaveta mobile sempre mostra os labels. Preferência persistida em
+`localStorage` (`cafeos-sidebar-collapsed`).
+
+## Notificação de alertas
+
+`NotificationBell` (`components/layout/`) no Header faz polling de
+`GET /alerts` a cada 60s e mostra um badge com a contagem de alertas em
+aberto. Cada alerta pode ser resolvido ou descartado direto no dropdown
+(`PUT /alerts/{id}`).
 
 ## Perfis RBAC
 

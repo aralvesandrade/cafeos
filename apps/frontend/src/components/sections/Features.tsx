@@ -1,4 +1,4 @@
-import { MapPin, Grid3X3, Tractor, Calendar, DollarSign, LayoutDashboard } from 'lucide-react'
+import { MapPin, Grid3X3, Tractor, Calendar, DollarSign, LayoutDashboard, Wallet, SplitSquareHorizontal, Bell } from 'lucide-react'
 
 const features = [
   {
@@ -30,6 +30,21 @@ const features = [
     icon: LayoutDashboard,
     title: 'Dashboard',
     desc: 'Visão consolidada de produção, custos, evolução da safra e operações recentes.',
+  },
+  {
+    icon: Wallet,
+    title: 'Orçamento',
+    desc: 'Orçado x realizado por centro de custo e safra, com variação e execução.',
+  },
+  {
+    icon: SplitSquareHorizontal,
+    title: 'Rateio de Custo',
+    desc: 'Distribuição de custos por talhão, proporcional por área ou percentual customizado.',
+  },
+  {
+    icon: Bell,
+    title: 'Alertas Inteligentes',
+    desc: 'Motor de regras identifica baixa produtividade e custo elevado automaticamente.',
   },
 ]
 

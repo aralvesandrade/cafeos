@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown, Percent, RefreshCw } from 'lucide-react'
+import { TrendingUp, TrendingDown, Wallet, Landmark } from 'lucide-react'
 
 const indicators = [
   {
@@ -14,16 +14,16 @@ const indicators = [
     desc: 'Custo operacional total dividido pela produção',
   },
   {
-    icon: Percent,
-    label: 'Rentabilidade',
-    value: '%',
-    desc: 'Margem operacional da safra',
+    icon: Wallet,
+    label: 'COE',
+    value: 'R$',
+    desc: 'Custo Operacional Efetivo: desembolsos diretos da safra',
   },
   {
-    icon: RefreshCw,
-    label: 'Bienalidade',
-    value: 'variação %',
-    desc: 'Alternância de produtividade entre safras',
+    icon: Landmark,
+    label: 'COT',
+    value: 'R$',
+    desc: 'Custo Operacional Total: COE + mão de obra familiar e depreciação',
   },
 ]
 

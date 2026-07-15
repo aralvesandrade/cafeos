@@ -93,7 +93,7 @@ Landing page responsiva com paleta de cores cafeicultura:
 src/
 ├── components/
 │   ├── layout/       # Header, Footer
-│   ├── sections/     # Hero, About, Features, CoffeeCycle, Indicators, Plans, TechStack, Roadmap, CTA
+│   ├── sections/     # Hero, About, Features, CoffeeCycle, Indicators, Plans, CtaSection
 │   └── ui/           # Button, Badge (shadcn/ui)
 ├── lib/utils.ts      # cn() utility
 ├── App.tsx           # Página principal
@@ -123,7 +123,10 @@ src/
 │   ├── api.ts        # Cliente HTTP com JWT
 │   ├── auth.tsx      # AuthContext + hook
 │   └── theme.tsx     # ThemeProvider + useTheme (light/dark)
-├── pages/            # Login, Dashboard, Farms, Plots, Operations, Harvests, Organizations, Users, NotFound
+├── pages/            # Login, Dashboard, Farms, FarmDetail, FarmEdit, Plots, PlotDetail, PlotEdit,
+│                     # Operations, OperationDetail, OperationTypes, Harvests, HarvestDetail,
+│                     # Financial, CostCenters, Budget, CostAllocations, Stock, Fleet, Labor,
+│                     # Organizations, Users, NotFound
 ├── router.tsx        # React Router DOM v7 (nested layouts, lazy routes)
 ├── App.tsx
 ├── main.tsx
@@ -136,7 +139,7 @@ npm run dev      # Desenvolvimento (http://localhost:5174)
 npm run build    # Build produção
 ```
 
-Suporta tema claro/escuro (toggle no Header e na tela de login), persistido em `localStorage`.
+Suporta tema claro/escuro (toggle no rodapé do Sidebar e na tela de login), persistido em `localStorage`. Sidebar é colapsável (modo só-ícones, com tooltip, preferência também persistida). Header traz um sino de notificação (`NotificationBell`) com polling de alertas gerados pelo Rule Engine, permitindo resolver/descartar direto no painel.
 
 ### Swagger
 
@@ -221,7 +224,12 @@ Rotas admin (`platform_owner` apenas, prefixo `/api/v1/admin`):
 
 ### Engine de Regras
 
-Motor de regras configurável para alertas automáticos:
+Motor de regras configurável para alertas automáticos, conectado ao fluxo de
+finalização de safra: ao rodar `HarvestService.Finalize`, os indicadores
+recém-calculados são avaliados pelo `RuleEngine`, e cada regra disparada vira
+um registro na tabela `alerts` (status `aberto`/`resolvido`/`descartado`),
+consultável via `GET/PUT /api/v1/{organization_id}/alerts` e visível no sino
+de notificação do admin.
 
 - **Baixa produtividade**: alerta se < 25 sacas/hectare
 - **Custo elevado**: alerta se > R$ 400/saca
@@ -348,6 +356,19 @@ cd apps/backend && go run ./cmd/worker/main.go
 - [x] Estoque (insumos, validade, movimentações)
 - [x] Frota (veículos, manutenções preventivas/corretivas)
 - [x] Mão de Obra (equipes, trabalhadores, apontamento de horas)
+
+### Fase 2.5 ✅ (implementado — admin)
+- [x] CRUD completo de Operações (criar/editar/excluir + tela de detalhe)
+- [x] Cadastro de Tipos de Operação (antes enum fixo, agora gerenciável)
+- [x] Indicadores de safra na UI (sacas/ha, custo/saca, COE/COT/CT) +
+      dashboard do platform_owner
+- [x] Orçamento (orçado x realizado por centro de custo/safra)
+- [x] Rateio de Custo por talhão (proporcional por área ou percentual
+      customizado)
+- [x] Rollups de custo em Mão de Obra e Frota (total por trabalhador/equipe/
+      veículo)
+- [x] Rule Engine reativado + alertas persistidos + sino de notificação
+- [x] Sidebar colapsável (modo só-ícones)
 
 ### Fase 3 ✅ (MVP)
 - [x] Mobile offline (React Native + SQLite + sync engine)
