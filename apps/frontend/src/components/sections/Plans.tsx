@@ -1,87 +1,26 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Check, X } from 'lucide-react'
 import { LeadModal } from '@/components/ui/LeadModal'
+import { fetchPlans, type Plan } from '@/lib/api'
 
-const plans = [
-  {
-    name: 'Grátis',
-    price: 'R$ 0',
-    period: '/mês',
-    desc: 'Para pequenos produtores que estão começando',
-    featured: false,
-    features: [
-      { label: '1 fazenda', included: true },
-      { label: '5 talhões', included: true },
-      { label: '50 operações/mês', included: true },
-      { label: '3 safras', included: true },
-      { label: '2 usuários', included: true },
-      { label: 'Dashboard básico', included: true },
-      { label: 'Relatórios CSV/PDF', included: false },
-      { label: 'White Label', included: false },
-      { label: 'Suporte prioritário', included: false },
-    ],
-  },
-  {
-    name: 'Pro',
-    price: 'R$ 97',
-    period: '/mês',
-    desc: 'Para médios produtores com operações mais complexas',
-    featured: true,
-    features: [
-      { label: '10 fazendas', included: true },
-      { label: '50 talhões', included: true },
-      { label: 'Operações ilimitadas', included: true },
-      { label: 'Safras ilimitadas', included: true },
-      { label: '10 usuários', included: true },
-      { label: 'Dashboard avançado', included: true },
-      { label: 'Relatórios CSV/PDF', included: true },
-      { label: 'White Label', included: false },
-      { label: 'Suporte por email', included: true },
-    ],
-  },
-  {
-    name: 'Cooperativa',
-    price: 'R$ 297',
-    period: '/mês',
-    desc: 'Para cooperativas que gerenciam múltiplos associados',
-    featured: false,
-    features: [
-      { label: 'Fazendas ilimitadas', included: true },
-      { label: 'Talhões ilimitados', included: true },
-      { label: 'Operações ilimitadas', included: true },
-      { label: 'Safras ilimitadas', included: true },
-      { label: '50 usuários', included: true },
-      { label: 'Dashboard consolidado', included: true },
-      { label: 'Benchmarking associados', included: true },
-      { label: 'White Label', included: false },
-      { label: 'Suporte prioritário', included: true },
-    ],
-  },
-  {
-    name: 'Consultoria',
-    price: 'R$ 497',
-    period: '/mês',
-    desc: 'Para consultorias que atendem múltiplos clientes',
-    featured: false,
-    features: [
-      { label: 'Multi-cliente', included: true },
-      { label: 'Talhões ilimitados', included: true },
-      { label: 'Operações ilimitadas', included: true },
-      { label: 'Safras ilimitadas', included: true },
-      { label: '30 usuários', included: true },
-      { label: 'Dashboard por cliente', included: true },
-      { label: 'Relatórios técnicos', included: true },
-      { label: 'White Label', included: true },
-      { label: 'Suporte dedicado', included: true },
-    ],
-  },
-]
+function formatPrice(cents: number) {
+  return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: cents % 100 === 0 ? 0 : 2 })
+}
 
 export function Plans() {
+  const [plans, setPlans] = useState<Plan[]>([])
+  const [loading, setLoading] = useState(true)
   const [showSignup, setShowSignup] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState('Grátis')
+  const [selectedPlan, setSelectedPlan] = useState('')
+
+  useEffect(() => {
+    fetchPlans()
+      .then(setPlans)
+      .catch(() => setPlans([]))
+      .finally(() => setLoading(false))
+  }, [])
 
   return (
     <section className="py-20 bg-ink" id="plans">
@@ -96,61 +35,65 @@ export function Plans() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative rounded-sm p-6 flex flex-col border ${
-                plan.featured
-                  ? 'bg-ink-raised border-terreiro shadow-xl scale-105'
-                  : 'bg-ink-raised border-rule'
-              }`}
-            >
-              {plan.featured && (
-                <Badge variant="success" className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  Mais Popular
-                </Badge>
-              )}
-
-              <h3 className="font-display text-xl font-semibold mb-1 text-parchment">
-                {plan.name}
-              </h3>
-              <p className="text-sm mb-4 text-muted">
-                {plan.desc}
-              </p>
-
-              <div className="mb-6 font-mono">
-                <span className="text-3xl text-gold font-medium">{plan.price}</span>
-                <span className="text-sm text-muted">
-                  {plan.period}
-                </span>
-              </div>
-
-              <ul className="space-y-3 mb-8 flex-1">
-                {plan.features.map((f) => (
-                  <li key={f.label} className="flex items-center gap-2 text-sm">
-                    {f.included ? (
-                      <Check className="h-4 w-4 flex-shrink-0 text-terreiro-light" />
-                    ) : (
-                      <X className="h-4 w-4 flex-shrink-0 text-rule" />
-                    )}
-                    <span className={!f.included ? 'text-muted/50' : 'text-muted'}>
-                      {f.label}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <Button
-                variant={plan.featured ? 'secondary' : 'outline'}
-                className="w-full"
-                onClick={() => { setSelectedPlan(plan.name); setShowSignup(true) }}
+        {loading ? (
+          <div className="text-center text-muted">Carregando planos...</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {plans.map((plan) => (
+              <div
+                key={plan.id}
+                className={`relative rounded-sm p-6 flex flex-col border ${
+                  plan.featured
+                    ? 'bg-ink-raised border-terreiro shadow-xl scale-105'
+                    : 'bg-ink-raised border-rule'
+                }`}
               >
-                Assinar
-              </Button>
-            </div>
-          ))}
-        </div>
+                {plan.featured && (
+                  <Badge variant="success" className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    Mais Popular
+                  </Badge>
+                )}
+
+                <h3 className="font-display text-xl font-semibold mb-1 text-parchment">
+                  {plan.name}
+                </h3>
+                <p className="text-sm mb-4 text-muted">
+                  {plan.description}
+                </p>
+
+                <div className="mb-6 font-mono">
+                  <span className="text-3xl text-gold font-medium">{formatPrice(plan.price_cents)}</span>
+                  <span className="text-sm text-muted">
+                    /{plan.billing_interval === 'yearly' ? 'ano' : 'mês'}
+                  </span>
+                </div>
+
+                <ul className="space-y-3 mb-8 flex-1">
+                  {plan.features.map((feature) => (
+                    <li key={feature.label} className="flex items-center gap-2 text-sm">
+                      {feature.included ? (
+                        <Check className="h-4 w-4 flex-shrink-0 text-terreiro-light" />
+                      ) : (
+                        <X className="h-4 w-4 flex-shrink-0 text-rule" />
+                      )}
+                      <span className={!feature.included ? 'text-muted/50' : 'text-muted'}>
+                        {feature.label}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Button
+                  variant={plan.featured ? 'secondary' : 'outline'}
+                  className="w-full"
+                  onClick={() => { setSelectedPlan(plan.name); setShowSignup(true) }}
+                >
+                  Assinar
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <LeadModal open={showSignup} onClose={() => setShowSignup(false)} mode="signup" plan={selectedPlan} />

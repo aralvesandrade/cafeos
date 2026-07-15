@@ -14,23 +14,35 @@ interface Organization {
   brand_name: string
   slug: string
   plan: string
+  plan_id: string | null
   status: string
   created_at: string
 }
 
+interface Plan {
+  id: string
+  name: string
+  slug: string
+}
+
 export function Organizations() {
   const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [plans, setPlans] = useState<Plan[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<Organization | null>(null)
-  const [form, setForm] = useState({ name: '', plan: 'free', status: 'active' })
+  const [form, setForm] = useState({ name: '', plan_id: '', status: 'active' })
   const [saving, setSaving] = useState(false)
   const toast = useToast()
 
   const load = useCallback(async () => {
     try {
-      const data = await apiRequest<Organization[]>('/admin/organizations', { admin: true })
-      setOrganizations(data)
+      const [organizationData, planData] = await Promise.all([
+        apiRequest<Organization[]>('/admin/organizations', { admin: true }),
+        apiRequest<Plan[]>('/admin/plans', { admin: true }),
+      ])
+      setOrganizations(organizationData)
+      setPlans(planData)
     } catch (err) {
       console.error(err)
     } finally {
@@ -68,7 +80,7 @@ export function Organizations() {
           <h1 className="font-display text-2xl font-semibold text-foreground">Organizações</h1>
           <p className="text-sm text-muted-foreground">Gerenciar clientes da plataforma</p>
         </div>
-        <Button onClick={() => { setEditing(null); setForm({ name: '', plan: 'free', status: 'active' }); setDialogOpen(true) }}>
+        <Button onClick={() => { setEditing(null); setForm({ name: '', plan_id: plans[0]?.id || '', status: 'active' }); setDialogOpen(true) }}>
           <Plus className="h-4 w-4" /> Nova Organização
         </Button>
       </div>
@@ -93,14 +105,14 @@ export function Organizations() {
                 </div>
               </TableCell>
               <TableCell className="text-muted-foreground text-sm">{o.slug}</TableCell>
-              <TableCell><Badge>{o.plan}</Badge></TableCell>
+              <TableCell><Badge>{plans.find((p) => p.id === o.plan_id)?.name || o.plan}</Badge></TableCell>
               <TableCell>
                 <Badge variant={o.status === 'active' ? 'success' : 'default'}>
                   {o.status === 'active' ? 'Ativo' : 'Inativo'}
                 </Badge>
               </TableCell>
               <TableCell className="text-right">
-                <Button variant="ghost" size="sm" onClick={() => { setEditing(o); setForm({ name: o.name, plan: o.plan, status: o.status }); setDialogOpen(true) }}>
+                <Button variant="ghost" size="sm" onClick={() => { setEditing(o); setForm({ name: o.name, plan_id: o.plan_id || plans[0]?.id || '', status: o.status }); setDialogOpen(true) }}>
                   <Pencil className="h-4 w-4" />
                 </Button>
               </TableCell>
@@ -120,11 +132,10 @@ export function Organizations() {
           </div>
           <div>
             <label className="block text-sm font-medium text-foreground mb-1">Plano</label>
-            <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.plan} onChange={(e) => setForm({ ...form, plan: e.target.value })}>
-              <option value="free">Grátis</option>
-              <option value="pro">Pro</option>
-              <option value="cooperativa">Cooperativa</option>
-              <option value="consultoria">Consultoria</option>
+            <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.plan_id} onChange={(e) => setForm({ ...form, plan_id: e.target.value })}>
+              {plans.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
             </select>
           </div>
           {editing && (

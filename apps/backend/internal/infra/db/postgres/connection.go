@@ -30,6 +30,7 @@ func NewConnection(databaseURL string, log *slog.Logger, gormLevel slog.Level) (
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 
 	if err := db.AutoMigrate(
+		&entity.Plan{},
 		&entity.Organization{},
 		&entity.User{},
 		&entity.Farm{},

@@ -10,6 +10,7 @@ type Organization struct {
 	LogoURL      string    `json:"logo_url" gorm:"default:''"`
 	PrimaryColor string    `json:"primary_color" gorm:"default:'#2E7D32'"`
 	Plan         string    `json:"plan" gorm:"default:'free'"`
+	PlanID       *string   `json:"plan_id" gorm:"type:uuid"`
 	Domain       string    `json:"domain" gorm:"default:''"`
 	Status       string    `json:"status" gorm:"default:'active'"`
 	CreatedAt    time.Time `json:"created_at"`

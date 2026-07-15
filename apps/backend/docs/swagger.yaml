@@ -333,6 +333,8 @@ definitions:
         type: string
       plan:
         type: string
+      plan_id:
+        type: string
       primary_color:
         type: string
       slug:
@@ -340,6 +342,46 @@ definitions:
       status:
         type: string
       updated_at:
+        type: string
+    type: object
+  entity.Plan:
+    properties:
+      active:
+        type: boolean
+      billing_interval:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      display_order:
+        type: integer
+      featured:
+        type: boolean
+      features:
+        items:
+          $ref: '#/definitions/entity.PlanFeature'
+        type: array
+      id:
+        type: string
+      max_farms:
+        type: integer
+      max_users:
+        type: integer
+      name:
+        type: string
+      price_cents:
+        type: integer
+      slug:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entity.PlanFeature:
+    properties:
+      included:
+        type: boolean
+      label:
         type: string
     type: object
   entity.Plot:
@@ -1185,6 +1227,35 @@ definitions:
         type: string
       plan:
         type: string
+      plan_id:
+        type: string
+    type: object
+  handler.createPlanRequest:
+    properties:
+      active:
+        type: boolean
+      billing_interval:
+        type: string
+      description:
+        type: string
+      display_order:
+        type: integer
+      featured:
+        type: boolean
+      features:
+        items:
+          $ref: '#/definitions/entity.PlanFeature'
+        type: array
+      max_farms:
+        type: integer
+      max_users:
+        type: integer
+      name:
+        type: string
+      price_cents:
+        type: integer
+      slug:
+        type: string
     type: object
   handler.createPlotRequest:
     properties:
@@ -1465,6 +1536,8 @@ definitions:
         type: string
       plan:
         type: string
+      plan_id:
+        type: string
       status:
         type: string
     type: object
@@ -1476,6 +1549,33 @@ definitions:
         $ref: '#/definitions/entity.Module'
       role:
         $ref: '#/definitions/entity.UserRole'
+    type: object
+  handler.updatePlanRequest:
+    properties:
+      active:
+        type: boolean
+      billing_interval:
+        type: string
+      description:
+        type: string
+      display_order:
+        type: integer
+      featured:
+        type: boolean
+      features:
+        items:
+          $ref: '#/definitions/entity.PlanFeature'
+        type: array
+      max_farms:
+        type: integer
+      max_users:
+        type: integer
+      name:
+        type: string
+      price_cents:
+        type: integer
+      slug:
+        type: string
     type: object
   handler.updateUserRequest:
     properties:
@@ -4539,6 +4639,129 @@ paths:
       summary: Atualizar organização
       tags:
       - organizations (Organizações)
+  /api/v1/admin/plans:
+    get:
+      description: Lista todos os planos de assinatura (somente platform_owner)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Plan'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Listar planos
+      tags:
+      - plans (Planos)
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo plano de assinatura (somente platform_owner)
+      parameters:
+      - description: Dados do plano
+        in: body
+        name: plan
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Plan'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar plano
+      tags:
+      - plans (Planos)
+  /api/v1/admin/plans/{id}:
+    delete:
+      description: Exclui um plano por ID (somente platform_owner)
+      parameters:
+      - description: ID do Plano
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Excluir plano
+      tags:
+      - plans (Planos)
+    get:
+      description: Retorna um único plano (somente platform_owner)
+      parameters:
+      - description: ID do Plano
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Plan'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obter plano por ID
+      tags:
+      - plans (Planos)
+    put:
+      consumes:
+      - application/json
+      description: Atualiza dados do plano (somente platform_owner)
+      parameters:
+      - description: ID do Plano
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados atualizados do plano
+        in: body
+        name: plan
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updatePlanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Plan'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar plano
+      tags:
+      - plans (Planos)
   /api/v1/admin/users:
     get:
       description: Lista todos os usuários (somente platform_owner)
@@ -4636,6 +4859,22 @@ paths:
       summary: Atualizar usuário
       tags:
       - users (Usuários)
+  /api/v1/public/plans:
+    get:
+      description: Lista os planos de assinatura ativos (público, usado na landing
+        page)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Plan'
+            type: array
+      summary: Listar planos públicos
+      tags:
+      - plans (Planos)
   /auth/login:
     post:
       consumes:

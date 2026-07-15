@@ -57,18 +57,116 @@ func hash(password string) string {
 }
 
 func seed(db *gorm.DB) error {
+	// Plans
+	// Features replica exatamente o conteúdo original hardcoded na landing
+	// page (apps/frontend/src/components/sections/Plans.tsx), agora como
+	// dado na tabela: cada item carrega label + included (check/x), na
+	// mesma ordem em que era exibido antes.
+	plans := []entity.Plan{
+		{
+			Name: "Grátis", Slug: "free", Description: "Para pequenos produtores que estão começando",
+			PriceCents: 0, BillingInterval: "monthly", MaxFarms: 1, MaxUsers: 2,
+			Features: entity.PlanFeatureList{
+				{Label: "1 fazenda", Included: true},
+				{Label: "5 talhões", Included: true},
+				{Label: "50 operações/mês", Included: true},
+				{Label: "3 safras", Included: true},
+				{Label: "2 usuários", Included: true},
+				{Label: "Dashboard básico", Included: true},
+				{Label: "Relatórios CSV/PDF", Included: false},
+				{Label: "White Label", Included: false},
+				{Label: "Suporte prioritário", Included: false},
+			},
+			Active: true, Featured: false, DisplayOrder: 1,
+		},
+		{
+			Name: "Pro", Slug: "pro", Description: "Para médios produtores com operações mais complexas",
+			PriceCents: 9700, BillingInterval: "monthly", MaxFarms: 10, MaxUsers: 10,
+			Features: entity.PlanFeatureList{
+				{Label: "10 fazendas", Included: true},
+				{Label: "50 talhões", Included: true},
+				{Label: "Operações ilimitadas", Included: true},
+				{Label: "Safras ilimitadas", Included: true},
+				{Label: "10 usuários", Included: true},
+				{Label: "Dashboard avançado", Included: true},
+				{Label: "Relatórios CSV/PDF", Included: true},
+				{Label: "White Label", Included: false},
+				{Label: "Suporte por email", Included: true},
+			},
+			Active: true, Featured: true, DisplayOrder: 2,
+		},
+		{
+			Name: "Cooperativa", Slug: "cooperativa", Description: "Para cooperativas que gerenciam múltiplos associados",
+			PriceCents: 29700, BillingInterval: "monthly", MaxFarms: 0, MaxUsers: 50,
+			Features: entity.PlanFeatureList{
+				{Label: "Fazendas ilimitadas", Included: true},
+				{Label: "Talhões ilimitados", Included: true},
+				{Label: "Operações ilimitadas", Included: true},
+				{Label: "Safras ilimitadas", Included: true},
+				{Label: "50 usuários", Included: true},
+				{Label: "Dashboard consolidado", Included: true},
+				{Label: "Benchmarking associados", Included: true},
+				{Label: "White Label", Included: false},
+				{Label: "Suporte prioritário", Included: true},
+			},
+			Active: true, Featured: false, DisplayOrder: 3,
+		},
+		{
+			Name: "Consultoria", Slug: "consultoria", Description: "Para consultorias que atendem múltiplos clientes",
+			PriceCents: 49700, BillingInterval: "monthly", MaxFarms: 0, MaxUsers: 30,
+			Features: entity.PlanFeatureList{
+				{Label: "Multi-cliente", Included: true},
+				{Label: "Talhões ilimitados", Included: true},
+				{Label: "Operações ilimitadas", Included: true},
+				{Label: "Safras ilimitadas", Included: true},
+				{Label: "30 usuários", Included: true},
+				{Label: "Dashboard por cliente", Included: true},
+				{Label: "Relatórios técnicos", Included: true},
+				{Label: "White Label", Included: true},
+				{Label: "Suporte dedicado", Included: true},
+			},
+			Active: true, Featured: false, DisplayOrder: 4,
+		},
+	}
+	planIDBySlug := make(map[string]string, len(plans))
+	for i := range plans {
+		if err := db.Create(&plans[i]).Error; err != nil {
+			return fmt.Errorf("create plan %s: %w", plans[i].Slug, err)
+		}
+		planIDBySlug[plans[i].Slug] = plans[i].ID
+	}
+	fmt.Println("  ✓ Plans: free, pro, cooperativa, consultoria")
+
 	// Organization
+	proPlanID := planIDBySlug["pro"]
 	organization := entity.Organization{
 		Name:         "CafeOS Padrão",
 		Slug:         "cafeos",
 		BrandName:    "CafeOS",
 		Plan:         "pro",
+		PlanID:       &proPlanID,
 		PrimaryColor: "#2E7D32",
 	}
 	if err := db.Create(&organization).Error; err != nil {
 		return fmt.Errorf("create organization: %w", err)
 	}
 	fmt.Println("  ✓ Organization: CafeOS Padrão (cafeos)")
+
+	// Backfill: qualquer organização existente sem plan_id recebe o PlanID
+	// correspondente ao seu campo legado `plan` (texto livre), por slug.
+	var orgsToBackfill []entity.Organization
+	if err := db.Where("plan_id IS NULL").Find(&orgsToBackfill).Error; err != nil {
+		return fmt.Errorf("list organizations for plan backfill: %w", err)
+	}
+	for _, org := range orgsToBackfill {
+		planID, ok := planIDBySlug[org.Plan]
+		if !ok {
+			continue
+		}
+		if err := db.Model(&entity.Organization{}).Where("id = ?", org.ID).Update("plan_id", planID).Error; err != nil {
+			return fmt.Errorf("backfill plan_id for organization %s: %w", org.ID, err)
+		}
+	}
 
 	permSvc := domainSvc.NewPermissionService(infraRepo.NewPermissionRepository(db))
 	if err := permSvc.SeedDefaults(organization.ID); err != nil {

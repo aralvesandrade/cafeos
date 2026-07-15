@@ -15,6 +15,7 @@ import { OperationTypes } from '@/pages/OperationTypes'
 import { Harvests } from '@/pages/Harvests'
 import { HarvestDetail } from '@/pages/HarvestDetail'
 import { Organizations } from '@/pages/Organizations'
+import { Plans } from '@/pages/Plans'
 import { Users } from '@/pages/Users'
 import { Financial } from '@/pages/Financial'
 import { CostCenters } from '@/pages/CostCenters'
@@ -60,6 +61,7 @@ export const router = createBrowserRouter([
       { path: 'labor', element: <Labor /> },
       { path: 'team', element: <TeamUsers /> },
       { path: 'organizations', element: <Organizations /> },
+      { path: 'plans', element: <Plans /> },
       { path: 'users', element: <Users /> },
       { path: 'permissions', element: <Permissions /> },
       { path: '404', element: <NotFound /> },

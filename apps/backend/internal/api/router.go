@@ -29,6 +29,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	hpRepo := infraRepo.NewHarvestProductionRepository(db)
 	indicatorRepo := infraRepo.NewIndicatorRepository(db)
 	organizationRepo := infraRepo.NewOrganizationRepository(db)
+	planRepo := infraRepo.NewPlanRepository(db)
 	userRepo := infraRepo.NewUserRepository(db)
 	finRepo := infraRepo.NewFinancialRepository(db)
 	stockItemRepo := infraRepo.NewStockItemRepository(db)
@@ -61,6 +62,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	budgetSvc := domainSvc.NewBudgetService(budgetRepo, harvestRepo, opRepo, maintRepo, shiftRepo, finRepo, allocRepo)
 	allocSvc := domainSvc.NewCostAllocationService(allocRepo, plotRepo)
 	permSvc := domainSvc.NewPermissionService(permRepo)
+	planSvc := domainSvc.NewPlanService(planRepo)
 
 	if organizations, err := organizationRepo.List(); err != nil {
 		log.Error("failed to list organizations for permission backfill", "error", err)
@@ -79,6 +81,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	dashboardH := handler.NewDashboardHandler(harvestRepo, indicatorRepo, opRepo, plotRepo, farmRepo, hpRepo, farmSvc)
 	authH := handler.NewAuthHandler(userRepo, organizationRepo, jwtSecret)
 	organizationH := handler.NewOrganizationHandler(organizationRepo, permSvc)
+	planH := handler.NewPlanHandler(planSvc)
 	userH := handler.NewUserHandler(userRepo)
 	finH := handler.NewFinancialHandler(finSvc, farmSvc)
 	stockH := handler.NewStockHandler(stockSvc, farmSvc)
@@ -101,6 +104,9 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 
 	// Health
 	mux.HandleFunc("GET /health", handler.HealthCheck)
+
+	// Public plans (landing page)
+	mux.HandleFunc("GET /api/v1/public/plans", planH.ListPublic)
 
 	// Swagger UI
 	mux.Handle("GET /swagger/", httpSwagger.Handler(
@@ -213,6 +219,12 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	mux.Handle("GET /api/v1/admin/organizations/{id}", adminChain(organizationH.GetByID))
 	mux.Handle("PUT /api/v1/admin/organizations/{id}", adminChain(organizationH.Update))
 	mux.Handle("DELETE /api/v1/admin/organizations/{id}", adminChain(organizationH.Delete))
+
+	mux.Handle("GET /api/v1/admin/plans", adminChain(planH.List))
+	mux.Handle("POST /api/v1/admin/plans", adminChain(planH.Create))
+	mux.Handle("GET /api/v1/admin/plans/{id}", adminChain(planH.GetByID))
+	mux.Handle("PUT /api/v1/admin/plans/{id}", adminChain(planH.Update))
+	mux.Handle("DELETE /api/v1/admin/plans/{id}", adminChain(planH.Delete))
 
 	// Admin — User management (platform_owner only)
 	mux.Handle("GET /api/v1/admin/users", adminChain(userH.List))

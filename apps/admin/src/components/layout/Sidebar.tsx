@@ -24,6 +24,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   ShieldCheck,
+  CreditCard,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { useTheme } from '@/lib/theme'
@@ -51,6 +52,7 @@ const phase2Items: { to: string; icon: typeof LayoutDashboard; label: string; mo
 
 const adminItems = [
   { to: '/organizations', icon: Building2, label: 'Organizações' },
+  { to: '/plans', icon: CreditCard, label: 'Planos' },
   { to: '/users', icon: Users, label: 'Usuários' },
 ]
 

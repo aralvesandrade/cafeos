@@ -214,6 +214,202 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/admin/plans": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todos os planos de assinatura (somente platform_owner)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "plans (Planos)"
+                ],
+                "summary": "Listar planos",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Plan"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cria um novo plano de assinatura (somente platform_owner)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "plans (Planos)"
+                ],
+                "summary": "Criar plano",
+                "parameters": [
+                    {
+                        "description": "Dados do plano",
+                        "name": "plan",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createPlanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Plan"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/plans/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna um único plano (somente platform_owner)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "plans (Planos)"
+                ],
+                "summary": "Obter plano por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Plano",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Plan"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza dados do plano (somente platform_owner)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "plans (Planos)"
+                ],
+                "summary": "Atualizar plano",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Plano",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados do plano",
+                        "name": "plan",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.updatePlanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Plan"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui um plano por ID (somente platform_owner)",
+                "tags": [
+                    "plans (Planos)"
+                ],
+                "summary": "Excluir plano",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do Plano",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
         "/api/v1/admin/users": {
             "get": {
                 "security": [
@@ -365,6 +561,29 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/api/v1/public/plans": {
+            "get": {
+                "description": "Lista os planos de assinatura ativos (público, usado na landing page)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "plans (Planos)"
+                ],
+                "summary": "Listar planos públicos",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Plan"
+                            }
+                        }
                     }
                 }
             }
@@ -5433,6 +5652,9 @@ const docTemplate = `{
                 "plan": {
                     "type": "string"
                 },
+                "plan_id": {
+                    "type": "string"
+                },
                 "primary_color": {
                     "type": "string"
                 },
@@ -5443,6 +5665,67 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Plan": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "billing_interval": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "display_order": {
+                    "type": "integer"
+                },
+                "featured": {
+                    "type": "boolean"
+                },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.PlanFeature"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "max_farms": {
+                    "type": "integer"
+                },
+                "max_users": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price_cents": {
+                    "type": "integer"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.PlanFeature": {
+            "type": "object",
+            "properties": {
+                "included": {
+                    "type": "boolean"
+                },
+                "label": {
                     "type": "string"
                 }
             }
@@ -6706,6 +6989,50 @@ const docTemplate = `{
                 },
                 "plan": {
                     "type": "string"
+                },
+                "plan_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.createPlanRequest": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "billing_interval": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "display_order": {
+                    "type": "integer"
+                },
+                "featured": {
+                    "type": "boolean"
+                },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.PlanFeature"
+                    }
+                },
+                "max_farms": {
+                    "type": "integer"
+                },
+                "max_users": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price_cents": {
+                    "type": "integer"
+                },
+                "slug": {
+                    "type": "string"
                 }
             }
         },
@@ -7136,6 +7463,9 @@ const docTemplate = `{
                 "plan": {
                     "type": "string"
                 },
+                "plan_id": {
+                    "type": "string"
+                },
                 "status": {
                     "type": "string"
                 }
@@ -7152,6 +7482,47 @@ const docTemplate = `{
                 },
                 "role": {
                     "$ref": "#/definitions/entity.UserRole"
+                }
+            }
+        },
+        "handler.updatePlanRequest": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "billing_interval": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "display_order": {
+                    "type": "integer"
+                },
+                "featured": {
+                    "type": "boolean"
+                },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.PlanFeature"
+                    }
+                },
+                "max_farms": {
+                    "type": "integer"
+                },
+                "max_users": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price_cents": {
+                    "type": "integer"
+                },
+                "slug": {
+                    "type": "string"
                 }
             }
         },
