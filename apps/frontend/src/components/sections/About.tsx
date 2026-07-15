@@ -25,29 +25,30 @@ const challenges = [
 
 export function About() {
   return (
-    <section className="py-20 bg-white" id="about">
+    <section className="py-20 bg-ink" id="about">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-coffee-green-dark mb-4">
+          <h2 className="font-display text-3xl sm:text-4xl font-semibold text-parchment mb-4">
             Por que o CafeOS?
           </h2>
-          <p className="text-lg text-coffee-text-light">
+          <p className="text-lg text-muted">
             A cafeicultura enfrenta desafios únicos que sistemas genéricos não resolvem.
             O CafeOS nasceu para ser a plataforma especialista que o cafeicultor merece.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {challenges.map((item) => (
             <div
               key={item.title}
-              className="text-center p-6 rounded-xl bg-coffee-beige hover:bg-coffee-beige-dark transition-colors"
+              className="relative bg-ink-raised border border-rule rounded-sm p-6 hover:border-terreiro/50 transition-colors"
             >
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-coffee-green/10 text-coffee-green mb-4">
-                <item.icon className="h-6 w-6" />
+              <div className="absolute top-4 left-4 w-1.5 h-1.5 rounded-full bg-rule" />
+              <div className="inline-flex items-center justify-center w-11 h-11 rounded-sm bg-terreiro/10 text-terreiro-light mb-4 mt-2">
+                <item.icon className="h-5 w-5" />
               </div>
-              <h3 className="font-semibold text-coffee-green-dark mb-2">{item.title}</h3>
-              <p className="text-sm text-coffee-text-light">{item.desc}</p>
+              <h3 className="font-display font-semibold text-parchment mb-2">{item.title}</h3>
+              <p className="text-sm text-muted">{item.desc}</p>
             </div>
           ))}
         </div>

@@ -8,12 +8,12 @@ export function CtaSection() {
   const [showContact, setShowContact] = useState(false)
 
   return (
-    <section className="py-20 bg-gradient-to-r from-coffee-green-dark to-coffee-green text-white">
+    <section className="py-20 bg-gradient-to-br from-terreiro to-terreiro/60 text-parchment">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+        <h2 className="font-display text-3xl sm:text-4xl font-semibold mb-4">
           Pronto para transformar sua cafeicultura?
         </h2>
-        <p className="text-lg text-coffee-beige/80 max-w-2xl mx-auto mb-8">
+        <p className="text-lg text-parchment/85 max-w-2xl mx-auto mb-8">
           Comece grátis hoje e descubra como o CafeOS pode ajudar você a
           aumentar a produtividade, reduzir custos e tomar decisões melhores.
         </p>
@@ -31,7 +31,7 @@ export function CtaSection() {
           <Button
             variant="outline"
             size="lg"
-            className="border-white/30 text-white hover:bg-white/10 gap-2"
+            className="border-parchment/40 text-parchment hover:bg-parchment/10 gap-2"
             onClick={() => setShowContact(true)}
           >
             <Mail className="h-5 w-5" />

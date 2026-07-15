@@ -15,15 +15,15 @@ export function Button({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 cursor-pointer',
+        'inline-flex items-center justify-center font-medium rounded-sm transition-all duration-200 cursor-pointer',
         {
-          'bg-coffee-green text-white hover:bg-coffee-green-dark shadow-sm hover:shadow-md':
+          'bg-terreiro text-parchment hover:bg-terreiro-light shadow-sm hover:shadow-md':
             variant === 'primary',
-          'bg-coffee-brown text-white hover:bg-coffee-brown-light':
+          'bg-gold text-ink hover:brightness-110':
             variant === 'secondary',
-          'border-2 border-coffee-green text-coffee-green hover:bg-coffee-green hover:text-white':
+          'border border-muted/40 text-parchment hover:border-terreiro hover:text-terreiro':
             variant === 'outline',
-          'text-coffee-text hover:text-coffee-green': variant === 'ghost',
+          'text-muted hover:text-parchment': variant === 'ghost',
         },
         {
           'px-4 py-2 text-sm': size === 'sm',

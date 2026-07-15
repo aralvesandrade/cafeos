@@ -84,13 +84,13 @@ export function Plans() {
   const [selectedPlan, setSelectedPlan] = useState('Grátis')
 
   return (
-    <section className="py-20 bg-coffee-beige" id="plans">
+    <section className="py-20 bg-ink" id="plans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-coffee-green-dark mb-4">
+          <h2 className="font-display text-3xl sm:text-4xl font-semibold text-parchment mb-4">
             Planos
           </h2>
-          <p className="text-lg text-coffee-text-light">
+          <p className="text-lg text-muted">
             Escolha o plano ideal para o seu perfil. Do pequeno produtor à
             cooperativa ou consultoria.
           </p>
@@ -100,10 +100,10 @@ export function Plans() {
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-2xl p-6 flex flex-col ${
+              className={`relative rounded-sm p-6 flex flex-col border ${
                 plan.featured
-                  ? 'bg-coffee-green-dark text-white ring-2 ring-coffee-green shadow-xl scale-105'
-                  : 'bg-white text-coffee-text border border-gray-200'
+                  ? 'bg-ink-raised border-terreiro shadow-xl scale-105'
+                  : 'bg-ink-raised border-rule'
               }`}
             >
               {plan.featured && (
@@ -112,16 +112,16 @@ export function Plans() {
                 </Badge>
               )}
 
-              <h3 className={`text-xl font-bold mb-1 ${plan.featured ? 'text-white' : 'text-coffee-green-dark'}`}>
+              <h3 className="font-display text-xl font-semibold mb-1 text-parchment">
                 {plan.name}
               </h3>
-              <p className={`text-sm mb-4 ${plan.featured ? 'text-coffee-beige/80' : 'text-coffee-text-light'}`}>
+              <p className="text-sm mb-4 text-muted">
                 {plan.desc}
               </p>
 
-              <div className="mb-6">
-                <span className="text-3xl font-bold">{plan.price}</span>
-                <span className={`text-sm ${plan.featured ? 'text-coffee-beige/80' : 'text-coffee-text-light'}`}>
+              <div className="mb-6 font-mono">
+                <span className="text-3xl text-gold font-medium">{plan.price}</span>
+                <span className="text-sm text-muted">
                   {plan.period}
                 </span>
               </div>
@@ -130,11 +130,11 @@ export function Plans() {
                 {plan.features.map((f) => (
                   <li key={f.label} className="flex items-center gap-2 text-sm">
                     {f.included ? (
-                      <Check className={`h-4 w-4 flex-shrink-0 ${plan.featured ? 'text-green-300' : 'text-coffee-green'}`} />
+                      <Check className="h-4 w-4 flex-shrink-0 text-terreiro-light" />
                     ) : (
-                      <X className={`h-4 w-4 flex-shrink-0 ${plan.featured ? 'text-white/40' : 'text-gray-300'}`} />
+                      <X className="h-4 w-4 flex-shrink-0 text-rule" />
                     )}
-                    <span className={!f.included && !plan.featured ? 'text-gray-400' : ''}>
+                    <span className={!f.included ? 'text-muted/50' : 'text-muted'}>
                       {f.label}
                     </span>
                   </li>
