@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { apiRequest } from '@/lib/api'
 import { Button } from '@/components/ui/button'
-import { FarmForm, emptyProducer, type FarmData } from '@/components/farms/FarmForm'
+import { FarmForm, type FarmData, type ProducerData } from '@/components/farms/FarmForm'
 import { ArrowLeft } from 'lucide-react'
 import type { Farm } from '@/pages/Farms'
 import { useToast } from '@/lib/toast'
@@ -46,26 +46,24 @@ function farmToFormData(farm: Farm): FarmData {
     livestock_area_not_covered: String(farm.livestock_area_not_covered_ha ?? ''),
     agriculture_area_not_covered: String(farm.agriculture_area_not_covered_ha ?? ''),
     non_agricultural_area: String(farm.non_agricultural_area_ha ?? ''),
-    producer: farm.producer
-      ? {
-          cpf: farm.producer.cpf ?? '',
-          name: farm.producer.name ?? '',
-          rg: farm.producer.rg ?? '',
-          issuing_body: farm.producer.issuing_body ?? '',
-          gender: farm.producer.gender ?? '',
-          birth_date: farm.producer.birth_date ? farm.producer.birth_date.slice(0, 10) : '',
-          marital_status: farm.producer.marital_status ?? '',
-          phone: farm.producer.phone ?? '',
-          email: farm.producer.email ?? '',
-          education: farm.producer.education ?? '',
-        }
-      : emptyProducer,
+    producers: (farm.producers ?? []).map((p): ProducerData => ({
+      user_id: p.user_id,
+      role_id: p.role_id,
+      cpf: p.cpf ?? '',
+      name: p.name ?? '',
+      rg: p.rg ?? '',
+      issuing_body: p.issuing_body ?? '',
+      gender: p.gender ?? '',
+      birth_date: p.birth_date ? p.birth_date.slice(0, 10) : '',
+      marital_status: p.marital_status ?? '',
+      phone: p.phone ?? '',
+      email: p.email ?? '',
+      education: p.education ?? '',
+    })),
   }
 }
 
 function formDataToPayload(form: FarmData) {
-  const hasProducerData = Object.entries(form.producer).some(([key, value]) => key !== 'gender' && value !== '')
-
   return {
     name: form.name,
     owner: form.owner,
@@ -104,20 +102,20 @@ function formDataToPayload(form: FarmData) {
     livestock_area_not_covered_ha: parseFloat(form.livestock_area_not_covered) || 0,
     agriculture_area_not_covered_ha: parseFloat(form.agriculture_area_not_covered) || 0,
     non_agricultural_area_ha: parseFloat(form.non_agricultural_area) || 0,
-    producer: hasProducerData
-      ? {
-          cpf: form.producer.cpf,
-          name: form.producer.name,
-          rg: form.producer.rg,
-          issuing_body: form.producer.issuing_body,
-          gender: form.producer.gender,
-          birth_date: form.producer.birth_date || null,
-          marital_status: form.producer.marital_status,
-          phone: form.producer.phone,
-          email: form.producer.email,
-          education: form.producer.education,
-        }
-      : null,
+    producers: form.producers.map((p) => ({
+      user_id: p.user_id,
+      role_id: p.role_id,
+      cpf: p.cpf,
+      name: p.name,
+      rg: p.rg,
+      issuing_body: p.issuing_body,
+      gender: p.gender,
+      birth_date: p.birth_date || null,
+      marital_status: p.marital_status,
+      phone: p.phone,
+      email: p.email,
+      education: p.education,
+    })),
   }
 }
 

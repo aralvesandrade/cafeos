@@ -23,13 +23,13 @@ func (r *FarmRepository) Create(f *entity.Farm) error {
 
 func (r *FarmRepository) GetByID(id string) (*entity.Farm, error) {
 	var f entity.Farm
-	err := r.db.Preload("Producer").First(&f, "id = ?", id).Error
+	err := r.db.Preload("Producers").First(&f, "id = ?", id).Error
 	return &f, err
 }
 
 func (r *FarmRepository) ListByOrganization(organizationID string) ([]*entity.Farm, error) {
 	var farms []*entity.Farm
-	err := r.db.Preload("Producer").Where("organization_id = ?", organizationID).Order("name").Find(&farms).Error
+	err := r.db.Preload("Producers").Where("organization_id = ?", organizationID).Order("name").Find(&farms).Error
 	return farms, err
 }
 

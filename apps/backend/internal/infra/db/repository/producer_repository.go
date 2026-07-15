@@ -21,10 +21,22 @@ func (r *ProducerRepository) Create(p *entity.Producer) error {
 	return r.db.Create(p).Error
 }
 
-func (r *ProducerRepository) GetByFarmID(farmID string) (*entity.Producer, error) {
-	var p entity.Producer
-	err := r.db.First(&p, "farm_id = ?", farmID).Error
-	return &p, err
+func (r *ProducerRepository) ListByFarmID(farmID string) ([]*entity.Producer, error) {
+	var producers []*entity.Producer
+	err := r.db.Where("farm_id = ?", farmID).Find(&producers).Error
+	return producers, err
+}
+
+func (r *ProducerRepository) ListByUserID(userID string) ([]*entity.Producer, error) {
+	var producers []*entity.Producer
+	err := r.db.Where("user_id = ?", userID).Find(&producers).Error
+	return producers, err
+}
+
+func (r *ProducerRepository) ExistsByFarmAndUser(farmID, userID string) (bool, error) {
+	var count int64
+	err := r.db.Model(&entity.Producer{}).Where("farm_id = ? AND user_id = ?", farmID, userID).Count(&count).Error
+	return count > 0, err
 }
 
 func (r *ProducerRepository) Update(p *entity.Producer) error {

@@ -8,7 +8,9 @@ import { useToast } from '@/lib/toast'
 import { useConfirm } from '@/lib/confirm'
 import { useModuleAccess } from '@/lib/permissions'
 
-interface Producer {
+export interface Producer {
+  user_id: string
+  role_id: string
   cpf: string
   name: string
   rg: string
@@ -65,7 +67,7 @@ export interface Farm {
   agriculture_area_not_covered_ha: number
   non_agricultural_area_ha: number
 
-  producer?: Producer | null
+  producers?: Producer[] | null
 }
 
 export function Farms() {

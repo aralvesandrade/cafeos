@@ -52,7 +52,7 @@ type Farm struct {
 	UpdatedAt    time.Time    `json:"updated_at"`
 	Organization Organization `json:"-" gorm:"foreignKey:OrganizationID"`
 	Plots        []Plot       `json:"plots,omitempty" gorm:"foreignKey:FarmID"`
-	Producer     *Producer    `json:"producer,omitempty" gorm:"foreignKey:FarmID"`
+	Producers    []Producer   `json:"producers,omitempty" gorm:"foreignKey:FarmID"`
 }
 
 func (Farm) TableName() string {

@@ -30,6 +30,8 @@ func NewFarmHandler(svc *service.FarmService) *FarmHandler {
 }
 
 type producerRequest struct {
+	UserID        string  `json:"user_id"`
+	RoleID        string  `json:"role_id"`
 	CPF           string  `json:"cpf"`
 	Name          string  `json:"name"`
 	RG            string  `json:"rg"`
@@ -44,6 +46,8 @@ type producerRequest struct {
 
 func (p *producerRequest) toEntity() (*entity.Producer, error) {
 	producer := &entity.Producer{
+		UserID:        p.UserID,
+		RoleID:        p.RoleID,
 		CPF:           p.CPF,
 		Name:          p.Name,
 		RG:            p.RG,
@@ -62,6 +66,18 @@ func (p *producerRequest) toEntity() (*entity.Producer, error) {
 		producer.BirthDate = &t
 	}
 	return producer, nil
+}
+
+func toProducerEntities(reqs []producerRequest) ([]*entity.Producer, error) {
+	producers := make([]*entity.Producer, 0, len(reqs))
+	for i := range reqs {
+		p, err := reqs[i].toEntity()
+		if err != nil {
+			return nil, err
+		}
+		producers = append(producers, p)
+	}
+	return producers, nil
 }
 
 type createFarmRequest struct {
@@ -108,7 +124,7 @@ type createFarmRequest struct {
 	AgricultureAreaNotCoveredHA float64 `json:"agriculture_area_not_covered_ha"`
 	NonAgriculturalAreaHA       float64 `json:"non_agricultural_area_ha"`
 
-	Producer *producerRequest `json:"producer"`
+	Producers []producerRequest `json:"producers"`
 }
 
 func (req *createFarmRequest) toEntity(organizationID string) *entity.Farm {
@@ -175,17 +191,13 @@ func (h *FarmHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var producer *entity.Producer
-	if req.Producer != nil {
-		p, err := req.Producer.toEntity()
-		if err != nil {
-			writeError(w, "invalid producer birth_date, expected YYYY-MM-DD", http.StatusBadRequest)
-			return
-		}
-		producer = p
+	producers, err := toProducerEntities(req.Producers)
+	if err != nil {
+		writeError(w, "invalid producer birth_date, expected YYYY-MM-DD", http.StatusBadRequest)
+		return
 	}
 
-	farm, err := h.svc.Create(req.toEntity(organizationID), producer)
+	farm, err := h.svc.Create(req.toEntity(organizationID), producers)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -330,7 +342,7 @@ func (h *FarmHandler) Update(w http.ResponseWriter, r *http.Request) {
 		AgricultureAreaNotCoveredHA *float64 `json:"agriculture_area_not_covered_ha"`
 		NonAgriculturalAreaHA       *float64 `json:"non_agricultural_area_ha"`
 
-		Producer *producerRequest `json:"producer"`
+		Producers *[]producerRequest `json:"producers"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		writeError(w, "invalid request body", http.StatusBadRequest)
@@ -454,18 +466,21 @@ func (h *FarmHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if input.Producer != nil {
-		producer, err := input.Producer.toEntity()
+	if input.Producers != nil {
+		producers, err := toProducerEntities(*input.Producers)
 		if err != nil {
 			writeError(w, "invalid producer birth_date, expected YYYY-MM-DD", http.StatusBadRequest)
 			return
 		}
-		saved, err := h.svc.UpsertProducer(existing.ID, producer)
+		saved, err := h.svc.SetProducers(existing.ID, producers)
 		if err != nil {
 			writeError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		existing.Producer = saved
+		existing.Producers = make([]entity.Producer, len(saved))
+		for i, p := range saved {
+			existing.Producers[i] = *p
+		}
 	}
 
 	writeJSON(w, existing, http.StatusOK)

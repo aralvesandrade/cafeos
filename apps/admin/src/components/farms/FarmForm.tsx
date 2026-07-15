@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react'
+import { apiRequest } from '@/lib/api'
+import { useRoles } from '@/lib/roles'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
+import { Plus, Trash2 } from 'lucide-react'
 
 export interface ProducerData {
+  user_id: string
+  role_id: string
   cpf: string
   name: string
   rg: string
@@ -14,6 +19,12 @@ export interface ProducerData {
   phone: string
   email: string
   education: string
+}
+
+interface OrgUser {
+  id: string
+  name: string
+  email: string
 }
 
 export interface FarmData {
@@ -59,10 +70,12 @@ export interface FarmData {
   agriculture_area_not_covered: string
   non_agricultural_area: string
 
-  producer: ProducerData
+  producers: ProducerData[]
 }
 
 export const emptyProducer: ProducerData = {
+  user_id: '',
+  role_id: '',
   cpf: '',
   name: '',
   rg: '',
@@ -113,7 +126,7 @@ export const emptyFarm: FarmData = {
   livestock_area_not_covered: '',
   agriculture_area_not_covered: '',
   non_agricultural_area: '',
-  producer: emptyProducer,
+  producers: [],
 }
 
 interface FarmFormProps {
@@ -170,14 +183,29 @@ function DocField({
 
 export function FarmForm({ initial, onSave, onCancel, loading }: FarmFormProps) {
   const [form, setForm] = useState<FarmData>(emptyFarm)
+  const [orgUsers, setOrgUsers] = useState<OrgUser[]>([])
+  const { roles } = useRoles()
 
   useEffect(() => {
-    if (initial) setForm({ ...emptyFarm, ...initial, producer: { ...emptyProducer, ...initial.producer } })
+    apiRequest<OrgUser[]>('/users').then(setOrgUsers).catch(console.error)
+  }, [])
+
+  useEffect(() => {
+    if (initial) setForm({ ...emptyFarm, ...initial, producers: initial.producers ?? [] })
   }, [initial])
 
   const set = <K extends keyof FarmData>(key: K, value: FarmData[K]) => setForm((f) => ({ ...f, [key]: value }))
-  const setProducer = <K extends keyof ProducerData>(key: K, value: ProducerData[K]) =>
-    setForm((f) => ({ ...f, producer: { ...f.producer, [key]: value } }))
+
+  const addProducer = () => setForm((f) => ({ ...f, producers: [...f.producers, { ...emptyProducer }] }))
+  const removeProducer = (index: number) =>
+    setForm((f) => ({ ...f, producers: f.producers.filter((_, i) => i !== index) }))
+  const setProducer = <K extends keyof ProducerData>(index: number, key: K, value: ProducerData[K]) =>
+    setForm((f) => ({
+      ...f,
+      producers: f.producers.map((p, i) => (i === index ? { ...p, [key]: value } : p)),
+    }))
+
+  const roleKeyFor = (roleId: string) => roles.find((r) => r.id === roleId)?.key
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -288,53 +316,91 @@ export function FarmForm({ initial, onSave, onCancel, loading }: FarmFormProps) 
         </div>
       </Section>
 
-      <Section title="Dados do Produtor">
-        <div className="grid grid-cols-3 gap-4">
-          <Field label="CPF">
-            <Input value={form.producer.cpf} onChange={(e) => setProducer('cpf', e.target.value)} />
-          </Field>
-          <Field label="Nome">
-            <Input value={form.producer.name} onChange={(e) => setProducer('name', e.target.value)} />
-          </Field>
-          <Field label="RG">
-            <Input value={form.producer.rg} onChange={(e) => setProducer('rg', e.target.value)} />
-          </Field>
-          <Field label="Órgão Emissor">
-            <Input value={form.producer.issuing_body} onChange={(e) => setProducer('issuing_body', e.target.value)} />
-          </Field>
-          <Field label="Sexo">
-            <Select value={form.producer.gender} onChange={(e) => setProducer('gender', e.target.value)}>
-              <option value="">Selecione...</option>
-              <option value="masculino">Masculino</option>
-              <option value="feminino">Feminino</option>
-            </Select>
-          </Field>
-          <Field label="Data de nascimento">
-            <Input type="date" value={form.producer.birth_date} onChange={(e) => setProducer('birth_date', e.target.value)} />
-          </Field>
-          <Field label="Estado civil">
-            <Select value={form.producer.marital_status} onChange={(e) => setProducer('marital_status', e.target.value)}>
-              <option value="">Selecione...</option>
-              <option value="solteiro">Solteiro(a)</option>
-              <option value="casado">Casado(a)</option>
-              <option value="divorciado">Divorciado(a)</option>
-              <option value="viuvo">Viúvo(a)</option>
-            </Select>
-          </Field>
-          <Field label="Telefone">
-            <Input value={form.producer.phone} onChange={(e) => setProducer('phone', e.target.value)} />
-          </Field>
-          <Field label="E-mail">
-            <Input type="email" value={form.producer.email} onChange={(e) => setProducer('email', e.target.value)} />
-          </Field>
-          <Field label="Escolaridade">
-            <Select value={form.producer.education} onChange={(e) => setProducer('education', e.target.value)}>
-              <option value="">Selecione...</option>
-              <option value="fundamental">Ensino Fundamental</option>
-              <option value="medio">Ensino Médio</option>
-              <option value="superior">Ensino Superior</option>
-            </Select>
-          </Field>
+      <Section title="Vínculos da Fazenda">
+        <div className="space-y-4">
+          {form.producers.map((producer, index) => {
+            const isProprietario = roleKeyFor(producer.role_id) === 'proprietario'
+            return (
+              <div key={index} className="rounded-lg border border-border p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="grid grid-cols-2 gap-4 flex-1">
+                    <Field label="Usuário">
+                      <Select value={producer.user_id} onChange={(e) => setProducer(index, 'user_id', e.target.value)} required>
+                        <option value="">Selecione...</option>
+                        {orgUsers.map((u) => (
+                          <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+                        ))}
+                      </Select>
+                    </Field>
+                    <Field label="Papel nesta fazenda">
+                      <Select value={producer.role_id} onChange={(e) => setProducer(index, 'role_id', e.target.value)} required>
+                        <option value="">Selecione...</option>
+                        {roles.map((r) => (
+                          <option key={r.id} value={r.id}>{r.name}</option>
+                        ))}
+                      </Select>
+                    </Field>
+                  </div>
+                  <Button type="button" variant="ghost" size="sm" className="ml-4 mt-6" onClick={() => removeProducer(index)}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+
+                {isProprietario && (
+                  <div className="grid grid-cols-3 gap-4 pt-2 border-t border-border">
+                    <Field label="CPF">
+                      <Input value={producer.cpf} onChange={(e) => setProducer(index, 'cpf', e.target.value)} />
+                    </Field>
+                    <Field label="Nome">
+                      <Input value={producer.name} onChange={(e) => setProducer(index, 'name', e.target.value)} />
+                    </Field>
+                    <Field label="RG">
+                      <Input value={producer.rg} onChange={(e) => setProducer(index, 'rg', e.target.value)} />
+                    </Field>
+                    <Field label="Órgão Emissor">
+                      <Input value={producer.issuing_body} onChange={(e) => setProducer(index, 'issuing_body', e.target.value)} />
+                    </Field>
+                    <Field label="Sexo">
+                      <Select value={producer.gender} onChange={(e) => setProducer(index, 'gender', e.target.value)}>
+                        <option value="">Selecione...</option>
+                        <option value="masculino">Masculino</option>
+                        <option value="feminino">Feminino</option>
+                      </Select>
+                    </Field>
+                    <Field label="Data de nascimento">
+                      <Input type="date" value={producer.birth_date} onChange={(e) => setProducer(index, 'birth_date', e.target.value)} />
+                    </Field>
+                    <Field label="Estado civil">
+                      <Select value={producer.marital_status} onChange={(e) => setProducer(index, 'marital_status', e.target.value)}>
+                        <option value="">Selecione...</option>
+                        <option value="solteiro">Solteiro(a)</option>
+                        <option value="casado">Casado(a)</option>
+                        <option value="divorciado">Divorciado(a)</option>
+                        <option value="viuvo">Viúvo(a)</option>
+                      </Select>
+                    </Field>
+                    <Field label="Telefone">
+                      <Input value={producer.phone} onChange={(e) => setProducer(index, 'phone', e.target.value)} />
+                    </Field>
+                    <Field label="E-mail">
+                      <Input type="email" value={producer.email} onChange={(e) => setProducer(index, 'email', e.target.value)} />
+                    </Field>
+                    <Field label="Escolaridade">
+                      <Select value={producer.education} onChange={(e) => setProducer(index, 'education', e.target.value)}>
+                        <option value="">Selecione...</option>
+                        <option value="fundamental">Ensino Fundamental</option>
+                        <option value="medio">Ensino Médio</option>
+                        <option value="superior">Ensino Superior</option>
+                      </Select>
+                    </Field>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+          <Button type="button" variant="outline" onClick={addProducer}>
+            <Plus className="h-4 w-4" /> Adicionar vínculo
+          </Button>
         </div>
       </Section>
 

@@ -46,18 +46,32 @@ func TestFarmService_Create_WithProducer(t *testing.T) {
 		OrganizationID: "organization-1",
 		Name:           "Fazenda Boa Vista",
 		TotalAreaHA:    100.0,
-	}, &entity.Producer{
-		Name: "Carlos Eduardo Rosa",
-		CPF:  "930.744.338-68",
+	}, []*entity.Producer{
+		{Name: "Carlos Eduardo Rosa", CPF: "930.744.338-68", UserID: "user-1", RoleID: "role-proprietario"},
 	})
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
-	if farm.Producer == nil {
-		t.Fatal("expected producer to be set")
+	if len(farm.Producers) != 1 {
+		t.Fatal("expected one producer link to be set")
 	}
-	if farm.Producer.FarmID != farm.ID {
-		t.Errorf("expected producer.farm_id %s, got %s", farm.ID, farm.Producer.FarmID)
+	if farm.Producers[0].FarmID != farm.ID {
+		t.Errorf("expected producer.farm_id %s, got %s", farm.ID, farm.Producers[0].FarmID)
+	}
+}
+
+func TestFarmService_Create_WithProducer_RequiresUserAndRole(t *testing.T) {
+	svc, _ := newFarmSvc()
+
+	_, err := svc.Create(&entity.Farm{
+		OrganizationID: "organization-1",
+		Name:           "Fazenda Boa Vista",
+		TotalAreaHA:    100.0,
+	}, []*entity.Producer{
+		{Name: "Carlos Eduardo Rosa"},
+	})
+	if err == nil {
+		t.Error("expected error for missing user_id/role_id")
 	}
 }
 
@@ -166,28 +180,49 @@ func TestFarmService_Delete(t *testing.T) {
 	}
 }
 
-func TestFarmService_UpsertProducer(t *testing.T) {
+func TestFarmService_SetProducers(t *testing.T) {
 	svc, _ := newFarmSvc()
 
 	farm, _ := svc.Create(&entity.Farm{OrganizationID: "t1", Name: "Farm", TotalAreaHA: 100, PlantedAreaHA: 80}, nil)
 
-	producer, err := svc.UpsertProducer(farm.ID, &entity.Producer{Name: "Carlos"})
+	saved, err := svc.SetProducers(farm.ID, []*entity.Producer{
+		{Name: "Carlos", UserID: "user-1", RoleID: "role-proprietario"},
+		{Name: "Ana", UserID: "user-2", RoleID: "role-operador"},
+	})
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
-	if producer.FarmID != farm.ID {
-		t.Errorf("expected farm_id %s, got %s", farm.ID, producer.FarmID)
+	if len(saved) != 2 {
+		t.Fatalf("expected 2 links, got %d", len(saved))
 	}
 
-	updated, err := svc.UpsertProducer(farm.ID, &entity.Producer{Name: "Carlos Eduardo"})
+	// Replacing again with a single link drops the previous ones.
+	replaced, err := svc.SetProducers(farm.ID, []*entity.Producer{
+		{Name: "Carlos Eduardo", UserID: "user-1", RoleID: "role-proprietario"},
+	})
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
-	if updated.ID != producer.ID {
-		t.Error("expected upsert to reuse the same producer ID")
+	if len(replaced) != 1 {
+		t.Fatalf("expected 1 link after replace, got %d", len(replaced))
 	}
-	if updated.Name != "Carlos Eduardo" {
-		t.Errorf("expected updated name, got %s", updated.Name)
+	if replaced[0].Name != "Carlos Eduardo" {
+		t.Errorf("expected updated name, got %s", replaced[0].Name)
+	}
+}
+
+func TestFarmService_IsOwner(t *testing.T) {
+	svc, _ := newFarmSvc()
+
+	farm, _ := svc.Create(&entity.Farm{OrganizationID: "t1", Name: "Farm", TotalAreaHA: 100, PlantedAreaHA: 80}, []*entity.Producer{
+		{Name: "Carlos", UserID: "user-1", RoleID: "role-proprietario"},
+	})
+
+	if !svc.IsOwner(farm.ID, "user-1") {
+		t.Error("expected user-1 to be recognized as owner")
+	}
+	if svc.IsOwner(farm.ID, "user-2") {
+		t.Error("expected user-2 to not be recognized as owner")
 	}
 }
 

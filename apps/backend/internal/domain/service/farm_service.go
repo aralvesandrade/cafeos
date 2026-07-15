@@ -31,9 +31,23 @@ func validateFarm(farm *entity.Farm) error {
 	return nil
 }
 
-// Create registers a new farm and, optionally, its responsible producer.
-// producer may be nil when no producer data is provided yet.
-func (s *FarmService) Create(farm *entity.Farm, producer *entity.Producer) (*entity.Farm, error) {
+func validateProducer(producer *entity.Producer) error {
+	if producer.Name == "" {
+		return errors.New("producer name is required")
+	}
+	if producer.UserID == "" {
+		return errors.New("producer user_id is required")
+	}
+	if producer.RoleID == "" {
+		return errors.New("producer role_id is required")
+	}
+	return nil
+}
+
+// Create registers a new farm and, optionally, the users linked to it (each
+// with a role scoped to this farm — see entity.Producer). producers may be
+// empty when no links are provided yet.
+func (s *FarmService) Create(farm *entity.Farm, producers []*entity.Producer) (*entity.Farm, error) {
 	if err := validateFarm(farm); err != nil {
 		return nil, err
 	}
@@ -46,9 +60,10 @@ func (s *FarmService) Create(farm *entity.Farm, producer *entity.Producer) (*ent
 		return nil, err
 	}
 
-	if producer != nil {
-		if producer.Name == "" {
-			return nil, errors.New("producer name is required")
+	for _, producer := range producers {
+		if err := validateProducer(producer); err != nil {
+			_ = s.repo.Delete(farm.ID)
+			return nil, err
 		}
 		producer.ID = uuid.New().String()
 		producer.OrganizationID = farm.OrganizationID
@@ -60,7 +75,12 @@ func (s *FarmService) Create(farm *entity.Farm, producer *entity.Producer) (*ent
 			_ = s.repo.Delete(farm.ID)
 			return nil, err
 		}
-		farm.Producer = producer
+	}
+	if len(producers) > 0 {
+		farm.Producers = make([]entity.Producer, len(producers))
+		for i, p := range producers {
+			farm.Producers[i] = *p
+		}
 	}
 
 	return farm, nil
@@ -74,43 +94,48 @@ func (s *FarmService) ListByOrganization(organizationID string) ([]*entity.Farm,
 	return s.repo.ListByOrganization(organizationID)
 }
 
-// ListByOwner returns only the farms whose linked producer is the given user
-// (used to scope the proprietario role to the farms it actually owns).
+// ListByOwner returns only the farms the given user is linked to (used to
+// scope the proprietario role to the farms it actually has a link to).
 func (s *FarmService) ListByOwner(organizationID, userID string) ([]*entity.Farm, error) {
-	farms, err := s.repo.ListByOrganization(organizationID)
+	links, err := s.producerRepo.ListByUserID(userID)
 	if err != nil {
 		return nil, err
 	}
-	owned := make([]*entity.Farm, 0, len(farms))
-	for _, f := range farms {
-		if f.Producer != nil && f.Producer.UserID != nil && *f.Producer.UserID == userID {
-			owned = append(owned, f)
+	owned := make([]*entity.Farm, 0, len(links))
+	for _, link := range links {
+		if link.OrganizationID != organizationID {
+			continue
 		}
+		farm, err := s.repo.GetByID(link.FarmID)
+		if err != nil {
+			continue
+		}
+		owned = append(owned, farm)
 	}
 	return owned, nil
 }
 
-// OwnedFarmIDs returns the set of farm IDs owned by the given user, for
-// cross-referencing plot/operation/financial/etc. records to that user's farms.
+// OwnedFarmIDs returns the set of farm IDs the given user is linked to, for
+// cross-referencing plot/operation/financial/etc. records to that user's
+// farms.
 func (s *FarmService) OwnedFarmIDs(organizationID, userID string) (map[string]bool, error) {
-	farms, err := s.ListByOwner(organizationID, userID)
+	links, err := s.producerRepo.ListByUserID(userID)
 	if err != nil {
 		return nil, err
 	}
-	ids := make(map[string]bool, len(farms))
-	for _, f := range farms {
-		ids[f.ID] = true
+	ids := make(map[string]bool, len(links))
+	for _, link := range links {
+		if link.OrganizationID == organizationID {
+			ids[link.FarmID] = true
+		}
 	}
 	return ids, nil
 }
 
-// IsOwner reports whether the given user is the producer linked to the farm.
+// IsOwner reports whether the given user has a link to the farm.
 func (s *FarmService) IsOwner(farmID, userID string) bool {
-	producer, err := s.producerRepo.GetByFarmID(farmID)
-	if err != nil {
-		return false
-	}
-	return producer.UserID != nil && *producer.UserID == userID
+	exists, err := s.producerRepo.ExistsByFarmAndUser(farmID, userID)
+	return err == nil && exists
 }
 
 func (s *FarmService) Update(farm *entity.Farm) error {
@@ -120,19 +145,25 @@ func (s *FarmService) Update(farm *entity.Farm) error {
 	return s.repo.Update(farm)
 }
 
-// UpsertProducer creates or updates the producer responsible for a farm.
-func (s *FarmService) UpsertProducer(farmID string, producer *entity.Producer) (*entity.Producer, error) {
-	if producer.Name == "" {
-		return nil, errors.New("producer name is required")
-	}
-
+// SetProducers replaces every user-link of a farm with the given list — the
+// same "PUT replaces state" pattern used for the permissions matrix.
+func (s *FarmService) SetProducers(farmID string, producers []*entity.Producer) ([]*entity.Producer, error) {
 	farm, err := s.repo.GetByID(farmID)
 	if err != nil {
 		return nil, errors.New("farm not found")
 	}
 
-	existing, err := s.producerRepo.GetByFarmID(farmID)
-	if err != nil {
+	for _, producer := range producers {
+		if err := validateProducer(producer); err != nil {
+			return nil, err
+		}
+	}
+
+	if err := s.producerRepo.DeleteByFarmID(farmID); err != nil {
+		return nil, err
+	}
+
+	for _, producer := range producers {
 		producer.ID = uuid.New().String()
 		producer.OrganizationID = farm.OrganizationID
 		producer.FarmID = farmID
@@ -141,18 +172,8 @@ func (s *FarmService) UpsertProducer(farmID string, producer *entity.Producer) (
 		if err := s.producerRepo.Create(producer); err != nil {
 			return nil, err
 		}
-		return producer, nil
 	}
-
-	producer.ID = existing.ID
-	producer.OrganizationID = existing.OrganizationID
-	producer.FarmID = existing.FarmID
-	producer.CreatedAt = existing.CreatedAt
-	producer.UpdatedAt = time.Now()
-	if err := s.producerRepo.Update(producer); err != nil {
-		return nil, err
-	}
-	return producer, nil
+	return producers, nil
 }
 
 func (s *FarmService) Delete(id string) error {

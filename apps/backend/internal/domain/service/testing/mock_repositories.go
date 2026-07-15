@@ -75,15 +75,39 @@ func (r *InMemoryProducerRepo) Create(p *entity.Producer) error {
 	return nil
 }
 
-func (r *InMemoryProducerRepo) GetByFarmID(farmID string) (*entity.Producer, error) {
+func (r *InMemoryProducerRepo) ListByFarmID(farmID string) ([]*entity.Producer, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var result []*entity.Producer
+	for _, p := range r.producers {
+		if p.FarmID == farmID {
+			result = append(result, p)
+		}
+	}
+	return result, nil
+}
+
+func (r *InMemoryProducerRepo) ListByUserID(userID string) ([]*entity.Producer, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var result []*entity.Producer
+	for _, p := range r.producers {
+		if p.UserID == userID {
+			result = append(result, p)
+		}
+	}
+	return result, nil
+}
+
+func (r *InMemoryProducerRepo) ExistsByFarmAndUser(farmID, userID string) (bool, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	for _, p := range r.producers {
-		if p.FarmID == farmID {
-			return p, nil
+		if p.FarmID == farmID && p.UserID == userID {
+			return true, nil
 		}
 	}
-	return nil, errors.New("producer not found")
+	return false, nil
 }
 
 func (r *InMemoryProducerRepo) Update(p *entity.Producer) error {

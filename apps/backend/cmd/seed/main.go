@@ -242,13 +242,17 @@ func seed(db *gorm.DB) error {
 	}
 	fmt.Printf("  ✓ Fazendas: %d criadas\n", len(farms))
 
-	// Producers
+	// Producers — Farm↔User links, each with a role scoped to that farm.
+	// Recanto Verde demonstrates multiple links: João as proprietário, Ana
+	// as operador de campo.
 	joaoUserID := users[1].ID
 	mariaUserID := users[2].ID
+	anaUserID := users[4].ID
 	producers := []entity.Producer{
-		{OrganizationID: organization.ID, FarmID: farms[0].ID, UserID: &joaoUserID, CPF: "123.456.789-00", Name: "João Silva", Phone: "(35) 99999-0001", Email: "joao@cafeos.com.br"},
-		{OrganizationID: organization.ID, FarmID: farms[1].ID, UserID: &joaoUserID, CPF: "123.456.789-00", Name: "João Silva", Phone: "(35) 99999-0001", Email: "joao@cafeos.com.br"},
-		{OrganizationID: organization.ID, FarmID: farms[2].ID, UserID: &mariaUserID, CPF: "987.654.321-00", Name: "Maria Oliveira", Phone: "(35) 99999-0002", Email: "maria@cafeos.com.br"},
+		{OrganizationID: organization.ID, FarmID: farms[0].ID, UserID: joaoUserID, RoleID: roleIDByKey[entity.RoleKeyProprietario], CPF: "123.456.789-00", Name: "João Silva", Phone: "(35) 99999-0001", Email: "joao@cafeos.com.br"},
+		{OrganizationID: organization.ID, FarmID: farms[0].ID, UserID: anaUserID, RoleID: roleIDByKey["operador_campo"], Name: "Ana Costa", Phone: "(35) 99999-0004", Email: "ana@cafeos.com.br"},
+		{OrganizationID: organization.ID, FarmID: farms[1].ID, UserID: joaoUserID, RoleID: roleIDByKey[entity.RoleKeyProprietario], CPF: "123.456.789-00", Name: "João Silva", Phone: "(35) 99999-0001", Email: "joao@cafeos.com.br"},
+		{OrganizationID: organization.ID, FarmID: farms[2].ID, UserID: mariaUserID, RoleID: roleIDByKey[entity.RoleKeyProprietario], CPF: "987.654.321-00", Name: "Maria Oliveira", Phone: "(35) 99999-0002", Email: "maria@cafeos.com.br"},
 	}
 	for i := range producers {
 		if err := db.Create(&producers[i]).Error; err != nil {

@@ -5,8 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { ArrowLeft, Grid3X3, Ruler, HardHat, Map, User, Pencil, FileText, Trees } from 'lucide-react'
+import { useRoles } from '@/lib/roles'
 
 interface Producer {
+  user_id: string
+  role_id: string
   cpf: string
   name: string
   rg: string
@@ -59,7 +62,7 @@ interface Farm {
   livestock_area_not_covered_ha?: number
   agriculture_area_not_covered_ha?: number
   non_agricultural_area_ha?: number
-  producer?: Producer | null
+  producers?: Producer[] | null
 }
 
 interface Plot {
@@ -78,6 +81,7 @@ export function FarmDetail() {
   const [farm, setFarm] = useState<Farm | null>(null)
   const [plots, setPlots] = useState<Plot[]>([])
   const [loading, setLoading] = useState(true)
+  const { roles } = useRoles()
 
   const load = useCallback(async () => {
     try {
@@ -237,55 +241,62 @@ export function FarmDetail() {
         </CardContent>
       </Card>
 
-      {farm.producer && (
+      {farm.producers && farm.producers.length > 0 && (
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
             <User className="h-4 w-4 text-primary" />
-            <CardTitle className="text-sm font-medium text-muted-foreground">Produtor</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Vínculos da Fazenda</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground">Nome</p>
-                <p className="font-medium text-foreground">{farm.producer.name || '—'}</p>
+          <CardContent className="space-y-4">
+            {farm.producers.map((producer, i) => (
+              <div key={producer.user_id + i} className={i > 0 ? 'pt-4 border-t border-border' : ''}>
+                <p className="text-xs font-medium text-primary mb-2">
+                  {roles.find((r) => r.id === producer.role_id)?.name || 'Papel não encontrado'}
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Nome</p>
+                    <p className="font-medium text-foreground">{producer.name || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">CPF</p>
+                    <p className="font-medium text-foreground">{producer.cpf || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Telefone</p>
+                    <p className="font-medium text-foreground">{producer.phone || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">E-mail</p>
+                    <p className="font-medium text-foreground">{producer.email || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">RG</p>
+                    <p className="font-medium text-foreground">{producer.rg || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Órgão Emissor</p>
+                    <p className="font-medium text-foreground">{producer.issuing_body || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Sexo</p>
+                    <p className="font-medium text-foreground">{producer.gender || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Data de Nascimento</p>
+                    <p className="font-medium text-foreground">{producer.birth_date ? new Date(producer.birth_date).toLocaleDateString('pt-BR') : '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Estado Civil</p>
+                    <p className="font-medium text-foreground">{producer.marital_status || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Escolaridade</p>
+                    <p className="font-medium text-foreground">{producer.education || '—'}</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-muted-foreground">CPF</p>
-                <p className="font-medium text-foreground">{farm.producer.cpf || '—'}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Telefone</p>
-                <p className="font-medium text-foreground">{farm.producer.phone || '—'}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">E-mail</p>
-                <p className="font-medium text-foreground">{farm.producer.email || '—'}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">RG</p>
-                <p className="font-medium text-foreground">{farm.producer.rg || '—'}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Órgão Emissor</p>
-                <p className="font-medium text-foreground">{farm.producer.issuing_body || '—'}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Sexo</p>
-                <p className="font-medium text-foreground">{farm.producer.gender || '—'}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Data de Nascimento</p>
-                <p className="font-medium text-foreground">{farm.producer.birth_date ? new Date(farm.producer.birth_date).toLocaleDateString('pt-BR') : '—'}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Estado Civil</p>
-                <p className="font-medium text-foreground">{farm.producer.marital_status || '—'}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Escolaridade</p>
-                <p className="font-medium text-foreground">{farm.producer.education || '—'}</p>
-              </div>
-            </div>
+            ))}
           </CardContent>
         </Card>
       )}
