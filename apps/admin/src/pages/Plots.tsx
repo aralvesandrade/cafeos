@@ -6,6 +6,8 @@ import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@
 import { Badge } from '@/components/ui/badge'
 import { Select } from '@/components/ui/select'
 import { Plus, Pencil, Trash2, ExternalLink } from 'lucide-react'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 
 export interface Plot {
   id: string
@@ -46,6 +48,8 @@ export function Plots() {
   const [farms, setFarms] = useState<Farm[]>([])
   const [farmFilter, setFarmFilter] = useState('')
   const [loading, setLoading] = useState(true)
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const loadData = useCallback(async () => {
     try {
@@ -65,11 +69,12 @@ export function Plots() {
   useEffect(() => { loadData() }, [loadData])
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Remover talhão?')) return
+    if (!(await confirm({ title: 'Remover talhão?', variant: 'danger' }))) return
     try {
       await apiRequest(`/plots/${id}`, { method: 'DELETE' })
       await loadData()
-    } catch (err) { console.error(err) }
+      toast.success('Talhão removido')
+    } catch (err) { console.error(err); toast.error('Erro ao remover talhão') }
   }
 
   if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>

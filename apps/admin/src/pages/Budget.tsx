@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -36,6 +38,8 @@ export function Budget() {
   const [editing, setEditing] = useState<BudgetItem | null>(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const load = useCallback(async () => {
     try {
@@ -75,14 +79,15 @@ export function Budget() {
       else await apiRequest('/budgets', { method: 'POST', body })
       setDialogOpen(false); setEditing(null)
       await load()
-    } catch (err) { console.error(err) }
+      toast.success(editing ? 'Orçamento atualizado' : 'Orçamento criado')
+    } catch (err) { console.error(err); toast.error('Erro ao salvar orçamento') }
     finally { setSaving(false) }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Remover orçamento?')) return
-    try { await apiRequest(`/budgets/${id}`, { method: 'DELETE' }); await load() }
-    catch (err) { console.error(err) }
+    if (!(await confirm({ title: 'Remover orçamento?', variant: 'danger' }))) return
+    try { await apiRequest(`/budgets/${id}`, { method: 'DELETE' }); await load(); toast.success('Orçamento removido') }
+    catch (err) { console.error(err); toast.error('Erro ao remover orçamento') }
   }
 
   const despesaCostCenters = costCenters.filter((cc) => cc.type === 'despesa')

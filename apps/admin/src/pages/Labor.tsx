@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -27,6 +29,8 @@ export function Labor() {
   const [workerForm, setWorkerForm] = useState({ team_id: '', name: '', role: '', phone: '', hourly_rate: '', is_active: true })
   const [shiftForm, setShiftForm] = useState({ worker_id: '', hours: '', cost: '', date: '', notes: '' })
   const [saving, setSaving] = useState(false)
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const load = useCallback(async () => {
     try {
@@ -48,7 +52,8 @@ export function Labor() {
       if (editingTeam) await apiRequest(`/labor/teams/${editingTeam.id}`, { method: 'PUT', body: teamForm })
       else await apiRequest('/labor/teams', { method: 'POST', body: teamForm })
       setTeamDialog(false); setEditingTeam(null); await load()
-    } catch (err) { console.error(err) }
+      toast.success(editingTeam ? 'Equipe atualizada' : 'Equipe criada')
+    } catch (err) { console.error(err); toast.error('Erro ao salvar equipe') }
     finally { setSaving(false) }
   }
 
@@ -59,7 +64,8 @@ export function Labor() {
       if (editingWorker) await apiRequest(`/labor/workers/${editingWorker.id}`, { method: 'PUT', body })
       else await apiRequest('/labor/workers', { method: 'POST', body })
       setWorkerDialog(false); setEditingWorker(null); await load()
-    } catch (err) { console.error(err) }
+      toast.success(editingWorker ? 'Trabalhador atualizado' : 'Trabalhador cadastrado')
+    } catch (err) { console.error(err); toast.error('Erro ao salvar trabalhador') }
     finally { setSaving(false) }
   }
 
@@ -68,8 +74,27 @@ export function Labor() {
     try {
       await apiRequest('/labor/shifts', { method: 'POST', body: { ...shiftForm, hours: parseFloat(shiftForm.hours), cost: parseFloat(shiftForm.cost) } })
       setShiftDialog(false); await load()
-    } catch (err) { console.error(err) }
+      toast.success('Apontamento registrado')
+    } catch (err) { console.error(err); toast.error('Erro ao registrar apontamento') }
     finally { setSaving(false) }
+  }
+
+  const handleDeleteTeam = async (id: string) => {
+    if (!(await confirm({ title: 'Remover equipe?', variant: 'danger' }))) return
+    try { await apiRequest(`/labor/teams/${id}`, { method: 'DELETE' }); await load(); toast.success('Equipe removida') }
+    catch (err) { console.error(err); toast.error('Erro ao remover equipe') }
+  }
+
+  const handleDeleteWorker = async (id: string) => {
+    if (!(await confirm({ title: 'Remover trabalhador?', variant: 'danger' }))) return
+    try { await apiRequest(`/labor/workers/${id}`, { method: 'DELETE' }); await load(); toast.success('Trabalhador removido') }
+    catch (err) { console.error(err); toast.error('Erro ao remover trabalhador') }
+  }
+
+  const handleDeleteShift = async (id: string) => {
+    if (!(await confirm({ title: 'Remover apontamento?', variant: 'danger' }))) return
+    try { await apiRequest(`/labor/shifts/${id}`, { method: 'DELETE' }); await load(); toast.success('Apontamento removido') }
+    catch (err) { console.error(err); toast.error('Erro ao remover apontamento') }
   }
 
   const workerTotals: Record<string, { hours: number; cost: number }> = {}
@@ -114,7 +139,7 @@ export function Labor() {
         <TableCell className="text-right">R$ {(teamTotals[t.id]?.cost || 0).toFixed(2)}</TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
           <Button variant="ghost" size="sm" onClick={() => { setEditingTeam(t); setTeamForm({ name: t.name, leader: t.leader, description: t.description }); setTeamDialog(true) }}><Pencil className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover equipe?')) apiRequest(`/labor/teams/${t.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          <Button variant="ghost" size="sm" onClick={() => handleDeleteTeam(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
         </div></TableCell>
       </TableRow>))}
       {teams.length === 0 && <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Nenhuma equipe cadastrada.</TableCell></TableRow>}
@@ -132,7 +157,7 @@ export function Labor() {
         <TableCell><Badge variant={w.is_active ? 'success' : 'default'}>{w.is_active ? 'Ativo' : 'Inativo'}</Badge></TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
           <Button variant="ghost" size="sm" onClick={() => { setEditingWorker(w); setWorkerForm({ team_id: w.team_id, name: w.name, role: w.role, phone: w.phone, hourly_rate: String(w.hourly_rate), is_active: w.is_active }); setWorkerDialog(true) }}><Pencil className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover trabalhador?')) apiRequest(`/labor/workers/${w.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          <Button variant="ghost" size="sm" onClick={() => handleDeleteWorker(w.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
         </div></TableCell>
       </TableRow>))}
       {workers.length === 0 && <TableRow><TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Nenhum trabalhador cadastrado.</TableCell></TableRow>}
@@ -145,7 +170,7 @@ export function Labor() {
         <TableCell className="font-medium"><div className="flex items-center gap-2"><User className="h-4 w-4 text-primary" />{s.worker?.name || s.worker_id}</div></TableCell>
         <TableCell className="text-sm">{s.date}</TableCell><TableCell>{s.hours}h</TableCell>
         <TableCell>R$ {s.cost.toFixed(2)}</TableCell><TableCell className="text-sm text-muted-foreground">{s.notes || '-'}</TableCell>
-        <TableCell className="text-right"><Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover apontamento?')) apiRequest(`/labor/shifts/${s.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+        <TableCell className="text-right"><Button variant="ghost" size="sm" onClick={() => handleDeleteShift(s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
       </TableRow>))}
       {shifts.length === 0 && <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Nenhum apontamento registrado.</TableCell></TableRow>}
       </TableBody>

@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -42,6 +44,8 @@ export function Users() {
   const [editing, setEditing] = useState<AppUser | null>(null)
   const [form, setForm] = useState({ name: '', email: '', password: '', role: '', organization_id: '', status: 'active' })
   const [saving, setSaving] = useState(false)
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const load = useCallback(async () => {
     try {
@@ -70,19 +74,22 @@ export function Users() {
       }
       setDialogOpen(false); setEditing(null)
       await load()
+      toast.success(editing ? 'Usuário atualizado' : 'Usuário criado')
     } catch (err) {
       console.error(err)
+      toast.error('Erro ao salvar usuário')
     } finally {
       setSaving(false)
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Remover usuário?')) return
+    if (!(await confirm({ title: 'Remover usuário?', variant: 'danger' }))) return
     try {
       await apiRequest(`/admin/users/${id}`, { method: 'DELETE', admin: true })
       await load()
-    } catch (err) { console.error(err) }
+      toast.success('Usuário removido')
+    } catch (err) { console.error(err); toast.error('Erro ao remover usuário') }
   }
 
   if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>

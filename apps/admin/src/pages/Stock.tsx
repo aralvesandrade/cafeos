@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -42,6 +44,8 @@ export function Stock() {
   const [form, setForm] = useState({ product_id: '', farm_id: '', quantity: '', unit: '', batch: '', expiry_date: '', min_stock: '', location: '', notes: '' })
   const [movForm, setMovForm] = useState({ item_id: '', type: 'in', quantity: '', date: '', reference: '', notes: '' })
   const [saving, setSaving] = useState(false)
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const load = useCallback(async () => {
     try {
@@ -64,7 +68,8 @@ export function Stock() {
       if (editing) await apiRequest(`/stock/items/${editing.id}`, { method: 'PUT', body })
       else await apiRequest('/stock/items', { method: 'POST', body })
       setDialogOpen(false); setEditing(null); await load()
-    } catch (err) { console.error(err) }
+      toast.success(editing ? 'Item atualizado' : 'Item cadastrado')
+    } catch (err) { console.error(err); toast.error('Erro ao salvar item') }
     finally { setSaving(false) }
   }
 
@@ -73,8 +78,18 @@ export function Stock() {
     try {
       await apiRequest('/stock/movements', { method: 'POST', body: { ...movForm, quantity: parseFloat(movForm.quantity) } })
       setMovDialogOpen(false); await load()
-    } catch (err) { console.error(err) }
+      toast.success('Movimentação registrada')
+    } catch (err) { console.error(err); toast.error('Erro ao registrar movimentação') }
     finally { setSaving(false) }
+  }
+
+  const handleDeleteItem = async (id: string) => {
+    if (!(await confirm({ title: 'Remover item?', variant: 'danger' }))) return
+    try {
+      await apiRequest(`/stock/items/${id}`, { method: 'DELETE' })
+      await load()
+      toast.success('Item removido')
+    } catch (err) { console.error(err); toast.error('Erro ao remover item') }
   }
 
   if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
@@ -110,7 +125,7 @@ export function Stock() {
           <TableCell className="text-sm">{i.location || '-'}</TableCell>
           <TableCell className="text-right"><div className="flex justify-end gap-1">
             <Button variant="ghost" size="sm" onClick={() => { setEditing(i); setForm({ product_id: i.product_id, farm_id: i.farm_id || '', quantity: String(i.quantity), unit: i.unit, batch: i.batch, expiry_date: i.expiry_date || '', min_stock: String(i.min_stock), location: i.location, notes: i.notes }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover item?')) apiRequest(`/stock/items/${i.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+            <Button variant="ghost" size="sm" onClick={() => handleDeleteItem(i.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
           </div></TableCell>
         </TableRow>)
       })}

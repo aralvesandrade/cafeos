@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -42,6 +44,8 @@ export function CostCenters() {
   const [editing, setEditing] = useState<CostCenter | null>(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const load = useCallback(async () => {
     try {
@@ -63,14 +67,18 @@ export function CostCenters() {
       if (editing) await apiRequest(`/cost-centers/${editing.id}`, { method: 'PUT', body: form })
       else await apiRequest('/cost-centers', { method: 'POST', body: form })
       setDialogOpen(false); setEditing(null); await load()
-    } catch (err) { console.error(err) }
+      toast.success(editing ? 'Centro de custo atualizado' : 'Centro de custo criado')
+    } catch (err) { console.error(err); toast.error('Erro ao salvar centro de custo') }
     finally { setSaving(false) }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Remover centro de custo?')) return
-    try { await apiRequest(`/cost-centers/${id}`, { method: 'DELETE' }); await load() }
-    catch (err) { console.error(err) }
+    if (!(await confirm({ title: 'Remover centro de custo?', variant: 'danger' }))) return
+    try {
+      await apiRequest(`/cost-centers/${id}`, { method: 'DELETE' }); await load()
+      toast.success('Centro de custo removido')
+    }
+    catch (err) { console.error(err); toast.error('Erro ao remover centro de custo') }
   }
 
   const applySenarCategory = (name: string) => {

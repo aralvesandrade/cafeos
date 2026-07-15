@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { FarmForm, emptyProducer, type FarmData } from '@/components/farms/FarmForm'
 import { ArrowLeft } from 'lucide-react'
 import type { Farm } from '@/pages/Farms'
+import { useToast } from '@/lib/toast'
 
 function farmToFormData(farm: Farm): FarmData {
   return {
@@ -127,6 +128,7 @@ export function FarmEdit() {
   const [initial, setInitial] = useState<FarmData | undefined>(undefined)
   const [loading, setLoading] = useState(isEditing)
   const [saving, setSaving] = useState(false)
+  const toast = useToast()
 
   const load = useCallback(async () => {
     if (!farmId) return
@@ -151,9 +153,11 @@ export function FarmEdit() {
       } else {
         await apiRequest('/farms', { method: 'POST', body: payload })
       }
+      toast.success(isEditing ? 'Fazenda atualizada' : 'Fazenda cadastrada')
       navigate('/farms')
     } catch (err) {
       console.error(err)
+      toast.error('Erro ao salvar fazenda')
     } finally {
       setSaving(false)
     }

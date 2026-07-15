@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -103,6 +105,8 @@ export function HarvestDetail() {
   const [finalizing, setFinalizing] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [form, setForm] = useState({ plot_id: '', quantity: '', notes: '' })
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const load = useCallback(async () => {
     try {
@@ -143,21 +147,25 @@ export function HarvestDetail() {
       setDialogOpen(false)
       setForm({ plot_id: '', quantity: '', notes: '' })
       await load()
+      toast.success('Produção registrada')
     } catch (err) {
       console.error(err)
+      toast.error('Erro ao registrar produção')
     } finally {
       setSaving(false)
     }
   }
 
   const handleFinalize = async () => {
-    if (!confirm('Finalizar esta safra? Esta ação não pode ser desfeita.')) return
+    if (!(await confirm({ title: 'Finalizar safra?', description: 'Esta ação não pode ser desfeita.', variant: 'danger' }))) return
     setFinalizing(true)
     try {
       await apiRequest(`/harvests/${harvestId}/finalize`, { method: 'PUT' })
       await load()
+      toast.success('Safra finalizada')
     } catch (err) {
       console.error(err)
+      toast.error('Erro ao finalizar safra')
     } finally {
       setFinalizing(false)
     }

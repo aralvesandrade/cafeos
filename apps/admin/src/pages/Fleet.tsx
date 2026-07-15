@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -34,6 +36,8 @@ export function Fleet() {
   const [form, setForm] = useState({ name: '', farm_id: '', type: 'trator', plate: '', brand: '', model: '', year: '', status: 'active' })
   const [maintForm, setMaintForm] = useState({ vehicle_id: '', type: 'preventive', description: '', cost: '', odometer: '', date: '', notes: '' })
   const [saving, setSaving] = useState(false)
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const load = useCallback(async () => {
     try {
@@ -56,7 +60,8 @@ export function Fleet() {
       if (editing) await apiRequest(`/fleet/vehicles/${editing.id}`, { method: 'PUT', body })
       else await apiRequest('/fleet/vehicles', { method: 'POST', body })
       setDialogOpen(false); setEditing(null); await load()
-    } catch (err) { console.error(err) }
+      toast.success(editing ? 'Veículo atualizado' : 'Veículo cadastrado')
+    } catch (err) { console.error(err); toast.error('Erro ao salvar veículo') }
     finally { setSaving(false) }
   }
 
@@ -65,8 +70,27 @@ export function Fleet() {
     try {
       await apiRequest('/fleet/maintenance', { method: 'POST', body: { ...maintForm, cost: parseFloat(maintForm.cost), odometer: parseFloat(maintForm.odometer) } })
       setMaintDialogOpen(false); await load()
-    } catch (err) { console.error(err) }
+      toast.success('Manutenção registrada')
+    } catch (err) { console.error(err); toast.error('Erro ao registrar manutenção') }
     finally { setSaving(false) }
+  }
+
+  const handleDeleteVehicle = async (id: string) => {
+    if (!(await confirm({ title: 'Remover veículo?', variant: 'danger' }))) return
+    try {
+      await apiRequest(`/fleet/vehicles/${id}`, { method: 'DELETE' })
+      await load()
+      toast.success('Veículo removido')
+    } catch (err) { console.error(err); toast.error('Erro ao remover veículo') }
+  }
+
+  const handleDeleteMaintenance = async (id: string) => {
+    if (!(await confirm({ title: 'Remover manutenção?', variant: 'danger' }))) return
+    try {
+      await apiRequest(`/fleet/maintenance/${id}`, { method: 'DELETE' })
+      await load()
+      toast.success('Manutenção removida')
+    } catch (err) { console.error(err); toast.error('Erro ao remover manutenção') }
   }
 
   const maintenanceCostByVehicle: Record<string, number> = {}
@@ -106,7 +130,7 @@ export function Fleet() {
         <TableCell className="text-right">R$ {(maintenanceCostByVehicle[v.id] || 0).toFixed(2)}</TableCell>
         <TableCell className="text-right"><div className="flex justify-end gap-1">
           <Button variant="ghost" size="sm" onClick={() => { setEditing(v); setForm({ name: v.name, farm_id: v.farm_id || '', type: v.type, plate: v.plate, brand: v.brand, model: v.model, year: String(v.year), status: v.status }); setDialogOpen(true) }}><Pencil className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover veículo?')) apiRequest(`/fleet/vehicles/${v.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          <Button variant="ghost" size="sm" onClick={() => handleDeleteVehicle(v.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
         </div></TableCell>
       </TableRow>))}
       {vehicles.length === 0 && <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">Nenhum veículo cadastrado.</TableCell></TableRow>}
@@ -120,7 +144,7 @@ export function Fleet() {
         <TableCell className="text-sm">{m.description}</TableCell>
         <TableCell>R$ {m.cost.toFixed(2)}</TableCell>
         <TableCell className="text-sm">{m.odometer}h</TableCell>
-        <TableCell className="text-right"><Button variant="ghost" size="sm" onClick={() => { if (confirm('Remover manutenção?')) apiRequest(`/fleet/maintenance/${m.id}`, { method: 'DELETE' }).then(load) }}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+        <TableCell className="text-right"><Button variant="ghost" size="sm" onClick={() => handleDeleteMaintenance(m.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
       </TableRow>))}
       {maintenance.length === 0 && <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhuma manutenção registrada.</TableCell></TableRow>}
       </TableBody>

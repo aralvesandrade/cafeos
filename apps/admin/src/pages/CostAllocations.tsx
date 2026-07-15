@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -53,6 +55,8 @@ export function CostAllocations() {
   const [form, setForm] = useState(emptyForm)
   const [percentages, setPercentages] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const load = useCallback(async () => {
     try {
@@ -110,14 +114,15 @@ export function CostAllocations() {
       setForm(emptyForm)
       setPercentages({})
       await load()
-    } catch (err) { console.error(err) }
+      toast.success('Rateio criado')
+    } catch (err) { console.error(err); toast.error('Erro ao criar rateio') }
     finally { setSaving(false) }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Remover rateio?')) return
-    try { await apiRequest(`/cost-allocations/${id}`, { method: 'DELETE' }); await load() }
-    catch (err) { console.error(err) }
+    if (!(await confirm({ title: 'Remover rateio?', variant: 'danger' }))) return
+    try { await apiRequest(`/cost-allocations/${id}`, { method: 'DELETE' }); await load(); toast.success('Rateio removido') }
+    catch (err) { console.error(err); toast.error('Erro ao remover rateio') }
   }
 
   const despesaCostCenters = costCenters.filter((cc) => cc.type === 'despesa')

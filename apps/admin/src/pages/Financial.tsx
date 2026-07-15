@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -44,6 +46,8 @@ export function Financial() {
   const [editing, setEditing] = useState<Transaction | null>(null)
   const [form, setForm] = useState({ type: 'despesa', cost_center_id: '', farm_id: '', description: '', amount: '', date: '', due_date: '', notes: '', status: 'pending' })
   const [saving, setSaving] = useState(false)
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const load = useCallback(async () => {
     try {
@@ -69,14 +73,18 @@ export function Financial() {
       if (editing) await apiRequest(`/financial/${editing.id}`, { method: 'PUT', body })
       else await apiRequest('/financial', { method: 'POST', body })
       setDialogOpen(false); setEditing(null); await load()
-    } catch (err) { console.error(err) }
+      toast.success(editing ? 'Transação atualizada' : 'Transação registrada')
+    } catch (err) { console.error(err); toast.error('Erro ao salvar transação') }
     finally { setSaving(false) }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Remover transação?')) return
-    try { await apiRequest(`/financial/${id}`, { method: 'DELETE' }); await load() }
-    catch (err) { console.error(err) }
+    if (!(await confirm({ title: 'Remover transação?', variant: 'danger' }))) return
+    try {
+      await apiRequest(`/financial/${id}`, { method: 'DELETE' }); await load()
+      toast.success('Transação removida')
+    }
+    catch (err) { console.error(err); toast.error('Erro ao remover transação') }
   }
 
   if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>

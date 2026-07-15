@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -32,6 +34,8 @@ export function OperationTypes() {
   const [editing, setEditing] = useState<OperationType | null>(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const load = useCallback(async () => {
     try {
@@ -49,14 +53,18 @@ export function OperationTypes() {
       if (editing) await apiRequest(`/operation-types/${editing.id}`, { method: 'PUT', body: form })
       else await apiRequest('/operation-types', { method: 'POST', body: form })
       setDialogOpen(false); setEditing(null); await load()
-    } catch (err) { console.error(err) }
+      toast.success(editing ? 'Tipo de operação atualizado' : 'Tipo de operação criado')
+    } catch (err) { console.error(err); toast.error('Erro ao salvar tipo de operação') }
     finally { setSaving(false) }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Remover tipo de operação?')) return
-    try { await apiRequest(`/operation-types/${id}`, { method: 'DELETE' }); await load() }
-    catch (err) { console.error(err) }
+    if (!(await confirm({ title: 'Remover tipo de operação?', variant: 'danger' }))) return
+    try {
+      await apiRequest(`/operation-types/${id}`, { method: 'DELETE' }); await load()
+      toast.success('Tipo de operação removido')
+    }
+    catch (err) { console.error(err); toast.error('Erro ao remover tipo de operação') }
   }
 
   if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>

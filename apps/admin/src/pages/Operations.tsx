@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { apiRequest } from "@/lib/api";
+import { useToast } from "@/lib/toast";
+import { useConfirm } from "@/lib/confirm";
 import {
   Table,
   TableHead,
@@ -78,6 +80,8 @@ export function Operations() {
   const [editing, setEditing] = useState<Operation | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const toast = useToast();
+  const confirm = useConfirm();
 
   const load = useCallback(async () => {
     try {
@@ -148,20 +152,24 @@ export function Operations() {
       setDialogOpen(false);
       setEditing(null);
       await load();
+      toast.success(editing ? "Operação atualizada" : "Operação registrada");
     } catch (err) {
       console.error(err);
+      toast.error("Erro ao salvar operação");
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Remover operação?")) return;
+    if (!(await confirm({ title: "Remover operação?", variant: "danger" }))) return;
     try {
       await apiRequest(`/operations/${id}`, { method: "DELETE" });
       await load();
+      toast.success("Operação removida");
     } catch (err) {
       console.error(err);
+      toast.error("Erro ao remover operação");
     }
   };
 

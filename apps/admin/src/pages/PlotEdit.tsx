@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { PlotForm, type PlotData } from '@/components/plots/PlotForm'
 import { ArrowLeft } from 'lucide-react'
 import type { Plot } from '@/pages/Plots'
+import { useToast } from '@/lib/toast'
 
 interface Farm { id: string; name: string }
 
@@ -80,6 +81,7 @@ export function PlotEdit() {
   const [farms, setFarms] = useState<Farm[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const toast = useToast()
 
   const load = useCallback(async () => {
     try {
@@ -107,9 +109,11 @@ export function PlotEdit() {
       } else {
         await apiRequest('/plots', { method: 'POST', body: payload })
       }
+      toast.success(isEditing ? 'Talhão atualizado' : 'Talhão cadastrado')
       navigate('/plots')
     } catch (err) {
       console.error(err)
+      toast.error('Erro ao salvar talhão')
     } finally {
       setSaving(false)
     }

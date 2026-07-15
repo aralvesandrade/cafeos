@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -24,6 +25,7 @@ export function Organizations() {
   const [editing, setEditing] = useState<Organization | null>(null)
   const [form, setForm] = useState({ name: '', plan: 'free', status: 'active' })
   const [saving, setSaving] = useState(false)
+  const toast = useToast()
 
   const load = useCallback(async () => {
     try {
@@ -48,8 +50,10 @@ export function Organizations() {
       }
       setDialogOpen(false); setEditing(null)
       await load()
+      toast.success(editing ? 'Organização atualizada' : 'Organização criada')
     } catch (err) {
       console.error(err)
+      toast.error('Erro ao salvar organização')
     } finally {
       setSaving(false)
     }

@@ -4,6 +4,8 @@ import { apiRequest } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { FarmList } from '@/components/farms/FarmList'
 import { Plus } from 'lucide-react'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 
 interface Producer {
   cpf: string
@@ -68,6 +70,8 @@ export interface Farm {
 export function Farms() {
   const [farms, setFarms] = useState<Farm[]>([])
   const [loading, setLoading] = useState(true)
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const loadFarms = useCallback(async () => {
     try {
@@ -85,12 +89,14 @@ export function Farms() {
   }, [loadFarms])
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Remover fazenda?')) return
+    if (!(await confirm({ title: 'Remover fazenda?', variant: 'danger' }))) return
     try {
       await apiRequest(`/farms/${id}`, { method: 'DELETE' })
       await loadFarms()
+      toast.success('Fazenda removida')
     } catch (err) {
       console.error(err)
+      toast.error('Erro ao remover fazenda')
     }
   }
 

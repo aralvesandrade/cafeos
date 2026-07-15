@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/lib/auth'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
 
 const profiles = [
   { label: 'Admin Plataforma', email: 'admin@cafeos.com.br', password: 'admin123', role: 'platform_owner' },
@@ -21,6 +22,7 @@ export function Login() {
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
+  const toast = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,7 +41,9 @@ export function Login() {
       login(data.token, data.organization_id, data.user)
       navigate('/')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao fazer login')
+      const message = err instanceof Error ? err.message : 'Erro ao fazer login'
+      setError(message)
+      toast.error('Erro ao entrar', 'Verifique suas credenciais')
     } finally {
       setLoading(false)
     }

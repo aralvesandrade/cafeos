@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -23,6 +25,8 @@ export function Harvests() {
   const [year, setYear] = useState('')
   const [estimated, setEstimated] = useState('')
   const [saving, setSaving] = useState(false)
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const load = useCallback(async () => {
     try {
@@ -48,20 +52,24 @@ export function Harvests() {
       setYear('')
       setEstimated('')
       await load()
+      toast.success('Safra criada')
     } catch (err) {
       console.error(err)
+      toast.error('Erro ao criar safra')
     } finally {
       setSaving(false)
     }
   }
 
   const handleFinalize = async (id: string) => {
-    if (!confirm('Finalizar safra?')) return
+    if (!(await confirm({ title: 'Finalizar safra?', variant: 'danger' }))) return
     try {
       await apiRequest(`/harvests/${id}/finalize`, { method: 'PUT' })
       await load()
+      toast.success('Safra finalizada')
     } catch (err) {
       console.error(err)
+      toast.error('Erro ao finalizar safra')
     }
   }
 

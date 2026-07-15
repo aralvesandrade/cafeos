@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { apiRequest } from '@/lib/api'
+import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/lib/confirm'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -37,6 +39,8 @@ export function OperationDetail() {
   const [costCenter, setCostCenter] = useState<CostCenter | null>(null)
   const [harvest, setHarvest] = useState<Harvest | null>(null)
   const [loading, setLoading] = useState(true)
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const load = useCallback(async () => {
     try {
@@ -65,11 +69,12 @@ export function OperationDetail() {
   useEffect(() => { load() }, [load])
 
   const handleDelete = async () => {
-    if (!operation || !confirm('Remover operação?')) return
+    if (!operation || !(await confirm({ title: 'Remover operação?', variant: 'danger' }))) return
     try {
       await apiRequest(`/operations/${operation.id}`, { method: 'DELETE' })
+      toast.success('Operação removida')
       navigate('/operations')
-    } catch (err) { console.error(err) }
+    } catch (err) { console.error(err); toast.error('Erro ao remover operação') }
   }
 
   if (loading) {
