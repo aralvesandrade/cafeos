@@ -5,17 +5,19 @@ import (
 	"net/http"
 
 	"github.com/aralvesandrade/cafeos/internal/api/middleware"
+	"github.com/aralvesandrade/cafeos/internal/domain/repository"
 	"github.com/aralvesandrade/cafeos/internal/domain/service"
 )
 
 type HarvestHandler struct {
-	svc     *service.HarvestService
-	plotSvc *service.PlotService
-	farmSvc *service.FarmService
+	svc           *service.HarvestService
+	plotSvc       *service.PlotService
+	farmSvc       *service.FarmService
+	indicatorRepo repository.IndicatorRepository
 }
 
-func NewHarvestHandler(svc *service.HarvestService, plotSvc *service.PlotService, farmSvc *service.FarmService) *HarvestHandler {
-	return &HarvestHandler{svc: svc, plotSvc: plotSvc, farmSvc: farmSvc}
+func NewHarvestHandler(svc *service.HarvestService, plotSvc *service.PlotService, farmSvc *service.FarmService, indicatorRepo repository.IndicatorRepository) *HarvestHandler {
+	return &HarvestHandler{svc: svc, plotSvc: plotSvc, farmSvc: farmSvc, indicatorRepo: indicatorRepo}
 }
 
 type createHarvestRequest struct {
@@ -112,6 +114,27 @@ func (h *HarvestHandler) Finalize(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+// GetIndicators retorna os indicadores calculados de uma colheita finalizada
+// @Summary Obter indicadores da colheita
+// @Description Retorna os indicadores calculados (sacas/ha, custo/saca, COE/COT/CT etc.) de uma colheita
+// @Tags harvests (Colheitas)
+// @Produce json
+// @Param organization_id path string true "ID da Organização"
+// @Param id path string true "ID da Colheita"
+// @Success 200 {array} entity.Indicator
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{organization_id}/harvests/{id}/indicators [get]
+func (h *HarvestHandler) GetIndicators(w http.ResponseWriter, r *http.Request) {
+	harvestID := r.PathValue("id")
+	indicators, err := h.indicatorRepo.ListByHarvest(harvestID)
+	if err != nil {
+		writeError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	writeJSON(w, indicators, http.StatusOK)
 }
 
 type recordProductionRequest struct {

@@ -11,6 +11,9 @@ interface DashboardData {
   total_plots: number
   total_production: number
   total_cost: number
+  coe?: number
+  cot?: number
+  ct_producao?: number
   production_by_harvest: { year: string; production: number }[]
   cost_per_bag: { year: string; cost: number }[]
   recent_operations: { id: string; type: string; date: string; plot_name: string; cost: number }[]
@@ -87,6 +90,9 @@ export function Dashboard() {
               totalPlots: data.total_plots,
               totalProduction: data.total_production,
               totalCost: data.total_cost,
+              coe: data.coe,
+              cot: data.cot,
+              ctProducao: data.ct_producao,
             }}
           />
 

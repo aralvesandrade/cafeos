@@ -7,8 +7,6 @@ type IndicatorType string
 const (
 	IndSacasHA       IndicatorType = "sacas_por_hectare"
 	IndCustoSaca     IndicatorType = "custo_por_saca"
-	IndRentabilidade IndicatorType = "rentabilidade"
-	IndBienalidade   IndicatorType = "bienalidade"
 	IndProducaoTotal IndicatorType = "producao_total"
 	IndCustoTotal    IndicatorType = "custo_total"
 

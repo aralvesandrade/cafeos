@@ -139,46 +139,6 @@ func (s *HarvestService) GetProductionByHarvest(harvestID string) ([]*entity.Har
 	return s.productionRepo.ListByHarvest(harvestID)
 }
 
-func (s *HarvestService) calculateIndicators(harvest *entity.Harvest) error {
-	productions, err := s.productionRepo.ListByHarvest(harvest.ID)
-	if err != nil {
-		return err
-	}
-
-	var totalProduction float64
-	for _, p := range productions {
-		totalProduction += p.Quantity
-	}
-
-	plots, err := s.plotRepo.ListByOrganization(harvest.OrganizationID)
-	if err != nil {
-		return err
-	}
-
-	var totalPlantedArea float64
-	for _, p := range plots {
-		totalPlantedArea += p.AreaHA
-	}
-
-	totalCost := s.calculateTotalCost(harvest,
-		s.operationRepo.ListByOrganization,
-		s.maintenanceRepo.ListByOrganization,
-		s.shiftRepo.ListByOrganization,
-		s.financialRepo.ListByOrganization,
-		s.allocationRepo.ListByHarvest,
-	)
-
-	indicators := s.buildIndicators(harvest, totalProduction, totalPlantedArea, totalCost, map[entity.CostGroup]float64{})
-
-	for _, ind := range indicators {
-		if err := s.indicatorRepo.Create(ind); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (s *HarvestService) calculateIndicatorsWithRepos(harvest *entity.Harvest, repos repository.TransactionProvider) error {
 	productions, err := repos.HarvestProduction().ListByHarvest(harvest.ID)
 	if err != nil {
@@ -215,59 +175,6 @@ func (s *HarvestService) calculateIndicatorsWithRepos(harvest *entity.Harvest, r
 	}
 
 	return nil
-}
-
-func (s *HarvestService) calculateTotalCost(harvest *entity.Harvest,
-	listOps func(string) ([]*entity.Operation, error),
-	listMaint func(string) ([]*entity.Maintenance, error),
-	listShifts func(string) ([]*entity.WorkShift, error),
-	listFin func(string) ([]*entity.FinancialTransaction, error),
-	listAllocs func(string) ([]*entity.CostAllocation, error),
-) float64 {
-	var totalCost float64
-
-	// Operations by HarvestID
-	ops, _ := listOps(harvest.OrganizationID)
-	for _, op := range ops {
-		if op.HarvestID != nil && *op.HarvestID == harvest.ID {
-			totalCost += op.Cost
-		}
-	}
-
-	start := harvest.StartDate
-	end := harvest.EndDate
-
-	// Maintenance by date range
-	maints, _ := listMaint(harvest.OrganizationID)
-	for _, m := range maints {
-		if inDateRange(m.Date, start, end) {
-			totalCost += m.Cost
-		}
-	}
-
-	// WorkShift by date range
-	shifts, _ := listShifts(harvest.OrganizationID)
-	for _, ws := range shifts {
-		if inDateRange(ws.Date, start, end) {
-			totalCost += ws.Cost
-		}
-	}
-
-	// FinancialTransaction (despesas) by date range
-	transactions, _ := listFin(harvest.OrganizationID)
-	for _, ft := range transactions {
-		if ft.Type == entity.TranDespesa && inDateRange(ft.Date, start, end) {
-			totalCost += ft.Amount
-		}
-	}
-
-	// CostAllocation by HarvestID
-	allocs, _ := listAllocs(harvest.ID)
-	for _, a := range allocs {
-		totalCost += a.TotalAmount
-	}
-
-	return totalCost
 }
 
 func (s *HarvestService) calculateTotalCostWithRepos(harvest *entity.Harvest, repos repository.TransactionProvider) float64 {

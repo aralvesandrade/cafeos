@@ -2417,6 +2417,59 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/{organization_id}/harvests/{id}/indicators": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna os indicadores calculados (sacas/ha, custo/saca, COE/COT/CT etc.) de uma colheita",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "harvests (Colheitas)"
+                ],
+                "summary": "Obter indicadores da colheita",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID da Colheita",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Indicator"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/{organization_id}/harvests/{id}/production": {
             "get": {
                 "security": [
@@ -4697,6 +4750,67 @@ const docTemplate = `{
                 "HarvestFinalizada"
             ]
         },
+        "entity.Indicator": {
+            "type": "object",
+            "properties": {
+                "calculated_at": {
+                    "type": "string"
+                },
+                "harvest_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "organization_id": {
+                    "type": "string"
+                },
+                "plot_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.IndicatorType"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "entity.IndicatorType": {
+            "type": "string",
+            "enum": [
+                "sacas_por_hectare",
+                "custo_por_saca",
+                "producao_total",
+                "custo_total",
+                "area_producao",
+                "coe",
+                "coe_por_area",
+                "coe_por_saca",
+                "cot",
+                "cot_por_area",
+                "cot_por_saca",
+                "ct_producao",
+                "ct_producao_por_area",
+                "ct_producao_por_saca"
+            ],
+            "x-enum-varnames": [
+                "IndSacasHA",
+                "IndCustoSaca",
+                "IndProducaoTotal",
+                "IndCustoTotal",
+                "IndAreaProducao",
+                "IndCOE",
+                "IndCOEPorArea",
+                "IndCOEPorSaca",
+                "IndCOT",
+                "IndCOTPorArea",
+                "IndCOTPorSaca",
+                "IndCTProducao",
+                "IndCTProducaoPorArea",
+                "IndCTProducaoPorSaca"
+            ]
+        },
         "entity.Maintenance": {
             "type": "object",
             "properties": {
@@ -5297,11 +5411,20 @@ const docTemplate = `{
         "handler.DashboardResponse": {
             "type": "object",
             "properties": {
+                "coe": {
+                    "type": "number"
+                },
                 "cost_per_bag": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/handler.CostPerBag"
                     }
+                },
+                "cot": {
+                    "type": "number"
+                },
+                "ct_producao": {
+                    "type": "number"
                 },
                 "production_by_harvest": {
                     "type": "array",

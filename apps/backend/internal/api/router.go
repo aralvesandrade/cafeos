@@ -61,7 +61,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	farmH := handler.NewFarmHandler(farmSvc)
 	plotH := handler.NewPlotHandler(plotSvc, farmSvc)
 	opH := handler.NewOperationHandler(opSvc, plotSvc, farmSvc)
-	harvestH := handler.NewHarvestHandler(harvestSvc, plotSvc, farmSvc)
+	harvestH := handler.NewHarvestHandler(harvestSvc, plotSvc, farmSvc, indicatorRepo)
 	dashboardH := handler.NewDashboardHandler(harvestRepo, indicatorRepo, opRepo, plotRepo, farmRepo, hpRepo, farmSvc)
 	authH := handler.NewAuthHandler(userRepo, organizationRepo, jwtSecret)
 	organizationH := handler.NewOrganizationHandler(organizationRepo)
@@ -134,6 +134,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	mux.Handle("PUT /api/v1/{organization_id}/harvests/{id}/finalize", chain(harvestH.Finalize))
 	mux.Handle("POST /api/v1/{organization_id}/harvests/{id}/production", chain(harvestH.RecordProduction))
 	mux.Handle("GET /api/v1/{organization_id}/harvests/{id}/production", chain(harvestH.GetProduction))
+	mux.Handle("GET /api/v1/{organization_id}/harvests/{id}/indicators", chain(harvestH.GetIndicators))
 
 	// Dashboard
 	mux.Handle("GET /api/v1/{organization_id}/dashboard", chain(dashboardH.GetDashboard))

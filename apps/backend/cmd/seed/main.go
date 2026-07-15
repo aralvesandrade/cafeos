@@ -238,7 +238,9 @@ func seed(db *gorm.DB) error {
 		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, Type: entity.IndCustoTotal, Value: 45000, CalculatedAt: now.AddDate(0, -4, 0)},
 		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, Type: entity.IndSacasHA, Value: 37.89, CalculatedAt: now.AddDate(0, -4, 0)},
 		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, Type: entity.IndCustoSaca, Value: 12.50, CalculatedAt: now.AddDate(0, -4, 0)},
-		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, Type: entity.IndRentabilidade, Value: 85000, CalculatedAt: now.AddDate(0, -4, 0)},
+		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, Type: entity.IndCOE, Value: 30000, CalculatedAt: now.AddDate(0, -4, 0)},
+		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, Type: entity.IndCOT, Value: 40000, CalculatedAt: now.AddDate(0, -4, 0)},
+		{OrganizationID: organization.ID, HarvestID: harvests[0].ID, Type: entity.IndCTProducao, Value: 45000, CalculatedAt: now.AddDate(0, -4, 0)},
 	}
 	for i := range indicators {
 		if err := db.Create(&indicators[i]).Error; err != nil {

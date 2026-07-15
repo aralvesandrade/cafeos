@@ -164,6 +164,55 @@ definitions:
     - HarvestPlanejada
     - HarvestEmAndamento
     - HarvestFinalizada
+  entity.Indicator:
+    properties:
+      calculated_at:
+        type: string
+      harvest_id:
+        type: string
+      id:
+        type: string
+      organization_id:
+        type: string
+      plot_id:
+        type: string
+      type:
+        $ref: '#/definitions/entity.IndicatorType'
+      value:
+        type: number
+    type: object
+  entity.IndicatorType:
+    enum:
+    - sacas_por_hectare
+    - custo_por_saca
+    - producao_total
+    - custo_total
+    - area_producao
+    - coe
+    - coe_por_area
+    - coe_por_saca
+    - cot
+    - cot_por_area
+    - cot_por_saca
+    - ct_producao
+    - ct_producao_por_area
+    - ct_producao_por_saca
+    type: string
+    x-enum-varnames:
+    - IndSacasHA
+    - IndCustoSaca
+    - IndProducaoTotal
+    - IndCustoTotal
+    - IndAreaProducao
+    - IndCOE
+    - IndCOEPorArea
+    - IndCOEPorSaca
+    - IndCOT
+    - IndCOTPorArea
+    - IndCOTPorSaca
+    - IndCTProducao
+    - IndCTProducaoPorArea
+    - IndCTProducaoPorSaca
   entity.Maintenance:
     properties:
       cost:
@@ -572,10 +621,16 @@ definitions:
     type: object
   handler.DashboardResponse:
     properties:
+      coe:
+        type: number
       cost_per_bag:
         items:
           $ref: '#/definitions/handler.CostPerBag'
         type: array
+      cot:
+        type: number
+      ct_producao:
+        type: number
       production_by_harvest:
         items:
           $ref: '#/definitions/handler.ProductionByHarvest'
@@ -2672,6 +2727,41 @@ paths:
       security:
       - BearerAuth: []
       summary: Finalizar colheita
+      tags:
+      - harvests (Colheitas)
+  /api/v1/{organization_id}/harvests/{id}/indicators:
+    get:
+      description: Retorna os indicadores calculados (sacas/ha, custo/saca, COE/COT/CT
+        etc.) de uma colheita
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: ID da Colheita
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Indicator'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obter indicadores da colheita
       tags:
       - harvests (Colheitas)
   /api/v1/{organization_id}/harvests/{id}/production:

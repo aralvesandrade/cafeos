@@ -63,6 +63,9 @@ type DashboardResponse struct {
 	TotalPlots          int                   `json:"total_plots"`
 	TotalProduction     float64               `json:"total_production"`
 	TotalCost           float64               `json:"total_cost"`
+	COE                 float64               `json:"coe,omitempty"`
+	COT                 float64               `json:"cot,omitempty"`
+	CTProducao          float64               `json:"ct_producao,omitempty"`
 	ProductionByHarvest []ProductionByHarvest `json:"production_by_harvest"`
 	CostPerBag          []CostPerBag          `json:"cost_per_bag"`
 	RecentOperations    []RecentOperationItem `json:"recent_operations"`
@@ -138,13 +141,19 @@ func (h *DashboardHandler) resolveFarmScope(r *http.Request, organizationID stri
 func (h *DashboardHandler) buildUnscopedDashboard(organizationID string, harvests []*entity.Harvest, operations []*entity.Operation, plots []*entity.Plot, farms []*entity.Farm) DashboardResponse {
 	indicators, _ := h.indicatorRepo.ListByOrganization(organizationID)
 
-	var totalProduction, totalCost float64
+	var totalProduction, totalCost, coe, cot, ctProducao float64
 	for _, ind := range indicators {
 		switch ind.Type {
 		case entity.IndProducaoTotal:
 			totalProduction = ind.Value
 		case entity.IndCustoTotal:
 			totalCost = ind.Value
+		case entity.IndCOE:
+			coe = ind.Value
+		case entity.IndCOT:
+			cot = ind.Value
+		case entity.IndCTProducao:
+			ctProducao = ind.Value
 		}
 	}
 
@@ -176,6 +185,9 @@ func (h *DashboardHandler) buildUnscopedDashboard(organizationID string, harvest
 		TotalPlots:          len(plots),
 		TotalProduction:     totalProduction,
 		TotalCost:           totalCost,
+		COE:                 coe,
+		COT:                 cot,
+		CTProducao:          ctProducao,
 		ProductionByHarvest: productionByHarvest,
 		CostPerBag:          costPerBag,
 		RecentOperations:    recentOps,

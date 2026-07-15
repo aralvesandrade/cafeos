@@ -8,7 +8,7 @@ import { Select } from '@/components/ui/select'
 import { Dialog } from '@/components/ui/dialog'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Calendar, Package, Plus } from 'lucide-react'
+import { ArrowLeft, Calendar, Package, Plus, TrendingUp } from 'lucide-react'
 
 interface Harvest {
   id: string
@@ -34,6 +34,55 @@ interface Plot {
 
 interface Farm { id: string; name: string }
 
+interface Indicator {
+  id: string
+  type: string
+  value: number
+}
+
+const indicatorLabels: Record<string, string> = {
+  sacas_por_hectare: 'Sacas/ha',
+  custo_por_saca: 'Custo/saca',
+  producao_total: 'Produção Total',
+  custo_total: 'Custo Total',
+  area_producao: 'Área de Produção',
+  coe: 'COE',
+  coe_por_area: 'COE/ha',
+  coe_por_saca: 'COE/saca',
+  cot: 'COT',
+  cot_por_area: 'COT/ha',
+  cot_por_saca: 'COT/saca',
+  ct_producao: 'CT',
+  ct_producao_por_area: 'CT/ha',
+  ct_producao_por_saca: 'CT/saca',
+}
+
+const indicatorTitles: Record<string, string> = {
+  sacas_por_hectare: 'Produtividade: total produzido (sacas) dividido pela área plantada (ha)',
+  custo_por_saca: 'Custo total da safra dividido pela produção total (sacas)',
+  producao_total: 'Soma de toda a produção registrada nesta safra',
+  custo_total: 'Soma de todos os custos (operações, manutenções, mão de obra, despesas e rateios) no período da safra',
+  area_producao: 'Soma da área de todos os talhões da organização',
+  coe: 'Custo Operacional Efetivo: soma dos desembolsos operacionais diretos (insumos, mão de obra contratada, combustível etc.)',
+  coe_por_area: 'COE dividido pela área de produção (ha)',
+  coe_por_saca: 'COE dividido pela produção total (sacas)',
+  cot: 'Custo Operacional Total: COE + mão de obra familiar + depreciação de máquinas e benfeitorias',
+  cot_por_area: 'COT dividido pela área de produção (ha)',
+  cot_por_saca: 'COT dividido pela produção total (sacas)',
+  ct_producao: 'Custo Total: COT + remuneração do capital investido (terra e outros ativos)',
+  ct_producao_por_area: 'CT dividido pela área de produção (ha)',
+  ct_producao_por_saca: 'CT dividido pela produção total (sacas)',
+}
+
+const currencyIndicators = new Set(['custo_por_saca', 'custo_total', 'coe', 'coe_por_area', 'coe_por_saca', 'cot', 'cot_por_area', 'cot_por_saca', 'ct_producao', 'ct_producao_por_area', 'ct_producao_por_saca'])
+
+function formatIndicator(type: string, value: number): string {
+  if (currencyIndicators.has(type)) return `R$ ${value.toFixed(2)}`
+  if (type === 'area_producao') return `${value.toFixed(2)} ha`
+  if (type === 'producao_total') return `${value.toFixed(2)} sacas`
+  return value.toFixed(2)
+}
+
 const statusLabels: Record<string, { label: string; variant: 'default' | 'success' | 'warning' }> = {
   planejada: { label: 'Planejada', variant: 'default' },
   em_andamento: { label: 'Em Andamento', variant: 'warning' },
@@ -45,6 +94,7 @@ export function HarvestDetail() {
   const navigate = useNavigate()
   const [harvest, setHarvest] = useState<Harvest | null>(null)
   const [productions, setProductions] = useState<Production[]>([])
+  const [indicators, setIndicators] = useState<Indicator[]>([])
   const [plots, setPlots] = useState<Plot[]>([])
   const [farms, setFarms] = useState<Farm[]>([])
   const [farmFilter, setFarmFilter] = useState('')
@@ -66,6 +116,10 @@ export function HarvestDetail() {
       setProductions(prodData)
       setPlots(plotsData)
       setFarms(farmsData)
+      if (harvestData.status === 'finalizada') {
+        const indicatorData = await apiRequest<Indicator[]>(`/harvests/${harvestId}/indicators`)
+        setIndicators(indicatorData)
+      }
     } catch (err) {
       console.error(err)
     } finally {
@@ -183,6 +237,29 @@ export function HarvestDetail() {
           </CardContent>
         </Card>
       </div>
+
+      {harvest.status === 'finalizada' && (
+        <Card>
+          <CardHeader className="flex flex-row items-center gap-2 pb-2">
+            <TrendingUp className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Indicadores</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {indicators.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhum indicador calculado.</p>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                {indicators.map((ind) => (
+                  <div key={ind.id} title={indicatorTitles[ind.type]}>
+                    <p className="text-muted-foreground">{indicatorLabels[ind.type] || ind.type}</p>
+                    <p className="font-medium text-foreground">{formatIndicator(ind.type, ind.value)}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div>
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
