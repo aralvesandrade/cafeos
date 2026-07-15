@@ -55,7 +55,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	laborSvc := domainSvc.NewLaborService(teamRepo, workerRepo, shiftRepo)
 	ccSvc := domainSvc.NewCostCenterService(ccRepo)
 	otSvc := domainSvc.NewOperationTypeService(otRepo)
-	budgetSvc := domainSvc.NewBudgetService(budgetRepo)
+	budgetSvc := domainSvc.NewBudgetService(budgetRepo, harvestRepo, opRepo, maintRepo, shiftRepo, finRepo, allocRepo)
 	allocSvc := domainSvc.NewCostAllocationService(allocRepo, plotRepo)
 
 	farmH := handler.NewFarmHandler(farmSvc)

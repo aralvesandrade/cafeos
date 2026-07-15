@@ -9,6 +9,9 @@ type Budget struct {
 	CostCenterID   string       `json:"cost_center_id" gorm:"type:uuid;not null;uniqueIndex:idx_budget_harvest_cc"`
 	PlannedAmount  float64      `json:"planned_amount" gorm:"type:numeric(12,2);default:0"`
 	Description    string       `json:"description" gorm:"default:''"`
+	CostCenterName string       `json:"cost_center_name" gorm:"->;-:migration"`
+	RealizedAmount float64      `json:"realized_amount" gorm:"->;-:migration"`
+	Variance       float64      `json:"variance" gorm:"->;-:migration"`
 	CreatedAt      time.Time    `json:"created_at"`
 	UpdatedAt      time.Time    `json:"updated_at"`
 	Organization   Organization `json:"-" gorm:"foreignKey:OrganizationID"`

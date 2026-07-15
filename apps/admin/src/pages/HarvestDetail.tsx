@@ -8,7 +8,7 @@ import { Select } from '@/components/ui/select'
 import { Dialog } from '@/components/ui/dialog'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Calendar, Package, Plus, TrendingUp } from 'lucide-react'
+import { ArrowLeft, Calendar, Package, Plus, TrendingUp, Wallet } from 'lucide-react'
 
 interface Harvest {
   id: string
@@ -193,7 +193,12 @@ export function HarvestDetail() {
           <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
         </div>
 
-        {harvest.status !== 'finalizada' && (
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => navigate(`/budgets?harvest_id=${harvest.id}`)}>
+            <Wallet className="h-4 w-4" />
+            Ver Orçamento
+          </Button>
+          {harvest.status !== 'finalizada' && (
           <Button
             variant="danger"
             onClick={handleFinalize}
@@ -201,7 +206,8 @@ export function HarvestDetail() {
           >
             {finalizing ? 'Finalizando...' : 'Finalizar Safra'}
           </Button>
-        )}
+          )}
+        </div>
       </div>
 
       {harvest.description && (

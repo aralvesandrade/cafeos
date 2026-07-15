@@ -18,6 +18,7 @@ import { Organizations } from '@/pages/Organizations'
 import { Users } from '@/pages/Users'
 import { Financial } from '@/pages/Financial'
 import { CostCenters } from '@/pages/CostCenters'
+import { Budget } from '@/pages/Budget'
 import { Stock } from '@/pages/Stock'
 import { Fleet } from '@/pages/Fleet'
 import { Labor } from '@/pages/Labor'
@@ -49,6 +50,7 @@ export const router = createBrowserRouter([
       { path: 'harvests/:harvestId', element: <HarvestDetail /> },
       { path: 'financial', element: <Financial /> },
       { path: 'cost-centers', element: <CostCenters /> },
+      { path: 'budgets', element: <Budget /> },
       { path: 'stock', element: <Stock /> },
       { path: 'fleet', element: <Fleet /> },
       { path: 'labor', element: <Labor /> },
