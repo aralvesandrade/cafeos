@@ -37,8 +37,8 @@ func (h *PermissionHandler) List(w http.ResponseWriter, r *http.Request) {
 }
 
 type updatePermissionEntry struct {
-	Role   entity.UserRole    `json:"role"`
-	Module entity.Module      `json:"module"`
+	RoleID string             `json:"role_id"`
+	Module entity.ModuleKey   `json:"module"`
 	Access entity.AccessLevel `json:"access"`
 }
 
@@ -64,7 +64,7 @@ func (h *PermissionHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, entry := range entries {
-		if err := h.svc.Update(organizationID, entry.Role, entry.Module, entry.Access); err != nil {
+		if err := h.svc.Update(organizationID, entry.RoleID, entry.Module, entry.Access); err != nil {
 			writeError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -86,9 +86,9 @@ func (h *PermissionHandler) Mine(w http.ResponseWriter, r *http.Request) {
 	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	role, _ := r.Context().Value(middleware.RoleKey).(string)
 
-	result := make(map[entity.Module]entity.AccessLevel, len(entity.AllModules))
+	result := make(map[entity.ModuleKey]entity.AccessLevel, len(entity.AllModules))
 	for _, module := range entity.AllModules {
-		access, err := h.svc.GetAccess(organizationID, entity.UserRole(role), module)
+		access, err := h.svc.GetAccess(organizationID, role, module)
 		if err != nil {
 			writeError(w, err.Error(), http.StatusInternalServerError)
 			return

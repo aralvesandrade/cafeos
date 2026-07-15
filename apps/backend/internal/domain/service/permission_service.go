@@ -12,125 +12,112 @@ import (
 )
 
 // defaultMatrix is the starting access-level configuration seeded for every
-// new organization. Organization admins can then adjust it via the
+// new organization, keyed by role key (see entity.SystemRoleKeys and
+// entity.DefaultOrgRoleKeys). Organization admins can then adjust it via the
 // Permissions screen — this is only ever used as a seed value, never
 // consulted directly at request time.
-var defaultMatrix = map[entity.Module]map[entity.UserRole]entity.AccessLevel{
+var defaultMatrix = map[entity.ModuleKey]map[string]entity.AccessLevel{
 	// Dashboard also gates GET/PUT /alerts — write lets a role resolve or
 	// dismiss an alert, not edit the dashboard itself.
 	entity.ModuleDashboard: {
-		entity.RolePlatformOwner:     entity.AccessWrite,
-		entity.RoleOrganizationAdmin: entity.AccessWrite,
-		entity.RoleProprietario:      entity.AccessWrite,
-		entity.RoleGerente:           entity.AccessWrite,
-		entity.RoleEngenheiro:        entity.AccessWrite,
-		entity.RoleTecnico:           entity.AccessWrite,
-		entity.RoleOperador:          entity.AccessWrite,
-		entity.RoleFinanceiro:        entity.AccessWrite,
-		entity.RoleConsultor:         entity.AccessRead,
-		entity.RoleAuditor:           entity.AccessRead,
+		entity.SystemRolePlatformOwner:     entity.AccessWrite,
+		entity.SystemRoleOrganizationAdmin: entity.AccessWrite,
+		"proprietario":                     entity.AccessWrite,
+		"gerente_agricola":                 entity.AccessWrite,
+		"engenheiro_agronomo":              entity.AccessWrite,
+		"tecnico_agricola":                 entity.AccessWrite,
+		"operador_campo":                   entity.AccessWrite,
+		"financeiro":                       entity.AccessWrite,
+		"consultor_externo":                entity.AccessRead,
+		"auditor":                          entity.AccessRead,
 	},
 	entity.ModuleFarms: {
-		entity.RolePlatformOwner:     entity.AccessWrite,
-		entity.RoleOrganizationAdmin: entity.AccessWrite,
-		entity.RoleProprietario:      entity.AccessWrite,
-		entity.RoleGerente:           entity.AccessWrite,
-		entity.RoleEngenheiro:        entity.AccessWrite,
-		entity.RoleTecnico:           entity.AccessWrite,
-		entity.RoleOperador:          entity.AccessRead,
-		entity.RoleFinanceiro:        entity.AccessRead,
-		entity.RoleConsultor:         entity.AccessRead,
-		entity.RoleAuditor:           entity.AccessRead,
+		entity.SystemRolePlatformOwner:     entity.AccessWrite,
+		entity.SystemRoleOrganizationAdmin: entity.AccessWrite,
+		"proprietario":                     entity.AccessWrite,
+		"gerente_agricola":                 entity.AccessWrite,
+		"engenheiro_agronomo":              entity.AccessWrite,
+		"tecnico_agricola":                 entity.AccessWrite,
+		"operador_campo":                   entity.AccessRead,
+		"financeiro":                       entity.AccessRead,
+		"consultor_externo":                entity.AccessRead,
+		"auditor":                          entity.AccessRead,
 	},
 	entity.ModuleOperations: {
-		entity.RolePlatformOwner:     entity.AccessWrite,
-		entity.RoleOrganizationAdmin: entity.AccessWrite,
-		entity.RoleProprietario:      entity.AccessWrite,
-		entity.RoleGerente:           entity.AccessWrite,
-		entity.RoleEngenheiro:        entity.AccessWrite,
-		entity.RoleTecnico:           entity.AccessWrite,
-		entity.RoleOperador:          entity.AccessWrite,
-		entity.RoleFinanceiro:        entity.AccessRead,
-		entity.RoleConsultor:         entity.AccessRead,
-		entity.RoleAuditor:           entity.AccessRead,
+		entity.SystemRolePlatformOwner:     entity.AccessWrite,
+		entity.SystemRoleOrganizationAdmin: entity.AccessWrite,
+		"proprietario":                     entity.AccessWrite,
+		"gerente_agricola":                 entity.AccessWrite,
+		"engenheiro_agronomo":              entity.AccessWrite,
+		"tecnico_agricola":                 entity.AccessWrite,
+		"operador_campo":                   entity.AccessWrite,
+		"financeiro":                       entity.AccessRead,
+		"consultor_externo":                entity.AccessRead,
+		"auditor":                          entity.AccessRead,
 	},
 	entity.ModuleHarvests: {
-		entity.RolePlatformOwner:     entity.AccessWrite,
-		entity.RoleOrganizationAdmin: entity.AccessWrite,
-		entity.RoleProprietario:      entity.AccessWrite,
-		entity.RoleGerente:           entity.AccessWrite,
-		entity.RoleEngenheiro:        entity.AccessWrite,
-		entity.RoleTecnico:           entity.AccessRead,
-		entity.RoleOperador:          entity.AccessRead,
-		entity.RoleFinanceiro:        entity.AccessRead,
-		entity.RoleConsultor:         entity.AccessRead,
-		entity.RoleAuditor:           entity.AccessRead,
+		entity.SystemRolePlatformOwner:     entity.AccessWrite,
+		entity.SystemRoleOrganizationAdmin: entity.AccessWrite,
+		"proprietario":                     entity.AccessWrite,
+		"gerente_agricola":                 entity.AccessWrite,
+		"engenheiro_agronomo":              entity.AccessWrite,
+		"tecnico_agricola":                 entity.AccessRead,
+		"operador_campo":                   entity.AccessRead,
+		"financeiro":                       entity.AccessRead,
+		"consultor_externo":                entity.AccessRead,
+		"auditor":                          entity.AccessRead,
 	},
 	entity.ModuleResources: {
-		entity.RolePlatformOwner:     entity.AccessWrite,
-		entity.RoleOrganizationAdmin: entity.AccessWrite,
-		entity.RoleProprietario:      entity.AccessWrite,
-		entity.RoleGerente:           entity.AccessWrite,
-		entity.RoleEngenheiro:        entity.AccessRead,
-		entity.RoleTecnico:           entity.AccessWrite,
-		entity.RoleOperador:          entity.AccessRead,
-		entity.RoleFinanceiro:        entity.AccessRead,
-		entity.RoleConsultor:         entity.AccessRead,
-		entity.RoleAuditor:           entity.AccessRead,
+		entity.SystemRolePlatformOwner:     entity.AccessWrite,
+		entity.SystemRoleOrganizationAdmin: entity.AccessWrite,
+		"proprietario":                     entity.AccessWrite,
+		"gerente_agricola":                 entity.AccessWrite,
+		"engenheiro_agronomo":              entity.AccessRead,
+		"tecnico_agricola":                 entity.AccessWrite,
+		"operador_campo":                   entity.AccessRead,
+		"financeiro":                       entity.AccessRead,
+		"consultor_externo":                entity.AccessRead,
+		"auditor":                          entity.AccessRead,
 	},
 	entity.ModuleFinancial: {
-		entity.RolePlatformOwner:     entity.AccessWrite,
-		entity.RoleOrganizationAdmin: entity.AccessWrite,
-		entity.RoleProprietario:      entity.AccessWrite,
-		entity.RoleGerente:           entity.AccessRead,
-		entity.RoleEngenheiro:        entity.AccessNone,
-		entity.RoleTecnico:           entity.AccessNone,
-		entity.RoleOperador:          entity.AccessNone,
-		entity.RoleFinanceiro:        entity.AccessWrite,
-		entity.RoleConsultor:         entity.AccessRead,
-		entity.RoleAuditor:           entity.AccessRead,
+		entity.SystemRolePlatformOwner:     entity.AccessWrite,
+		entity.SystemRoleOrganizationAdmin: entity.AccessWrite,
+		"proprietario":                     entity.AccessWrite,
+		"gerente_agricola":                 entity.AccessRead,
+		"engenheiro_agronomo":              entity.AccessNone,
+		"tecnico_agricola":                 entity.AccessNone,
+		"operador_campo":                   entity.AccessNone,
+		"financeiro":                       entity.AccessWrite,
+		"consultor_externo":                entity.AccessRead,
+		"auditor":                          entity.AccessRead,
 	},
 	// Users covers the org-scoped team roster (POST/GET/PUT/DELETE
 	// /{organization_id}/users) — distinct from the cross-tenant
 	// /admin/users screen, which stays platform_owner-only regardless.
 	entity.ModuleUsers: {
-		entity.RolePlatformOwner:     entity.AccessWrite,
-		entity.RoleOrganizationAdmin: entity.AccessWrite,
-		entity.RoleProprietario:      entity.AccessWrite,
-		entity.RoleGerente:           entity.AccessNone,
-		entity.RoleEngenheiro:        entity.AccessNone,
-		entity.RoleTecnico:           entity.AccessNone,
-		entity.RoleOperador:          entity.AccessNone,
-		entity.RoleFinanceiro:        entity.AccessNone,
-		entity.RoleConsultor:         entity.AccessNone,
-		entity.RoleAuditor:           entity.AccessNone,
+		entity.SystemRolePlatformOwner:     entity.AccessWrite,
+		entity.SystemRoleOrganizationAdmin: entity.AccessWrite,
+		"proprietario":                     entity.AccessWrite,
+		"gerente_agricola":                 entity.AccessNone,
+		"engenheiro_agronomo":              entity.AccessNone,
+		"tecnico_agricola":                 entity.AccessNone,
+		"operador_campo":                   entity.AccessNone,
+		"financeiro":                       entity.AccessNone,
+		"consultor_externo":                entity.AccessNone,
+		"auditor":                          entity.AccessNone,
 	},
 	entity.ModulePermissions: {
-		entity.RolePlatformOwner:     entity.AccessWrite,
-		entity.RoleOrganizationAdmin: entity.AccessWrite,
-		entity.RoleProprietario:      entity.AccessWrite,
-		entity.RoleGerente:           entity.AccessNone,
-		entity.RoleEngenheiro:        entity.AccessNone,
-		entity.RoleTecnico:           entity.AccessNone,
-		entity.RoleOperador:          entity.AccessNone,
-		entity.RoleFinanceiro:        entity.AccessNone,
-		entity.RoleConsultor:         entity.AccessNone,
-		entity.RoleAuditor:           entity.AccessNone,
+		entity.SystemRolePlatformOwner:     entity.AccessWrite,
+		entity.SystemRoleOrganizationAdmin: entity.AccessWrite,
+		"proprietario":                     entity.AccessWrite,
+		"gerente_agricola":                 entity.AccessNone,
+		"engenheiro_agronomo":              entity.AccessNone,
+		"tecnico_agricola":                 entity.AccessNone,
+		"operador_campo":                   entity.AccessNone,
+		"financeiro":                       entity.AccessNone,
+		"consultor_externo":                entity.AccessNone,
+		"auditor":                          entity.AccessNone,
 	},
-}
-
-var allRoles = []entity.UserRole{
-	entity.RolePlatformOwner, entity.RoleOrganizationAdmin, entity.RoleProprietario,
-	entity.RoleGerente, entity.RoleEngenheiro, entity.RoleTecnico, entity.RoleOperador,
-	entity.RoleFinanceiro, entity.RoleConsultor, entity.RoleAuditor,
-}
-
-func validRole(role entity.UserRole) bool {
-	return slices.Contains(allRoles, role)
-}
-
-func validModule(module entity.Module) bool {
-	return slices.Contains(entity.AllModules, module)
 }
 
 func validAccess(access entity.AccessLevel) bool {
@@ -143,28 +130,45 @@ func validAccess(access entity.AccessLevel) bool {
 }
 
 type PermissionService struct {
-	repo repository.PermissionRepository
+	repo     repository.PermissionRepository
+	roleRepo repository.RoleRepository
 
 	mu    sync.RWMutex
-	cache map[string]map[entity.UserRole]map[entity.Module]entity.AccessLevel
+	cache map[string]map[string]map[entity.ModuleKey]entity.AccessLevel
 }
 
-func NewPermissionService(repo repository.PermissionRepository) *PermissionService {
+func NewPermissionService(repo repository.PermissionRepository, roleRepo repository.RoleRepository) *PermissionService {
 	return &PermissionService{
-		repo:  repo,
-		cache: make(map[string]map[entity.UserRole]map[entity.Module]entity.AccessLevel),
+		repo:     repo,
+		roleRepo: roleRepo,
+		cache:    make(map[string]map[string]map[entity.ModuleKey]entity.AccessLevel),
 	}
 }
 
 // SeedDefaults overwrites every cell with the default matrix — callers that
 // must not clobber manual edits should use SeedDefaultsIfMissing instead.
+// It assumes the organization's roles have already been seeded (see
+// RoleService.SeedDefaultsIfMissing), since it needs each role's ID.
 func (s *PermissionService) SeedDefaults(organizationID string) error {
-	for module, roles := range defaultMatrix {
-		for role, access := range roles {
+	roles, err := s.roleRepo.ListForOrganization(organizationID)
+	if err != nil {
+		return err
+	}
+	roleIDByKey := make(map[string]string, len(roles))
+	for _, role := range roles {
+		roleIDByKey[role.Key] = role.ID
+	}
+
+	for module, roleAccess := range defaultMatrix {
+		for roleKey, access := range roleAccess {
+			roleID, ok := roleIDByKey[roleKey]
+			if !ok {
+				continue
+			}
 			permission := &entity.RolePermission{
 				ID:             uuid.New().String(),
 				OrganizationID: organizationID,
-				Role:           role,
+				RoleID:         roleID,
 				Module:         module,
 				Access:         access,
 				CreatedAt:      time.Now(),
@@ -197,9 +201,13 @@ func (s *PermissionService) ListByOrganization(organizationID string) ([]*entity
 	return s.repo.ListByOrganization(organizationID)
 }
 
-func (s *PermissionService) Update(organizationID string, role entity.UserRole, module entity.Module, access entity.AccessLevel) error {
-	if !validRole(role) {
+func (s *PermissionService) Update(organizationID, roleID string, module entity.ModuleKey, access entity.AccessLevel) error {
+	role, err := s.roleRepo.GetByID(roleID)
+	if err != nil {
 		return errors.New("invalid role")
+	}
+	if role.OrganizationID != nil && *role.OrganizationID != organizationID {
+		return errors.New("role does not belong to this organization")
 	}
 	if !validModule(module) {
 		return errors.New("invalid module")
@@ -211,7 +219,7 @@ func (s *PermissionService) Update(organizationID string, role entity.UserRole, 
 	permission := &entity.RolePermission{
 		ID:             uuid.New().String(),
 		OrganizationID: organizationID,
-		Role:           role,
+		RoleID:         roleID,
 		Module:         module,
 		Access:         access,
 		CreatedAt:      time.Now(),
@@ -224,9 +232,14 @@ func (s *PermissionService) Update(organizationID string, role entity.UserRole, 
 	return nil
 }
 
+func validModule(module entity.ModuleKey) bool {
+	return slices.Contains(entity.AllModules, module)
+}
+
 // GetAccess falls back to defaultMatrix for orgs/cells not yet seeded, so a
-// missing row never silently locks a role out.
-func (s *PermissionService) GetAccess(organizationID string, role entity.UserRole, module entity.Module) (entity.AccessLevel, error) {
+// missing row never silently locks a role out. roleKey is the role's Key
+// (what's carried in the JWT / request context), not its ID.
+func (s *PermissionService) GetAccess(organizationID, roleKey string, module entity.ModuleKey) (entity.AccessLevel, error) {
 	s.mu.RLock()
 	orgCache, ok := s.cache[organizationID]
 	s.mu.RUnlock()
@@ -239,32 +252,44 @@ func (s *PermissionService) GetAccess(organizationID string, role entity.UserRol
 		}
 	}
 
-	if roleAccess, ok := orgCache[role]; ok {
+	if roleAccess, ok := orgCache[roleKey]; ok {
 		if access, ok := roleAccess[module]; ok {
 			return access, nil
 		}
 	}
 
 	if roleDefaults, ok := defaultMatrix[module]; ok {
-		if access, ok := roleDefaults[role]; ok {
+		if access, ok := roleDefaults[roleKey]; ok {
 			return access, nil
 		}
 	}
 	return entity.AccessNone, nil
 }
 
-func (s *PermissionService) loadOrganization(organizationID string) (map[entity.UserRole]map[entity.Module]entity.AccessLevel, error) {
+func (s *PermissionService) loadOrganization(organizationID string) (map[string]map[entity.ModuleKey]entity.AccessLevel, error) {
 	rows, err := s.repo.ListByOrganization(organizationID)
 	if err != nil {
 		return nil, err
 	}
+	roles, err := s.roleRepo.ListForOrganization(organizationID)
+	if err != nil {
+		return nil, err
+	}
+	roleKeyByID := make(map[string]string, len(roles))
+	for _, role := range roles {
+		roleKeyByID[role.ID] = role.Key
+	}
 
-	orgCache := make(map[entity.UserRole]map[entity.Module]entity.AccessLevel)
+	orgCache := make(map[string]map[entity.ModuleKey]entity.AccessLevel)
 	for _, row := range rows {
-		if orgCache[row.Role] == nil {
-			orgCache[row.Role] = make(map[entity.Module]entity.AccessLevel)
+		roleKey, ok := roleKeyByID[row.RoleID]
+		if !ok {
+			continue
 		}
-		orgCache[row.Role][row.Module] = row.Access
+		if orgCache[roleKey] == nil {
+			orgCache[roleKey] = make(map[entity.ModuleKey]entity.AccessLevel)
+		}
+		orgCache[roleKey][row.Module] = row.Access
 	}
 
 	s.mu.Lock()

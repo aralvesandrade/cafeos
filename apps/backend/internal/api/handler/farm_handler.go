@@ -224,7 +224,7 @@ func (h *FarmHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 // every other role sees all farms in its organization.
 func (h *FarmHandler) canAccessFarm(r *http.Request, farmID string) bool {
 	role, _ := r.Context().Value(middleware.RoleKey).(string)
-	if role != string(entity.RoleProprietario) {
+	if role != entity.RoleKeyProprietario {
 		return true
 	}
 	userID, _ := r.Context().Value(middleware.UserIDKey).(string)
@@ -247,7 +247,7 @@ func (h *FarmHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	var farms []*entity.Farm
 	var err error
-	if role == string(entity.RoleProprietario) {
+	if role == entity.RoleKeyProprietario {
 		userID, _ := r.Context().Value(middleware.UserIDKey).(string)
 		farms, err = h.svc.ListByOwner(organizationID, userID)
 	} else {

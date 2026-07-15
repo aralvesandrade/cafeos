@@ -7,7 +7,7 @@ import (
 	"github.com/aralvesandrade/cafeos/internal/domain/service"
 )
 
-func RequireModule(svc *service.PermissionService, module entity.Module, need entity.AccessLevel) func(http.Handler) http.Handler {
+func RequireModule(svc *service.PermissionService, module entity.ModuleKey, need entity.AccessLevel) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			role, ok := r.Context().Value(RoleKey).(string)
@@ -21,7 +21,7 @@ func RequireModule(svc *service.PermissionService, module entity.Module, need en
 				return
 			}
 
-			access, err := svc.GetAccess(organizationID, entity.UserRole(role), module)
+			access, err := svc.GetAccess(organizationID, role, module)
 			if err != nil {
 				http.Error(w, "failed to resolve permissions", http.StatusInternalServerError)
 				return

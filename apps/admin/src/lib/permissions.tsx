@@ -5,18 +5,31 @@ import { useAuth } from './auth'
 export type Module = 'dashboard' | 'farms' | 'operations' | 'harvests' | 'resources' | 'financial' | 'users' | 'permissions'
 export type AccessLevel = 'none' | 'read' | 'write'
 
-export const MODULE_LABELS: Record<Module, string> = {
-  dashboard: 'Dashboard e Alertas',
-  farms: 'Fazendas, Talhões e Tipos de Operação',
-  operations: 'Operações',
-  harvests: 'Safras',
-  resources: 'Estoque, Frota e Equipes',
-  financial: 'Financeiro, Centros de Custo, Orçamento e Rateio',
-  users: 'Usuários da Organização',
-  permissions: 'Permissões',
+export interface ModuleMeta {
+  key: Module
+  name: string
+  order: number
 }
 
-export const ALL_MODULES: Module[] = ['dashboard', 'farms', 'operations', 'harvests', 'resources', 'financial', 'users', 'permissions']
+// useModules fetches the module catalog (name/order metadata) from the
+// backend — the set of keys is still fixed (routes are wired to them in
+// Go), but name/order are now editable through the Permissions screen
+// instead of duplicated here as a hardcoded label map.
+export function useModules() {
+  const [modules, setModules] = useState<ModuleMeta[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    apiRequest<ModuleMeta[]>('/modules')
+      .then((data) => { if (!cancelled) setModules(data) })
+      .catch((err) => console.error(err))
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+  }, [])
+
+  return { modules, loading }
+}
 
 export const ACCESS_LABELS: Record<AccessLevel, string> = {
   none: 'Nenhum',
@@ -91,6 +104,7 @@ export const ROUTE_MODULE: Record<string, Module> = {
   '/labor': 'resources',
   '/team': 'users',
   '/permissions': 'permissions',
+  '/roles': 'permissions',
 }
 
 export function moduleForPath(pathname: string): Module | null {

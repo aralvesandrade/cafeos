@@ -22,7 +22,7 @@ func (r *PermissionRepository) ListByOrganization(organizationID string) ([]*ent
 
 func (r *PermissionRepository) Upsert(permission *entity.RolePermission) error {
 	return r.db.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "organization_id"}, {Name: "role"}, {Name: "module"}},
+		Columns:   []clause.Column{{Name: "organization_id"}, {Name: "role_id"}, {Name: "module"}},
 		DoUpdates: clause.AssignmentColumns([]string{"access", "updated_at"}),
 	}).Create(permission).Error
 }

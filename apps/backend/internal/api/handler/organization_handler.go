@@ -16,10 +16,11 @@ import (
 type OrganizationHandler struct {
 	repo    repository.OrganizationRepository
 	permSvc *service.PermissionService
+	roleSvc *service.RoleService
 }
 
-func NewOrganizationHandler(repo repository.OrganizationRepository, permSvc *service.PermissionService) *OrganizationHandler {
-	return &OrganizationHandler{repo: repo, permSvc: permSvc}
+func NewOrganizationHandler(repo repository.OrganizationRepository, permSvc *service.PermissionService, roleSvc *service.RoleService) *OrganizationHandler {
+	return &OrganizationHandler{repo: repo, permSvc: permSvc, roleSvc: roleSvc}
 }
 
 type createOrganizationRequest struct {
@@ -97,6 +98,9 @@ func (h *OrganizationHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := h.roleSvc.SeedDefaultsIfMissing(organization.ID); err != nil {
+		slog.Error("failed to seed default roles for new organization", "organization_id", organization.ID, "error", err)
+	}
 	if err := h.permSvc.SeedDefaults(organization.ID); err != nil {
 		slog.Error("failed to seed default permissions for new organization", "organization_id", organization.ID, "error", err)
 	}

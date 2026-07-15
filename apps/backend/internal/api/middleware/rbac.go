@@ -2,11 +2,10 @@ package middleware
 
 import (
 	"net/http"
-
-	"github.com/aralvesandrade/cafeos/internal/domain/entity"
+	"slices"
 )
 
-func RequireRole(allowedRoles ...entity.UserRole) func(http.Handler) http.Handler {
+func RequireRole(allowedRoles ...string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			role, ok := r.Context().Value(RoleKey).(string)
@@ -15,14 +14,12 @@ func RequireRole(allowedRoles ...entity.UserRole) func(http.Handler) http.Handle
 				return
 			}
 
-			for _, allowed := range allowedRoles {
-				if string(allowed) == role {
-					next.ServeHTTP(w, r)
-					return
-				}
+			if !slices.Contains(allowedRoles, role) {
+				http.Error(w, "forbidden: insufficient permissions", http.StatusForbidden)
+				return
 			}
 
-			http.Error(w, "forbidden: insufficient permissions", http.StatusForbidden)
+			next.ServeHTTP(w, r)
 		})
 	}
 }

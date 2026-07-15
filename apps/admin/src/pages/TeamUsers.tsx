@@ -9,13 +9,14 @@ import { Input } from '@/components/ui/input'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Pencil, Trash2, User } from 'lucide-react'
-import { ROLE_LABELS, ALL_ROLES } from '@/lib/roles'
+import { useRoles, roleLabel } from '@/lib/roles'
 
 interface OrgUser {
   id: string
+  role_id: string
+  role: string
   name: string
   email: string
-  role: string
   status: string
 }
 
@@ -24,10 +25,11 @@ export function TeamUsers() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<OrgUser | null>(null)
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: '', status: 'active' })
+  const [form, setForm] = useState({ name: '', email: '', password: '', role_id: '', status: 'active' })
   const [saving, setSaving] = useState(false)
   const toast = useToast()
   const confirm = useConfirm()
+  const { roles } = useRoles()
   const canEdit = useModuleAccess('users') === 'write'
 
   const load = useCallback(async () => {
@@ -47,9 +49,9 @@ export function TeamUsers() {
     setSaving(true)
     try {
       if (editing) {
-        await apiRequest(`/users/${editing.id}`, { method: 'PUT', body: { name: form.name, email: form.email, role: form.role, is_active: form.status === 'active' } })
+        await apiRequest(`/users/${editing.id}`, { method: 'PUT', body: { name: form.name, email: form.email, role_id: form.role_id, is_active: form.status === 'active' } })
       } else {
-        await apiRequest('/users', { method: 'POST', body: { name: form.name, email: form.email, password: form.password, role: form.role } })
+        await apiRequest('/users', { method: 'POST', body: { name: form.name, email: form.email, password: form.password, role_id: form.role_id } })
       }
       setDialogOpen(false); setEditing(null)
       await load()
@@ -81,7 +83,7 @@ export function TeamUsers() {
           <p className="text-sm text-muted-foreground">Usuários da sua organização</p>
         </div>
         {canEdit && (
-          <Button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: '', role: '', status: 'active' }); setDialogOpen(true) }}>
+          <Button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: '', role_id: '', status: 'active' }); setDialogOpen(true) }}>
             <Plus className="h-4 w-4" /> Novo Usuário
           </Button>
         )}
@@ -107,7 +109,7 @@ export function TeamUsers() {
                 </div>
               </TableCell>
               <TableCell>{u.email}</TableCell>
-              <TableCell><Badge>{ROLE_LABELS[u.role as keyof typeof ROLE_LABELS] || u.role}</Badge></TableCell>
+              <TableCell><Badge>{roleLabel(roles, u.role)}</Badge></TableCell>
               <TableCell>
                 <Badge variant={u.status === 'active' ? 'success' : 'default'}>
                   {u.status === 'active' ? 'Ativo' : 'Inativo'}
@@ -116,7 +118,7 @@ export function TeamUsers() {
               <TableCell className="text-right">
                 {canEdit && (
                   <div className="flex justify-end gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => { setEditing(u); setForm({ name: u.name, email: u.email, password: '', role: u.role, status: u.status }); setDialogOpen(true) }}>
+                    <Button variant="ghost" size="sm" onClick={() => { setEditing(u); setForm({ name: u.name, email: u.email, password: '', role_id: u.role_id, status: u.status }); setDialogOpen(true) }}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => handleDelete(u.id)}>
@@ -151,10 +153,10 @@ export function TeamUsers() {
           )}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1">Perfil</label>
-            <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
+            <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.role_id} onChange={(e) => setForm({ ...form, role_id: e.target.value })}>
               <option value="">Selecione...</option>
-              {ALL_ROLES.map((role) => (
-                <option key={role} value={role}>{ROLE_LABELS[role]}</option>
+              {roles.map((role) => (
+                <option key={role.id} value={role.id}>{role.name}</option>
               ))}
             </select>
           </div>

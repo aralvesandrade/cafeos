@@ -1,12 +1,13 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import { setAuthData, clearAuthData } from './api'
-import type { UserRole } from './roles'
 
 interface User {
   id: string
   email: string
   name: string
-  role: UserRole
+  // role is a role key (e.g. "operador_campo") — roles are now a
+  // per-organization catalog rather than a fixed union, see lib/roles.tsx.
+  role: string
 }
 
 interface AuthContextType {

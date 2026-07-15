@@ -8,16 +8,18 @@ import (
 	"github.com/aralvesandrade/cafeos/internal/api/middleware"
 	"github.com/aralvesandrade/cafeos/internal/domain/entity"
 	"github.com/aralvesandrade/cafeos/internal/domain/repository"
+	"github.com/aralvesandrade/cafeos/internal/domain/service"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserHandler struct {
-	repo repository.UserRepository
+	repo    repository.UserRepository
+	roleSvc *service.RoleService
 }
 
-func NewUserHandler(repo repository.UserRepository) *UserHandler {
-	return &UserHandler{repo: repo}
+func NewUserHandler(repo repository.UserRepository, roleSvc *service.RoleService) *UserHandler {
+	return &UserHandler{repo: repo, roleSvc: roleSvc}
 }
 
 type createUserRequest struct {
@@ -25,14 +27,42 @@ type createUserRequest struct {
 	Name           string `json:"name"`
 	Email          string `json:"email"`
 	Password       string `json:"password"`
-	Role           string `json:"role"`
+	// RoleID is preferred; Role (a role key, e.g. "operador_campo") is
+	// accepted for backward compatibility and resolved via RoleService.
+	RoleID string `json:"role_id"`
+	Role   string `json:"role"`
 }
 
 type updateUserRequest struct {
 	Name     *string `json:"name"`
 	Email    *string `json:"email"`
+	RoleID   *string `json:"role_id"`
 	Role     *string `json:"role"`
 	IsActive *bool   `json:"is_active"`
+}
+
+// resolveRoleID validates the request's role reference against the
+// organization's roles and returns a concrete RoleID, defaulting to
+// "operador_campo" when nothing was supplied.
+func (h *UserHandler) resolveRoleID(organizationID, roleID, roleKey string) (string, error) {
+	if roleID != "" {
+		role, err := h.roleSvc.GetByID(roleID)
+		if err != nil {
+			return "", err
+		}
+		if role.OrganizationID != nil && *role.OrganizationID != organizationID {
+			return "", service.ErrForbiddenOrg
+		}
+		return role.ID, nil
+	}
+	if roleKey == "" {
+		roleKey = "operador_campo"
+	}
+	role, err := h.roleSvc.FindByKey(organizationID, roleKey)
+	if err != nil {
+		return "", err
+	}
+	return role.ID, nil
 }
 
 // List retorna todos os usuários
@@ -74,8 +104,14 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Name == "" || req.Email == "" || req.Password == "" {
-		writeError(w, "name, email, and password are required", http.StatusBadRequest)
+	if req.Name == "" || req.Email == "" || req.Password == "" || req.OrganizationID == "" {
+		writeError(w, "name, email, password, and organization_id are required", http.StatusBadRequest)
+		return
+	}
+
+	roleID, err := h.resolveRoleID(req.OrganizationID, req.RoleID, req.Role)
+	if err != nil {
+		writeError(w, "invalid role", http.StatusBadRequest)
 		return
 	}
 
@@ -85,18 +121,13 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	role := entity.UserRole(req.Role)
-	if role == "" {
-		role = entity.RoleOperador
-	}
-
 	user := &entity.User{
 		ID:             uuid.New().String(),
 		OrganizationID: req.OrganizationID,
 		Name:           req.Name,
 		Email:          req.Email,
 		PasswordHash:   string(hash),
-		Role:           role,
+		RoleID:         roleID,
 		IsActive:       true,
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
@@ -143,8 +174,20 @@ func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if req.Email != nil {
 		existing.Email = *req.Email
 	}
-	if req.Role != nil {
-		existing.Role = entity.UserRole(*req.Role)
+	if req.RoleID != nil || req.Role != nil {
+		var roleID, roleKey string
+		if req.RoleID != nil {
+			roleID = *req.RoleID
+		}
+		if req.Role != nil {
+			roleKey = *req.Role
+		}
+		resolved, err := h.resolveRoleID(existing.OrganizationID, roleID, roleKey)
+		if err != nil {
+			writeError(w, "invalid role", http.StatusBadRequest)
+			return
+		}
+		existing.RoleID = resolved
 	}
 	if req.IsActive != nil {
 		existing.IsActive = *req.IsActive
@@ -181,6 +224,7 @@ type userResponse struct {
 	OrganizationID string `json:"organization_id"`
 	Name           string `json:"name"`
 	Email          string `json:"email"`
+	RoleID         string `json:"role_id"`
 	Role           string `json:"role"`
 	IsActive       bool   `json:"is_active"`
 	Status         string `json:"status"`
@@ -196,7 +240,8 @@ func toUserResponse(u *entity.User) userResponse {
 		OrganizationID: u.OrganizationID,
 		Name:           u.Name,
 		Email:          u.Email,
-		Role:           string(u.Role),
+		RoleID:         u.RoleID,
+		Role:           u.Role.Key,
 		IsActive:       u.IsActive,
 		Status:         status,
 	}
@@ -250,15 +295,16 @@ func (h *UserHandler) CreateForOrg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	roleID, err := h.resolveRoleID(organizationID, req.RoleID, req.Role)
+	if err != nil {
+		writeError(w, "invalid role", http.StatusBadRequest)
+		return
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		writeError(w, "failed to hash password", http.StatusInternalServerError)
 		return
-	}
-
-	role := entity.UserRole(req.Role)
-	if role == "" {
-		role = entity.RoleOperador
 	}
 
 	user := &entity.User{
@@ -267,7 +313,7 @@ func (h *UserHandler) CreateForOrg(w http.ResponseWriter, r *http.Request) {
 		Name:           req.Name,
 		Email:          req.Email,
 		PasswordHash:   string(hash),
-		Role:           role,
+		RoleID:         roleID,
 		IsActive:       true,
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
@@ -317,8 +363,20 @@ func (h *UserHandler) UpdateForOrg(w http.ResponseWriter, r *http.Request) {
 	if req.Email != nil {
 		existing.Email = *req.Email
 	}
-	if req.Role != nil {
-		existing.Role = entity.UserRole(*req.Role)
+	if req.RoleID != nil || req.Role != nil {
+		var roleID, roleKey string
+		if req.RoleID != nil {
+			roleID = *req.RoleID
+		}
+		if req.Role != nil {
+			roleKey = *req.Role
+		}
+		resolved, err := h.resolveRoleID(organizationID, roleID, roleKey)
+		if err != nil {
+			writeError(w, "invalid role", http.StatusBadRequest)
+			return
+		}
+		existing.RoleID = resolved
 	}
 	if req.IsActive != nil {
 		existing.IsActive = *req.IsActive

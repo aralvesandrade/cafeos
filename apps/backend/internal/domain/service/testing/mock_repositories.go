@@ -399,8 +399,8 @@ func NewInMemoryPermissionRepo() *InMemoryPermissionRepo {
 	return &InMemoryPermissionRepo{permissions: make(map[string]*entity.RolePermission)}
 }
 
-func (r *InMemoryPermissionRepo) key(organizationID string, role entity.UserRole, module entity.Module) string {
-	return organizationID + "|" + string(role) + "|" + string(module)
+func (r *InMemoryPermissionRepo) key(organizationID, roleID string, module entity.ModuleKey) string {
+	return organizationID + "|" + roleID + "|" + string(module)
 }
 
 func (r *InMemoryPermissionRepo) ListByOrganization(organizationID string) ([]*entity.RolePermission, error) {
@@ -418,7 +418,7 @@ func (r *InMemoryPermissionRepo) ListByOrganization(organizationID string) ([]*e
 func (r *InMemoryPermissionRepo) Upsert(p *entity.RolePermission) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.permissions[r.key(p.OrganizationID, p.Role, p.Module)] = p
+	r.permissions[r.key(p.OrganizationID, p.RoleID, p.Module)] = p
 	return nil
 }
 
@@ -428,6 +428,86 @@ func (r *InMemoryPermissionRepo) CountByOrganization(organizationID string) (int
 	var count int64
 	for _, p := range r.permissions {
 		if p.OrganizationID == organizationID {
+			count++
+		}
+	}
+	return count, nil
+}
+
+type InMemoryRoleRepo struct {
+	mu    sync.RWMutex
+	roles map[string]*entity.Role
+}
+
+func NewInMemoryRoleRepo() *InMemoryRoleRepo {
+	return &InMemoryRoleRepo{roles: make(map[string]*entity.Role)}
+}
+
+func (r *InMemoryRoleRepo) ListForOrganization(organizationID string) ([]*entity.Role, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var result []*entity.Role
+	for _, role := range r.roles {
+		if role.OrganizationID == nil || *role.OrganizationID == organizationID {
+			result = append(result, role)
+		}
+	}
+	return result, nil
+}
+
+func (r *InMemoryRoleRepo) GetByID(id string) (*entity.Role, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	role, ok := r.roles[id]
+	if !ok {
+		return nil, errors.New("role not found")
+	}
+	return role, nil
+}
+
+func (r *InMemoryRoleRepo) FindByKey(organizationID, key string) (*entity.Role, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	for _, role := range r.roles {
+		if role.Key == key && role.OrganizationID != nil && *role.OrganizationID == organizationID {
+			return role, nil
+		}
+	}
+	for _, role := range r.roles {
+		if role.Key == key && role.OrganizationID == nil {
+			return role, nil
+		}
+	}
+	return nil, errors.New("role not found")
+}
+
+func (r *InMemoryRoleRepo) Create(role *entity.Role) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.roles[role.ID] = role
+	return nil
+}
+
+func (r *InMemoryRoleRepo) Update(role *entity.Role) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.roles[role.ID] = role
+	return nil
+}
+
+func (r *InMemoryRoleRepo) Delete(id string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	delete(r.roles, id)
+	return nil
+}
+
+func (r *InMemoryRoleRepo) CountByOrganization(organizationID string) (int64, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var count int64
+	for _, role := range r.roles {
+		if role.OrganizationID != nil && *role.OrganizationID == organizationID {
 			count++
 		}
 	}

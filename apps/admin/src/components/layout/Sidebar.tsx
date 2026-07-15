@@ -24,6 +24,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   ShieldCheck,
+  Shield,
   CreditCard,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
@@ -183,6 +184,17 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 >
                   <ShieldCheck className="h-5 w-5 shrink-0" />
                   {!collapsed && 'Permissões'}
+                </NavLink>
+              )}
+              {canConfigurePermissions && (
+                <NavLink
+                  to="/roles"
+                  onClick={onClose}
+                  title={collapsed ? 'Papéis' : undefined}
+                  className={linkClass}
+                >
+                  <Shield className="h-5 w-5 shrink-0" />
+                  {!collapsed && 'Papéis'}
                 </NavLink>
               )}
             </div>

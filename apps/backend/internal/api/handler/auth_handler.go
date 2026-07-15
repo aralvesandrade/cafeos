@@ -83,7 +83,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	claims := jwt.MapClaims{
 		"user_id":         user.ID,
 		"organization_id": user.OrganizationID,
-		"role":            string(user.Role),
+		"role":            user.Role.Key,
 		"exp":             time.Now().Add(24 * time.Hour).Unix(),
 		"iat":             time.Now().Unix(),
 	}
@@ -102,7 +102,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	resp.User.ID = user.ID
 	resp.User.Email = user.Email
 	resp.User.Name = user.Name
-	resp.User.Role = string(user.Role)
+	resp.User.Role = user.Role.Key
 
 	writeJSON(w, resp, http.StatusOK)
 }

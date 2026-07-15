@@ -23,37 +23,13 @@ func (a AccessLevel) Satisfies(need AccessLevel) bool {
 	}
 }
 
-type Module string
-
-const (
-	ModuleDashboard   Module = "dashboard"
-	ModuleFarms       Module = "farms"
-	ModuleOperations  Module = "operations"
-	ModuleHarvests    Module = "harvests"
-	ModuleResources   Module = "resources"
-	ModuleFinancial   Module = "financial"
-	ModuleUsers       Module = "users"
-	ModulePermissions Module = "permissions"
-)
-
-var AllModules = []Module{
-	ModuleDashboard,
-	ModuleFarms,
-	ModuleOperations,
-	ModuleHarvests,
-	ModuleResources,
-	ModuleFinancial,
-	ModuleUsers,
-	ModulePermissions,
-}
-
 // RolePermission is the per-organization, per-role, per-module access
 // level configured by an organization admin through the Permissions screen.
 type RolePermission struct {
 	ID             string      `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	OrganizationID string      `json:"organization_id" gorm:"type:uuid;not null;uniqueIndex:idx_org_role_module"`
-	Role           UserRole    `json:"role" gorm:"not null;uniqueIndex:idx_org_role_module"`
-	Module         Module      `json:"module" gorm:"not null;uniqueIndex:idx_org_role_module"`
+	RoleID         string      `json:"role_id" gorm:"type:uuid;not null;uniqueIndex:idx_org_role_module"`
+	Module         ModuleKey   `json:"module" gorm:"not null;uniqueIndex:idx_org_role_module"`
 	Access         AccessLevel `json:"access" gorm:"not null;default:'none'"`
 	CreatedAt      time.Time   `json:"created_at"`
 	UpdatedAt      time.Time   `json:"updated_at"`

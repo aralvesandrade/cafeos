@@ -168,21 +168,47 @@ func seed(db *gorm.DB) error {
 		}
 	}
 
-	permSvc := domainSvc.NewPermissionService(infraRepo.NewPermissionRepository(db))
+	roleRepo := infraRepo.NewRoleRepository(db)
+	userRepo := infraRepo.NewUserRepository(db)
+	roleSvc := domainSvc.NewRoleService(roleRepo, userRepo)
+	if err := roleSvc.SeedSystemRolesIfMissing(); err != nil {
+		return fmt.Errorf("seed system roles: %w", err)
+	}
+	if err := roleSvc.SeedDefaultsIfMissing(organization.ID); err != nil {
+		return fmt.Errorf("seed default roles: %w", err)
+	}
+	fmt.Println("  ✓ Papéis padrão seedados")
+
+	moduleSvc := domainSvc.NewModuleService(infraRepo.NewModuleRepository(db))
+	if err := moduleSvc.SeedDefaultsIfMissing(); err != nil {
+		return fmt.Errorf("seed modules: %w", err)
+	}
+	fmt.Println("  ✓ Módulos seedados")
+
+	permSvc := domainSvc.NewPermissionService(infraRepo.NewPermissionRepository(db), roleRepo)
 	if err := permSvc.SeedDefaults(organization.ID); err != nil {
 		return fmt.Errorf("seed default permissions: %w", err)
 	}
 	fmt.Println("  ✓ Permissões padrão seedadas")
 
+	roleIDByKey := make(map[string]string)
+	orgRoles, err := roleRepo.ListForOrganization(organization.ID)
+	if err != nil {
+		return fmt.Errorf("list roles: %w", err)
+	}
+	for _, role := range orgRoles {
+		roleIDByKey[role.Key] = role.ID
+	}
+
 	// Users
 	users := []entity.User{
-		{OrganizationID: organization.ID, Name: "Administrador", Email: adminEmail, PasswordHash: hash(adminPass), Role: entity.RolePlatformOwner, IsActive: true},
-		{OrganizationID: organization.ID, Name: "João Silva", Email: "joao@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleProprietario, IsActive: true},
-		{OrganizationID: organization.ID, Name: "Maria Oliveira", Email: "maria@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleProprietario, IsActive: true},
-		{OrganizationID: organization.ID, Name: "Carlos Santos", Email: "carlos@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleEngenheiro, IsActive: true},
-		{OrganizationID: organization.ID, Name: "Ana Costa", Email: "ana@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleOperador, IsActive: true},
-		{OrganizationID: organization.ID, Name: "Fernanda Lima", Email: "fernanda@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleOrganizationAdmin, IsActive: true},
-		{OrganizationID: organization.ID, Name: "Rodrigo Alves", Email: "rodrigo@cafeos.com.br", PasswordHash: hash("123456"), Role: entity.RoleConsultor, IsActive: true},
+		{OrganizationID: organization.ID, Name: "Administrador", Email: adminEmail, PasswordHash: hash(adminPass), RoleID: roleIDByKey[entity.SystemRolePlatformOwner], IsActive: true},
+		{OrganizationID: organization.ID, Name: "João Silva", Email: "joao@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.RoleKeyProprietario], IsActive: true},
+		{OrganizationID: organization.ID, Name: "Maria Oliveira", Email: "maria@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.RoleKeyProprietario], IsActive: true},
+		{OrganizationID: organization.ID, Name: "Carlos Santos", Email: "carlos@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey["engenheiro_agronomo"], IsActive: true},
+		{OrganizationID: organization.ID, Name: "Ana Costa", Email: "ana@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey["operador_campo"], IsActive: true},
+		{OrganizationID: organization.ID, Name: "Fernanda Lima", Email: "fernanda@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.SystemRoleOrganizationAdmin], IsActive: true},
+		{OrganizationID: organization.ID, Name: "Rodrigo Alves", Email: "rodrigo@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey["consultor_externo"], IsActive: true},
 	}
 	for i := range users {
 		if err := db.Create(&users[i]).Error; err != nil {

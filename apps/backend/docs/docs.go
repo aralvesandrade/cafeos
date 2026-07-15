@@ -3471,6 +3471,105 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/{organization_id}/modules": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista os módulos fixos da aplicação com nome e ordem de exibição (requer write em \"permissions\")",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "modules (Módulos)"
+                ],
+                "summary": "Listar módulos",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Module"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{organization_id}/modules/{key}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza nome/ordem de exibição de um módulo existente (requer write em \"permissions\")",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "modules (Módulos)"
+                ],
+                "summary": "Atualizar módulo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Chave do Módulo",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do módulo",
+                        "name": "module",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.updateModuleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Module"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/{organization_id}/operation-types": {
             "get": {
                 "security": [
@@ -4479,6 +4578,200 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{organization_id}/roles": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista os papéis de sistema e os papéis próprios da organização (requer write em \"permissions\")",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles (Papéis)"
+                ],
+                "summary": "Listar papéis",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Role"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cria um papel próprio da organização (requer write em \"permissions\")",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles (Papéis)"
+                ],
+                "summary": "Criar papel",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do papel",
+                        "name": "role",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Role"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/{organization_id}/roles/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Renomeia um papel próprio da organização; papéis de sistema não podem ser alterados (requer write em \"permissions\")",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles (Papéis)"
+                ],
+                "summary": "Atualizar papel",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Papel",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do papel",
+                        "name": "role",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.updateRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Role"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Exclui um papel próprio da organização, se não estiver em uso por nenhum usuário (requer write em \"permissions\")",
+                "tags": [
+                    "roles (Papéis)"
+                ],
+                "summary": "Excluir papel",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Papel",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -5580,6 +5873,26 @@ const docTemplate = `{
             }
         },
         "entity.Module": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "key": {
+                    "$ref": "#/definitions/entity.ModuleKey"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.ModuleKey": {
             "type": "string",
             "enum": [
                 "dashboard",
@@ -5907,6 +6220,32 @@ const docTemplate = `{
                 "ProdOutro"
             ]
         },
+        "entity.Role": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_system": {
+                    "type": "boolean"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "organization_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.RolePermission": {
             "type": "object",
             "properties": {
@@ -5920,13 +6259,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "module": {
-                    "$ref": "#/definitions/entity.Module"
+                    "$ref": "#/definitions/entity.ModuleKey"
                 },
                 "organization_id": {
                     "type": "string"
                 },
-                "role": {
-                    "$ref": "#/definitions/entity.UserRole"
+                "role_id": {
+                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
@@ -6077,39 +6416,15 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
-                    "$ref": "#/definitions/entity.UserRole"
+                    "$ref": "#/definitions/entity.Role"
+                },
+                "role_id": {
+                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
                 }
             }
-        },
-        "entity.UserRole": {
-            "type": "string",
-            "enum": [
-                "platform_owner",
-                "organization_admin",
-                "proprietario",
-                "gerente_agricola",
-                "engenheiro_agronomo",
-                "tecnico_agricola",
-                "operador_campo",
-                "financeiro",
-                "consultor_externo",
-                "auditor"
-            ],
-            "x-enum-varnames": [
-                "RolePlatformOwner",
-                "RoleOrganizationAdmin",
-                "RoleProprietario",
-                "RoleGerente",
-                "RoleEngenheiro",
-                "RoleTecnico",
-                "RoleOperador",
-                "RoleFinanceiro",
-                "RoleConsultor",
-                "RoleAuditor"
-            ]
         },
         "entity.Vehicle": {
             "type": "object",
@@ -7122,6 +7437,17 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.createRoleRequest": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.createStockItemRequest": {
             "type": "object",
             "properties": {
@@ -7184,6 +7510,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
+                    "type": "string"
+                },
+                "role_id": {
+                    "description": "RoleID is preferred; Role (a role key, e.g. \"operador_campo\") is\naccepted for backward compatibility and resolved via RoleService.",
                     "type": "string"
                 }
             }
@@ -7419,6 +7749,17 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.updateModuleRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "integer"
+                }
+            }
+        },
         "handler.updateOperationRequest": {
             "type": "object",
             "properties": {
@@ -7478,10 +7819,10 @@ const docTemplate = `{
                     "$ref": "#/definitions/entity.AccessLevel"
                 },
                 "module": {
-                    "$ref": "#/definitions/entity.Module"
+                    "$ref": "#/definitions/entity.ModuleKey"
                 },
-                "role": {
-                    "$ref": "#/definitions/entity.UserRole"
+                "role_id": {
+                    "type": "string"
                 }
             }
         },
@@ -7526,6 +7867,14 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.updateRoleRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.updateUserRequest": {
             "type": "object",
             "properties": {
@@ -7539,6 +7888,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
+                    "type": "string"
+                },
+                "role_id": {
                     "type": "string"
                 }
             }

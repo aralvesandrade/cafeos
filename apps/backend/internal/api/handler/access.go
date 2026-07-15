@@ -12,7 +12,7 @@ import (
 // returns the user ID to scope by. Every other role sees the whole organization.
 func restrictedOwnerID(r *http.Request) (userID string, restricted bool) {
 	role, _ := r.Context().Value(middleware.RoleKey).(string)
-	if role != string(entity.RoleProprietario) {
+	if role != entity.RoleKeyProprietario {
 		return "", false
 	}
 	userID, _ = r.Context().Value(middleware.UserIDKey).(string)

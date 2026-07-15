@@ -23,19 +23,19 @@ func (r *UserRepository) Create(u *entity.User) error {
 
 func (r *UserRepository) GetByID(id string) (*entity.User, error) {
 	var u entity.User
-	err := r.db.First(&u, "id = ?", id).Error
+	err := r.db.Preload("Role").First(&u, "id = ?", id).Error
 	return &u, err
 }
 
 func (r *UserRepository) GetByEmail(email string) (*entity.User, error) {
 	var u entity.User
-	err := r.db.Where("email = ?", email).First(&u).Error
+	err := r.db.Preload("Role").Where("email = ?", email).First(&u).Error
 	return &u, err
 }
 
 func (r *UserRepository) ListByOrganization(organizationID string) ([]*entity.User, error) {
 	var users []*entity.User
-	err := r.db.Where("organization_id = ?", organizationID).Order("name").Find(&users).Error
+	err := r.db.Preload("Role").Where("organization_id = ?", organizationID).Order("name").Find(&users).Error
 	return users, err
 }
 
@@ -45,10 +45,16 @@ func (r *UserRepository) Update(u *entity.User) error {
 
 func (r *UserRepository) List() ([]*entity.User, error) {
 	var users []*entity.User
-	err := r.db.Order("name").Find(&users).Error
+	err := r.db.Preload("Role").Order("name").Find(&users).Error
 	return users, err
 }
 
 func (r *UserRepository) Delete(id string) error {
 	return r.db.Delete(&entity.User{}, "id = ?", id).Error
+}
+
+func (r *UserRepository) CountByRole(roleID string) (int64, error) {
+	var count int64
+	err := r.db.Model(&entity.User{}).Where("role_id = ?", roleID).Count(&count).Error
+	return count, err
 }

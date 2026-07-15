@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Pencil, Trash2, User, Building2 } from 'lucide-react'
-import { ROLE_LABELS } from '@/lib/roles'
 
 interface AppUser {
   id: string
@@ -117,7 +116,7 @@ export function Users() {
                   </div>
                 </TableCell>
                 <TableCell>{u.email}</TableCell>
-                <TableCell><Badge>{ROLE_LABELS[u.role as keyof typeof ROLE_LABELS] || u.role}</Badge></TableCell>
+                <TableCell><Badge>{u.role}</Badge></TableCell>
                 <TableCell className="text-muted-foreground text-sm">
                   <div className="flex items-center gap-1">
                     <Building2 className="h-3 w-3" />
@@ -165,12 +164,9 @@ export function Users() {
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Perfil</label>
-            <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
-              {Object.entries(ROLE_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
-              ))}
-            </select>
+            <label className="block text-sm font-medium text-foreground mb-1">Perfil (chave do papel)</label>
+            <Input value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} placeholder="ex: operador_campo, proprietario, platform_owner" />
+            <p className="text-xs text-muted-foreground mt-1">Papéis são específicos de cada organização — consulte a tela de Papéis da organização de destino.</p>
           </div>
           {editing && (
             <div>

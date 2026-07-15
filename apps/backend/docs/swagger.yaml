@@ -281,6 +281,19 @@ definitions:
         type: string
     type: object
   entity.Module:
+    properties:
+      created_at:
+        type: string
+      key:
+        $ref: '#/definitions/entity.ModuleKey'
+      name:
+        type: string
+      order:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  entity.ModuleKey:
     enum:
     - dashboard
     - farms
@@ -504,6 +517,23 @@ definitions:
     - ProdDefensivo
     - ProdCombustivel
     - ProdOutro
+  entity.Role:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      is_system:
+        type: boolean
+      key:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
   entity.RolePermission:
     properties:
       access:
@@ -513,11 +543,11 @@ definitions:
       id:
         type: string
       module:
-        $ref: '#/definitions/entity.Module'
+        $ref: '#/definitions/entity.ModuleKey'
       organization_id:
         type: string
-      role:
-        $ref: '#/definitions/entity.UserRole'
+      role_id:
+        type: string
       updated_at:
         type: string
     type: object
@@ -617,34 +647,12 @@ definitions:
       organization_id:
         type: string
       role:
-        $ref: '#/definitions/entity.UserRole'
+        $ref: '#/definitions/entity.Role'
+      role_id:
+        type: string
       updated_at:
         type: string
     type: object
-  entity.UserRole:
-    enum:
-    - platform_owner
-    - organization_admin
-    - proprietario
-    - gerente_agricola
-    - engenheiro_agronomo
-    - tecnico_agricola
-    - operador_campo
-    - financeiro
-    - consultor_externo
-    - auditor
-    type: string
-    x-enum-varnames:
-    - RolePlatformOwner
-    - RoleOrganizationAdmin
-    - RoleProprietario
-    - RoleGerente
-    - RoleEngenheiro
-    - RoleTecnico
-    - RoleOperador
-    - RoleFinanceiro
-    - RoleConsultor
-    - RoleAuditor
   entity.Vehicle:
     properties:
       brand:
@@ -1314,6 +1322,13 @@ definitions:
       useful_life_years:
         type: integer
     type: object
+  handler.createRoleRequest:
+    properties:
+      key:
+        type: string
+      name:
+        type: string
+    type: object
   handler.createStockItemRequest:
     properties:
       batch:
@@ -1355,6 +1370,11 @@ definitions:
       password:
         type: string
       role:
+        type: string
+      role_id:
+        description: |-
+          RoleID is preferred; Role (a role key, e.g. "operador_campo") is
+          accepted for backward compatibility and resolved via RoleService.
         type: string
     type: object
   handler.createVehicleRequest:
@@ -1507,6 +1527,13 @@ definitions:
           $ref: '#/definitions/handler.syncErrorItem'
         type: array
     type: object
+  handler.updateModuleRequest:
+    properties:
+      name:
+        type: string
+      order:
+        type: integer
+    type: object
   handler.updateOperationRequest:
     properties:
       cost:
@@ -1546,9 +1573,9 @@ definitions:
       access:
         $ref: '#/definitions/entity.AccessLevel'
       module:
-        $ref: '#/definitions/entity.Module'
-      role:
-        $ref: '#/definitions/entity.UserRole'
+        $ref: '#/definitions/entity.ModuleKey'
+      role_id:
+        type: string
     type: object
   handler.updatePlanRequest:
     properties:
@@ -1577,6 +1604,11 @@ definitions:
       slug:
         type: string
     type: object
+  handler.updateRoleRequest:
+    properties:
+      name:
+        type: string
+    type: object
   handler.updateUserRequest:
     properties:
       email:
@@ -1586,6 +1618,8 @@ definitions:
       name:
         type: string
       role:
+        type: string
+      role_id:
         type: string
     type: object
 host: localhost:5001
@@ -3455,6 +3489,71 @@ paths:
       summary: Atualizar trabalhador
       tags:
       - labor (Mão de Obra)
+  /api/v1/{organization_id}/modules:
+    get:
+      description: Lista os módulos fixos da aplicação com nome e ordem de exibição
+        (requer write em "permissions")
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Module'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Listar módulos
+      tags:
+      - modules (Módulos)
+  /api/v1/{organization_id}/modules/{key}:
+    put:
+      consumes:
+      - application/json
+      description: Atualiza nome/ordem de exibição de um módulo existente (requer
+        write em "permissions")
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: Chave do Módulo
+        in: path
+        name: key
+        required: true
+        type: string
+      - description: Dados do módulo
+        in: body
+        name: module
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateModuleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Module'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar módulo
+      tags:
+      - modules (Módulos)
   /api/v1/{organization_id}/operation-types:
     get:
       description: Lista todos os tipos de operação pertencentes à organização
@@ -4112,6 +4211,133 @@ paths:
       summary: Listar operações por talhão
       tags:
       - operations (Operações)
+  /api/v1/{organization_id}/roles:
+    get:
+      description: Lista os papéis de sistema e os papéis próprios da organização
+        (requer write em "permissions")
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Role'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Listar papéis
+      tags:
+      - roles (Papéis)
+    post:
+      consumes:
+      - application/json
+      description: Cria um papel próprio da organização (requer write em "permissions")
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: Dados do papel
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Role'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar papel
+      tags:
+      - roles (Papéis)
+  /api/v1/{organization_id}/roles/{id}:
+    delete:
+      description: Exclui um papel próprio da organização, se não estiver em uso por
+        nenhum usuário (requer write em "permissions")
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: ID do Papel
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Excluir papel
+      tags:
+      - roles (Papéis)
+    put:
+      consumes:
+      - application/json
+      description: Renomeia um papel próprio da organização; papéis de sistema não
+        podem ser alterados (requer write em "permissions")
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: ID do Papel
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados do papel
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Role'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar papel
+      tags:
+      - roles (Papéis)
   /api/v1/{organization_id}/stock/items:
     get:
       description: Lista todos os itens de estoque pertencentes à organização

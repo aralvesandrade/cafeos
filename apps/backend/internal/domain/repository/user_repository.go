@@ -10,4 +10,5 @@ type UserRepository interface {
 	List() ([]*entity.User, error)
 	Update(user *entity.User) error
 	Delete(id string) error
+	CountByRole(roleID string) (int64, error)
 }

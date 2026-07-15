@@ -2,34 +2,26 @@ import { useEffect, useState, useCallback } from 'react'
 import { apiRequest } from '@/lib/api'
 import { useToast } from '@/lib/toast'
 import { usePermissions } from '@/lib/permissions'
-import { ALL_MODULES, MODULE_LABELS, ACCESS_LABELS, type Module, type AccessLevel } from '@/lib/permissions'
-import { ALL_ROLES, ROLE_LABELS, type UserRole } from '@/lib/roles'
+import { useModules, ACCESS_LABELS, type Module, type AccessLevel } from '@/lib/permissions'
+import { useRoles } from '@/lib/roles'
 import { Button } from '@/components/ui/button'
 import { Select } from '@/components/ui/select'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Save } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 interface RolePermission {
-  role: UserRole
+  role_id: string
   module: Module
   access: AccessLevel
 }
 
-type Matrix = Record<Module, Record<UserRole, AccessLevel>>
-
-function emptyMatrix(): Matrix {
-  const matrix = {} as Matrix
-  for (const module of ALL_MODULES) {
-    matrix[module] = {} as Record<UserRole, AccessLevel>
-    for (const role of ALL_ROLES) {
-      matrix[module][role] = 'none'
-    }
-  }
-  return matrix
-}
+type Matrix = Record<string, Record<string, AccessLevel>> // module -> role_id -> access
 
 export function Permissions() {
-  const [matrix, setMatrix] = useState<Matrix>(emptyMatrix)
+  const { modules, loading: modulesLoading } = useModules()
+  const { roles, loading: rolesLoading } = useRoles()
+  const [matrix, setMatrix] = useState<Matrix>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const toast = useToast()
@@ -39,9 +31,11 @@ export function Permissions() {
     setLoading(true)
     try {
       const rows = await apiRequest<RolePermission[]>('/permissions')
-      const next = emptyMatrix()
+      const next: Matrix = {}
+      for (const module of modules) next[module.key] = {}
       for (const row of rows) {
-        if (next[row.module]) next[row.module][row.role] = row.access
+        if (!next[row.module]) next[row.module] = {}
+        next[row.module][row.role_id] = row.access
       }
       setMatrix(next)
     } catch (err) {
@@ -50,19 +44,23 @@ export function Permissions() {
     } finally {
       setLoading(false)
     }
-  }, [toast])
+  }, [toast, modules])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    if (modules.length > 0) load()
+  }, [load, modules])
 
-  const setCell = (module: Module, role: UserRole, access: AccessLevel) => {
-    setMatrix((prev) => ({ ...prev, [module]: { ...prev[module], [role]: access } }))
+  const cellAccess = (module: Module, roleId: string): AccessLevel => matrix[module]?.[roleId] ?? 'none'
+
+  const setCell = (module: Module, roleId: string, access: AccessLevel) => {
+    setMatrix((prev) => ({ ...prev, [module]: { ...prev[module], [roleId]: access } }))
   }
 
   const handleSave = async () => {
     setSaving(true)
     try {
-      const entries: RolePermission[] = ALL_MODULES.flatMap((module) =>
-        ALL_ROLES.map((role) => ({ role, module, access: matrix[module][role] }))
+      const entries: RolePermission[] = modules.flatMap((module) =>
+        roles.map((role) => ({ role_id: role.id, module: module.key, access: cellAccess(module.key, role.id) }))
       )
       await apiRequest('/permissions', { method: 'PUT', body: entries })
       await refresh()
@@ -75,7 +73,9 @@ export function Permissions() {
     }
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
+  if (loading || modulesLoading || rolesLoading) {
+    return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>
+  }
 
   return (
     <div className="space-y-6">
@@ -86,29 +86,34 @@ export function Permissions() {
             Defina o que cada perfil pode ver e editar nesta organização.
           </p>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
-          <Save className="h-4 w-4" /> {saving ? 'Salvando...' : 'Salvar alterações'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Link to="/roles">
+            <Button variant="outline">Gerenciar Papéis</Button>
+          </Link>
+          <Button onClick={handleSave} disabled={saving}>
+            <Save className="h-4 w-4" /> {saving ? 'Salvando...' : 'Salvar alterações'}
+          </Button>
+        </div>
       </div>
 
       <Table>
         <TableHead>
           <TableRow>
             <TableHeader>Módulo</TableHeader>
-            {ALL_ROLES.map((role) => (
-              <TableHeader key={role}>{ROLE_LABELS[role]}</TableHeader>
+            {roles.map((role) => (
+              <TableHeader key={role.id}>{role.name}</TableHeader>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {ALL_MODULES.map((module) => (
-            <TableRow key={module}>
-              <TableCell className="font-medium whitespace-nowrap">{MODULE_LABELS[module]}</TableCell>
-              {ALL_ROLES.map((role) => (
-                <TableCell key={role}>
+          {modules.map((module) => (
+            <TableRow key={module.key}>
+              <TableCell className="font-medium whitespace-nowrap">{module.name}</TableCell>
+              {roles.map((role) => (
+                <TableCell key={role.id}>
                   <Select
-                    value={matrix[module][role]}
-                    onChange={(e) => setCell(module, role, e.target.value as AccessLevel)}
+                    value={cellAccess(module.key, role.id)}
+                    onChange={(e) => setCell(module.key, role.id, e.target.value as AccessLevel)}
                     className="w-32"
                   >
                     {(['none', 'read', 'write'] as AccessLevel[]).map((level) => (

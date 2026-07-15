@@ -46,6 +46,8 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	allocRepo := infraRepo.NewCostAllocationRepository(db)
 	alertRepo := infraRepo.NewAlertRepository(db)
 	permRepo := infraRepo.NewPermissionRepository(db)
+	roleRepo := infraRepo.NewRoleRepository(db)
+	moduleRepo := infraRepo.NewModuleRepository(db)
 	transactor := postgres.NewTransactor(db)
 	ruleEngine := domainSvc.NewRuleEngine()
 
@@ -61,13 +63,24 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	otSvc := domainSvc.NewOperationTypeService(otRepo)
 	budgetSvc := domainSvc.NewBudgetService(budgetRepo, harvestRepo, opRepo, maintRepo, shiftRepo, finRepo, allocRepo)
 	allocSvc := domainSvc.NewCostAllocationService(allocRepo, plotRepo)
-	permSvc := domainSvc.NewPermissionService(permRepo)
+	roleSvc := domainSvc.NewRoleService(roleRepo, userRepo)
+	moduleSvc := domainSvc.NewModuleService(moduleRepo)
+	permSvc := domainSvc.NewPermissionService(permRepo, roleRepo)
 	planSvc := domainSvc.NewPlanService(planRepo)
 
+	if err := roleSvc.SeedSystemRolesIfMissing(); err != nil {
+		log.Error("failed to seed system roles", "error", err)
+	}
+	if err := moduleSvc.SeedDefaultsIfMissing(); err != nil {
+		log.Error("failed to seed modules", "error", err)
+	}
 	if organizations, err := organizationRepo.List(); err != nil {
 		log.Error("failed to list organizations for permission backfill", "error", err)
 	} else {
 		for _, org := range organizations {
+			if err := roleSvc.SeedDefaultsIfMissing(org.ID); err != nil {
+				log.Error("failed to backfill default roles", "organization_id", org.ID, "error", err)
+			}
 			if err := permSvc.SeedDefaultsIfMissing(org.ID); err != nil {
 				log.Error("failed to backfill default permissions", "organization_id", org.ID, "error", err)
 			}
@@ -80,9 +93,9 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	harvestH := handler.NewHarvestHandler(harvestSvc, plotSvc, farmSvc, indicatorRepo)
 	dashboardH := handler.NewDashboardHandler(harvestRepo, indicatorRepo, opRepo, plotRepo, farmRepo, hpRepo, farmSvc)
 	authH := handler.NewAuthHandler(userRepo, organizationRepo, jwtSecret)
-	organizationH := handler.NewOrganizationHandler(organizationRepo, permSvc)
+	organizationH := handler.NewOrganizationHandler(organizationRepo, permSvc, roleSvc)
 	planH := handler.NewPlanHandler(planSvc)
-	userH := handler.NewUserHandler(userRepo)
+	userH := handler.NewUserHandler(userRepo, roleSvc)
 	finH := handler.NewFinancialHandler(finSvc, farmSvc)
 	stockH := handler.NewStockHandler(stockSvc, farmSvc)
 	fleetH := handler.NewFleetHandler(fleetSvc, farmSvc)
@@ -94,9 +107,11 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	allocH := handler.NewCostAllocationHandler(allocSvc)
 	alertH := handler.NewAlertHandler(alertRepo)
 	permH := handler.NewPermissionHandler(permSvc)
+	roleH := handler.NewRoleHandler(roleSvc)
+	moduleH := handler.NewModuleHandler(moduleSvc)
 
 	authMw := middleware.Auth(jwtSecret)
-	adminMw := middleware.RequireRole(entity.RolePlatformOwner)
+	adminMw := middleware.RequireRole(entity.SystemRolePlatformOwner)
 	corsMw := middleware.CORS
 
 	// Auth (public)
@@ -117,7 +132,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	chain := func(h http.HandlerFunc) http.Handler {
 		return authMw(http.HandlerFunc(h))
 	}
-	mchain := func(module entity.Module, access entity.AccessLevel, h http.HandlerFunc) http.Handler {
+	mchain := func(module entity.ModuleKey, access entity.AccessLevel, h http.HandlerFunc) http.Handler {
 		return authMw(middleware.RequireModule(permSvc, module, access)(http.HandlerFunc(h)))
 	}
 	read := entity.AccessRead
@@ -261,6 +276,16 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	mux.Handle("GET /api/v1/{organization_id}/permissions", mchain(entity.ModulePermissions, write, permH.List))
 	mux.Handle("PUT /api/v1/{organization_id}/permissions", mchain(entity.ModulePermissions, write, permH.Update))
 	mux.Handle("GET /api/v1/{organization_id}/permissions/me", chain(permH.Mine))
+
+	// Roles
+	mux.Handle("GET /api/v1/{organization_id}/roles", mchain(entity.ModulePermissions, write, roleH.List))
+	mux.Handle("POST /api/v1/{organization_id}/roles", mchain(entity.ModulePermissions, write, roleH.Create))
+	mux.Handle("PUT /api/v1/{organization_id}/roles/{id}", mchain(entity.ModulePermissions, write, roleH.Update))
+	mux.Handle("DELETE /api/v1/{organization_id}/roles/{id}", mchain(entity.ModulePermissions, write, roleH.Delete))
+
+	// Modules (catalog — display metadata only, keys are fixed in code)
+	mux.Handle("GET /api/v1/{organization_id}/modules", mchain(entity.ModulePermissions, write, moduleH.List))
+	mux.Handle("PUT /api/v1/{organization_id}/modules/{key}", mchain(entity.ModulePermissions, write, moduleH.Update))
 
 	// Users — org-scoped roster (distinct from the cross-tenant /admin/users)
 	mux.Handle("POST /api/v1/{organization_id}/users", mchain(entity.ModuleUsers, write, userH.CreateForOrg))
