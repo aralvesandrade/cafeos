@@ -68,8 +68,8 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	permSvc := domainSvc.NewPermissionService(permRepo, roleRepo)
 	planSvc := domainSvc.NewPlanService(planRepo)
 
-	if err := roleSvc.SeedSystemRolesIfMissing(); err != nil {
-		log.Error("failed to seed system roles", "error", err)
+	if err := roleSvc.SeedDefaultsIfMissing(); err != nil {
+		log.Error("failed to seed roles", "error", err)
 	}
 	if err := moduleSvc.SeedDefaultsIfMissing(); err != nil {
 		log.Error("failed to seed modules", "error", err)
@@ -78,9 +78,6 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 		log.Error("failed to list organizations for permission backfill", "error", err)
 	} else {
 		for _, org := range organizations {
-			if err := roleSvc.SeedDefaultsIfMissing(org.ID); err != nil {
-				log.Error("failed to backfill default roles", "organization_id", org.ID, "error", err)
-			}
 			if err := permSvc.SeedDefaultsIfMissing(org.ID); err != nil {
 				log.Error("failed to backfill default permissions", "organization_id", org.ID, "error", err)
 			}
@@ -93,7 +90,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	harvestH := handler.NewHarvestHandler(harvestSvc, plotSvc, farmSvc, indicatorRepo)
 	dashboardH := handler.NewDashboardHandler(harvestRepo, indicatorRepo, opRepo, plotRepo, farmRepo, hpRepo, farmSvc)
 	authH := handler.NewAuthHandler(userRepo, organizationRepo, jwtSecret)
-	organizationH := handler.NewOrganizationHandler(organizationRepo, permSvc, roleSvc)
+	organizationH := handler.NewOrganizationHandler(organizationRepo, permSvc)
 	planH := handler.NewPlanHandler(planSvc)
 	userH := handler.NewUserHandler(userRepo, roleSvc)
 	finH := handler.NewFinancialHandler(finSvc, farmSvc)

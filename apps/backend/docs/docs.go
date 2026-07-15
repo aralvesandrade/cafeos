@@ -4595,7 +4595,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lista os papéis de sistema e os papéis próprios da organização (requer write em \"permissions\")",
+                "description": "Lista o catálogo global de papéis, compartilhado por todas as organizações (requer write em \"permissions\")",
                 "produces": [
                     "application/json"
                 ],
@@ -4630,7 +4630,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Cria um papel próprio da organização (requer write em \"permissions\")",
+                "description": "Cria um papel no catálogo global, compartilhado por todas as organizações (requer write em \"permissions\")",
                 "consumes": [
                     "application/json"
                 ],
@@ -4685,7 +4685,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Renomeia um papel próprio da organização; papéis de sistema não podem ser alterados (requer write em \"permissions\")",
+                "description": "Renomeia um papel do catálogo global; papéis de sistema não podem ser alterados (requer write em \"permissions\")",
                 "consumes": [
                     "application/json"
                 ],
@@ -4745,7 +4745,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Exclui um papel próprio da organização, se não estiver em uso por nenhum usuário (requer write em \"permissions\")",
+                "description": "Exclui um papel do catálogo global, se não estiver em uso por nenhum usuário (requer write em \"permissions\")",
                 "tags": [
                     "roles (Papéis)"
                 ],
@@ -6236,9 +6236,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
-                },
-                "organization_id": {
                     "type": "string"
                 },
                 "updated_at": {

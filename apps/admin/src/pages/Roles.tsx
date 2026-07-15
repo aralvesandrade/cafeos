@@ -60,7 +60,7 @@ export function Roles() {
         <div>
           <h1 className="font-display text-2xl font-semibold text-foreground">Papéis</h1>
           <p className="text-sm text-muted-foreground">
-            Papéis de sistema (Platform Owner, Admin) não podem ser alterados. Os demais são específicos desta organização.
+            Catálogo global de papéis, compartilhado por todas as organizações. Papéis de sistema (Platform Owner, Admin) não podem ser alterados.
           </p>
         </div>
         {canEdit && (
@@ -91,7 +91,7 @@ export function Roles() {
               <TableCell className="text-muted-foreground text-sm">{role.key}</TableCell>
               <TableCell>
                 <Badge variant={role.is_system ? 'default' : 'success'}>
-                  {role.is_system ? 'Sistema' : 'Organização'}
+                  {role.is_system ? 'Sistema' : 'Global'}
                 </Badge>
               </TableCell>
               <TableCell className="text-right">

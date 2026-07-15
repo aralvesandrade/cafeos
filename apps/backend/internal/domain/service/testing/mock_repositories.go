@@ -443,14 +443,12 @@ func NewInMemoryRoleRepo() *InMemoryRoleRepo {
 	return &InMemoryRoleRepo{roles: make(map[string]*entity.Role)}
 }
 
-func (r *InMemoryRoleRepo) ListForOrganization(organizationID string) ([]*entity.Role, error) {
+func (r *InMemoryRoleRepo) List() ([]*entity.Role, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	var result []*entity.Role
 	for _, role := range r.roles {
-		if role.OrganizationID == nil || *role.OrganizationID == organizationID {
-			result = append(result, role)
-		}
+		result = append(result, role)
 	}
 	return result, nil
 }
@@ -465,16 +463,11 @@ func (r *InMemoryRoleRepo) GetByID(id string) (*entity.Role, error) {
 	return role, nil
 }
 
-func (r *InMemoryRoleRepo) FindByKey(organizationID, key string) (*entity.Role, error) {
+func (r *InMemoryRoleRepo) FindByKey(key string) (*entity.Role, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	for _, role := range r.roles {
-		if role.Key == key && role.OrganizationID != nil && *role.OrganizationID == organizationID {
-			return role, nil
-		}
-	}
-	for _, role := range r.roles {
-		if role.Key == key && role.OrganizationID == nil {
+		if role.Key == key {
 			return role, nil
 		}
 	}
@@ -502,14 +495,8 @@ func (r *InMemoryRoleRepo) Delete(id string) error {
 	return nil
 }
 
-func (r *InMemoryRoleRepo) CountByOrganization(organizationID string) (int64, error) {
+func (r *InMemoryRoleRepo) Count() (int64, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	var count int64
-	for _, role := range r.roles {
-		if role.OrganizationID != nil && *role.OrganizationID == organizationID {
-			count++
-		}
-	}
-	return count, nil
+	return int64(len(r.roles)), nil
 }

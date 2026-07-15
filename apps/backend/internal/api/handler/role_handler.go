@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/aralvesandrade/cafeos/internal/api/middleware"
 	"github.com/aralvesandrade/cafeos/internal/domain/service"
 )
 
@@ -17,9 +16,9 @@ func NewRoleHandler(svc *service.RoleService) *RoleHandler {
 	return &RoleHandler{svc: svc}
 }
 
-// List retorna os papéis disponíveis na organização (papéis de sistema + próprios)
+// List retorna o catálogo global de papéis (papéis de sistema + demais)
 // @Summary Listar papéis
-// @Description Lista os papéis de sistema e os papéis próprios da organização (requer write em "permissions")
+// @Description Lista o catálogo global de papéis, compartilhado por todas as organizações (requer write em "permissions")
 // @Tags roles (Papéis)
 // @Produce json
 // @Param organization_id path string true "ID da Organização"
@@ -27,8 +26,7 @@ func NewRoleHandler(svc *service.RoleService) *RoleHandler {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/roles [get]
 func (h *RoleHandler) List(w http.ResponseWriter, r *http.Request) {
-	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
-	roles, err := h.svc.ListForOrganization(organizationID)
+	roles, err := h.svc.List()
 	if err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -41,9 +39,9 @@ type createRoleRequest struct {
 	Name string `json:"name"`
 }
 
-// Create cria um papel customizado na organização
+// Create cria um novo papel no catálogo global
 // @Summary Criar papel
-// @Description Cria um papel próprio da organização (requer write em "permissions")
+// @Description Cria um papel no catálogo global, compartilhado por todas as organizações (requer write em "permissions")
 // @Tags roles (Papéis)
 // @Accept json
 // @Produce json
@@ -54,15 +52,13 @@ type createRoleRequest struct {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/roles [post]
 func (h *RoleHandler) Create(w http.ResponseWriter, r *http.Request) {
-	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
-
 	var req createRoleRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	role, err := h.svc.Create(organizationID, req.Key, req.Name)
+	role, err := h.svc.Create(req.Key, req.Name)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -74,9 +70,9 @@ type updateRoleRequest struct {
 	Name string `json:"name"`
 }
 
-// Update renomeia um papel customizado da organização
+// Update renomeia um papel do catálogo global
 // @Summary Atualizar papel
-// @Description Renomeia um papel próprio da organização; papéis de sistema não podem ser alterados (requer write em "permissions")
+// @Description Renomeia um papel do catálogo global; papéis de sistema não podem ser alterados (requer write em "permissions")
 // @Tags roles (Papéis)
 // @Accept json
 // @Produce json
@@ -88,7 +84,6 @@ type updateRoleRequest struct {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/roles/{id} [put]
 func (h *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
-	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
 
 	var req updateRoleRequest
@@ -97,7 +92,7 @@ func (h *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	role, err := h.svc.Update(organizationID, id, req.Name)
+	role, err := h.svc.Update(id, req.Name)
 	if err != nil {
 		writeError(w, err.Error(), roleErrStatus(err))
 		return
@@ -105,9 +100,9 @@ func (h *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, role, http.StatusOK)
 }
 
-// Delete remove um papel customizado da organização
+// Delete remove um papel do catálogo global
 // @Summary Excluir papel
-// @Description Exclui um papel próprio da organização, se não estiver em uso por nenhum usuário (requer write em "permissions")
+// @Description Exclui um papel do catálogo global, se não estiver em uso por nenhum usuário (requer write em "permissions")
 // @Tags roles (Papéis)
 // @Param organization_id path string true "ID da Organização"
 // @Param id path string true "ID do Papel"
@@ -116,10 +111,9 @@ func (h *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/roles/{id} [delete]
 func (h *RoleHandler) Delete(w http.ResponseWriter, r *http.Request) {
-	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
 	id := r.PathValue("id")
 
-	if err := h.svc.Delete(organizationID, id); err != nil {
+	if err := h.svc.Delete(id); err != nil {
 		writeError(w, err.Error(), roleErrStatus(err))
 		return
 	}
@@ -130,7 +124,7 @@ func roleErrStatus(err error) int {
 	switch {
 	case errors.Is(err, service.ErrRoleNotFound):
 		return http.StatusNotFound
-	case errors.Is(err, service.ErrRoleIsSystem), errors.Is(err, service.ErrRoleInUse), errors.Is(err, service.ErrForbiddenOrg):
+	case errors.Is(err, service.ErrRoleIsSystem), errors.Is(err, service.ErrRoleInUse):
 		return http.StatusBadRequest
 	default:
 		return http.StatusBadRequest

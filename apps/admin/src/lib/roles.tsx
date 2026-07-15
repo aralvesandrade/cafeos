@@ -2,9 +2,11 @@ import { createContext, useContext, useState, useCallback, useEffect, type React
 import { apiRequest } from './api'
 import { useAuth } from './auth'
 
+// Role is a global catalog entry — like Module, it's shared by every
+// organization. What varies per organization is access (see
+// lib/permissions.tsx), not the set of available roles.
 export interface Role {
   id: string
-  organization_id: string | null
   key: string
   name: string
   is_system: boolean

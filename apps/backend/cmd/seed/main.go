@@ -171,11 +171,8 @@ func seed(db *gorm.DB) error {
 	roleRepo := infraRepo.NewRoleRepository(db)
 	userRepo := infraRepo.NewUserRepository(db)
 	roleSvc := domainSvc.NewRoleService(roleRepo, userRepo)
-	if err := roleSvc.SeedSystemRolesIfMissing(); err != nil {
-		return fmt.Errorf("seed system roles: %w", err)
-	}
-	if err := roleSvc.SeedDefaultsIfMissing(organization.ID); err != nil {
-		return fmt.Errorf("seed default roles: %w", err)
+	if err := roleSvc.SeedDefaultsIfMissing(); err != nil {
+		return fmt.Errorf("seed roles: %w", err)
 	}
 	fmt.Println("  ✓ Papéis padrão seedados")
 
@@ -192,11 +189,11 @@ func seed(db *gorm.DB) error {
 	fmt.Println("  ✓ Permissões padrão seedadas")
 
 	roleIDByKey := make(map[string]string)
-	orgRoles, err := roleRepo.ListForOrganization(organization.ID)
+	allRoles, err := roleRepo.List()
 	if err != nil {
 		return fmt.Errorf("list roles: %w", err)
 	}
-	for _, role := range orgRoles {
+	for _, role := range allRoles {
 		roleIDByKey[role.Key] = role.ID
 	}
 

@@ -30,9 +30,20 @@ func NewConnection(databaseURL string, log *slog.Logger, gormLevel slog.Level) (
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 
 	if err := db.AutoMigrate(
+		// Global catalog entities — not organization-scoped, shared by the
+		// whole platform (plans on offer, fixed application modules, the
+		// roles a user can hold).
 		&entity.Plan{},
-		&entity.Organization{},
+		&entity.Module{},
 		&entity.Role{},
+
+		// Organization and everything organization-scoped below. Tenant
+		// isolation runs through OrganizationID on every entity in this
+		// group; RolePermission is the one exception worth noting — it's
+		// the per-organization access matrix over the global Role/Module
+		// catalogs above (organization × role × module -> access level).
+		&entity.Organization{},
+		&entity.RolePermission{},
 		&entity.User{},
 		&entity.Farm{},
 		&entity.Producer{},
@@ -56,8 +67,6 @@ func NewConnection(databaseURL string, log *slog.Logger, gormLevel slog.Level) (
 		&entity.CostAllocation{},
 		&entity.CostAllocationItem{},
 		&entity.Alert{},
-		&entity.Module{},
-		&entity.RolePermission{},
 	); err != nil {
 		return nil, fmt.Errorf("auto migrate: %w", err)
 	}

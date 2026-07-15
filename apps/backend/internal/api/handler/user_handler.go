@@ -41,24 +41,21 @@ type updateUserRequest struct {
 	IsActive *bool   `json:"is_active"`
 }
 
-// resolveRoleID validates the request's role reference against the
-// organization's roles and returns a concrete RoleID, defaulting to
+// resolveRoleID validates the request's role reference against the global
+// roles catalog and returns a concrete RoleID, defaulting to
 // "operador_campo" when nothing was supplied.
-func (h *UserHandler) resolveRoleID(organizationID, roleID, roleKey string) (string, error) {
+func (h *UserHandler) resolveRoleID(roleID, roleKey string) (string, error) {
 	if roleID != "" {
 		role, err := h.roleSvc.GetByID(roleID)
 		if err != nil {
 			return "", err
-		}
-		if role.OrganizationID != nil && *role.OrganizationID != organizationID {
-			return "", service.ErrForbiddenOrg
 		}
 		return role.ID, nil
 	}
 	if roleKey == "" {
 		roleKey = "operador_campo"
 	}
-	role, err := h.roleSvc.FindByKey(organizationID, roleKey)
+	role, err := h.roleSvc.FindByKey(roleKey)
 	if err != nil {
 		return "", err
 	}
@@ -109,7 +106,7 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roleID, err := h.resolveRoleID(req.OrganizationID, req.RoleID, req.Role)
+	roleID, err := h.resolveRoleID(req.RoleID, req.Role)
 	if err != nil {
 		writeError(w, "invalid role", http.StatusBadRequest)
 		return
@@ -182,7 +179,7 @@ func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 		if req.Role != nil {
 			roleKey = *req.Role
 		}
-		resolved, err := h.resolveRoleID(existing.OrganizationID, roleID, roleKey)
+		resolved, err := h.resolveRoleID(roleID, roleKey)
 		if err != nil {
 			writeError(w, "invalid role", http.StatusBadRequest)
 			return
@@ -295,7 +292,7 @@ func (h *UserHandler) CreateForOrg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roleID, err := h.resolveRoleID(organizationID, req.RoleID, req.Role)
+	roleID, err := h.resolveRoleID(req.RoleID, req.Role)
 	if err != nil {
 		writeError(w, "invalid role", http.StatusBadRequest)
 		return
@@ -371,7 +368,7 @@ func (h *UserHandler) UpdateForOrg(w http.ResponseWriter, r *http.Request) {
 		if req.Role != nil {
 			roleKey = *req.Role
 		}
-		resolved, err := h.resolveRoleID(organizationID, roleID, roleKey)
+		resolved, err := h.resolveRoleID(roleID, roleKey)
 		if err != nil {
 			writeError(w, "invalid role", http.StatusBadRequest)
 			return

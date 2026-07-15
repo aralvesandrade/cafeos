@@ -150,7 +150,7 @@ func NewPermissionService(repo repository.PermissionRepository, roleRepo reposit
 // It assumes the organization's roles have already been seeded (see
 // RoleService.SeedDefaultsIfMissing), since it needs each role's ID.
 func (s *PermissionService) SeedDefaults(organizationID string) error {
-	roles, err := s.roleRepo.ListForOrganization(organizationID)
+	roles, err := s.roleRepo.List()
 	if err != nil {
 		return err
 	}
@@ -202,12 +202,8 @@ func (s *PermissionService) ListByOrganization(organizationID string) ([]*entity
 }
 
 func (s *PermissionService) Update(organizationID, roleID string, module entity.ModuleKey, access entity.AccessLevel) error {
-	role, err := s.roleRepo.GetByID(roleID)
-	if err != nil {
+	if _, err := s.roleRepo.GetByID(roleID); err != nil {
 		return errors.New("invalid role")
-	}
-	if role.OrganizationID != nil && *role.OrganizationID != organizationID {
-		return errors.New("role does not belong to this organization")
 	}
 	if !validModule(module) {
 		return errors.New("invalid module")
@@ -271,7 +267,7 @@ func (s *PermissionService) loadOrganization(organizationID string) (map[string]
 	if err != nil {
 		return nil, err
 	}
-	roles, err := s.roleRepo.ListForOrganization(organizationID)
+	roles, err := s.roleRepo.List()
 	if err != nil {
 		return nil, err
 	}

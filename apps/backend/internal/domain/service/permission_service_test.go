@@ -9,8 +9,8 @@ import (
 	"github.com/google/uuid"
 )
 
-// seedTestRoles populates the given role repo with the ten default roles
-// (two system + eight org-scoped) for "org-1", returning role IDs by key.
+// seedTestRoles populates the given role repo with the ten default global
+// roles (two system + eight regular), returning role IDs by key.
 func seedTestRoles(t *testing.T, repo *mock.InMemoryRoleRepo) map[string]string {
 	t.Helper()
 	ids := make(map[string]string)
@@ -21,9 +21,8 @@ func seedTestRoles(t *testing.T, repo *mock.InMemoryRoleRepo) map[string]string 
 		}
 		ids[key] = role.ID
 	}
-	org := "org-1"
-	for _, key := range entity.DefaultOrgRoleKeys {
-		role := &entity.Role{ID: uuid.New().String(), OrganizationID: &org, Key: key, Name: key, CreatedAt: time.Now(), UpdatedAt: time.Now()}
+	for _, key := range entity.DefaultRoleKeys {
+		role := &entity.Role{ID: uuid.New().String(), Key: key, Name: key, CreatedAt: time.Now(), UpdatedAt: time.Now()}
 		if err := repo.Create(role); err != nil {
 			t.Fatalf("seed role %s: %v", key, err)
 		}

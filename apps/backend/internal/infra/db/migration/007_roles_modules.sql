@@ -1,33 +1,26 @@
--- CafeOS - Migration 007: Roles e Modules (cadastro configurável de papéis
--- e catálogo de módulos)
+-- CafeOS - Migration 007: Roles e Modules (catálogo global configurável de
+-- papéis e módulos)
 -- NOTE: schema is authoritatively managed by GORM AutoMigrate (see
 -- internal/infra/db/postgres/connection.go). This file exists for parity
 -- with the docker-compose bootstrap and as documentation of the tables
 -- added in this change; it is not run by a migration tool.
 --
 -- roles substitui as antigas 10 constantes UserRole hardcoded em código.
--- platform_owner e organization_admin são papéis de sistema
--- (organization_id NULL, is_system true), compartilhados por todas as
--- organizações e não editáveis/deletáveis. Todo outro papel pertence a uma
--- única organização: os oito papéis padrão (proprietario, gerente_agricola,
--- ...) são semeados como "kit inicial" editável na criação da organização,
--- e admins podem criar papéis adicionais (ex: "colhedor_chefe") pela tela
--- de Papéis.
+-- Assim como modules, é um catálogo GLOBAL — não organization-scoped —
+-- compartilhado por toda a plataforma. platform_owner e organization_admin
+-- são papéis de sistema (is_system true) e não são editáveis/deletáveis;
+-- todo outro papel pode ser renomeado, criado ou removido (se não estiver
+-- em uso) pela tela de Papéis. O que varia por organização é o ACESSO de
+-- cada papel a cada módulo (ver role_permissions), não o conjunto de
+-- papéis disponíveis.
 CREATE TABLE IF NOT EXISTS roles (
-    id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    organization_id UUID NULL,
-    key             VARCHAR(64) NOT NULL,
-    name            VARCHAR(120) NOT NULL,
-    is_system       BOOLEAN NOT NULL DEFAULT false,
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+    id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    key         VARCHAR(64) NOT NULL UNIQUE,
+    name        VARCHAR(120) NOT NULL,
+    is_system   BOOLEAN NOT NULL DEFAULT false,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
--- Partial unique indexes: a key must be unique among an organization's own
--- roles, and unique among the (organization-less) global system roles.
-CREATE UNIQUE INDEX IF NOT EXISTS idx_roles_org_key
-    ON roles (organization_id, key) WHERE organization_id IS NOT NULL;
-CREATE UNIQUE INDEX IF NOT EXISTS idx_roles_system_key
-    ON roles (key) WHERE organization_id IS NULL;
 
 -- modules is a global catalog of the application's fixed screens/areas.
 -- Route wiring in router.go still references the module key directly
@@ -43,27 +36,38 @@ CREATE TABLE IF NOT EXISTS modules (
 );
 
 -- role_permissions.role_id replaces the old role_permissions.role string
--- column, now pointing at roles.id.
+-- column, now pointing at roles.id. The table itself stays
+-- organization-scoped — it's the per-org access matrix over the global
+-- roles/modules catalogs above, hence the three FKs.
 ALTER TABLE role_permissions ADD COLUMN IF NOT EXISTS role_id UUID;
+ALTER TABLE role_permissions
+    ADD CONSTRAINT fk_role_permissions_organization FOREIGN KEY (organization_id) REFERENCES organizations(id),
+    ADD CONSTRAINT fk_role_permissions_role FOREIGN KEY (role_id) REFERENCES roles(id),
+    ADD CONSTRAINT fk_role_permissions_module_catalog FOREIGN KEY (module) REFERENCES modules(key);
+
 -- users.role_id replaces the old users.role string column.
 ALTER TABLE users ADD COLUMN IF NOT EXISTS role_id UUID;
+ALTER TABLE users
+    ADD CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles(id);
 
 -- Data backfill (run once, in order, against a database still carrying the
--- legacy `role`/`role` VARCHAR columns):
+-- legacy `role` VARCHAR columns):
 --   1. INSERT INTO roles (id, key, name, is_system) VALUES
 --        (uuid_generate_v4(), 'platform_owner', 'Platform Owner', true),
---        (uuid_generate_v4(), 'organization_admin', 'Admin da Organização', true);
---   2. For each organization, INSERT INTO roles (id, organization_id, key, name)
---      one row per legacy UserRole key (proprietario, gerente_agricola,
---      engenheiro_agronomo, tecnico_agricola, operador_campo, financeiro,
---      consultor_externo, auditor).
---   3. UPDATE role_permissions rp SET role_id = r.id FROM roles r
---        WHERE r.key = rp.role AND (r.organization_id = rp.organization_id OR r.organization_id IS NULL);
---   4. UPDATE users u SET role_id = r.id FROM roles r
---        WHERE r.key = u.role AND (r.organization_id = u.organization_id OR r.organization_id IS NULL);
---   5. ALTER TABLE role_permissions ALTER COLUMN role_id SET NOT NULL, DROP COLUMN role;
---   6. ALTER TABLE users ALTER COLUMN role_id SET NOT NULL, DROP COLUMN role;
+--        (uuid_generate_v4(), 'organization_admin', 'Admin da Organização', true),
+--        (uuid_generate_v4(), 'proprietario', 'Proprietário', false),
+--        (uuid_generate_v4(), 'gerente_agricola', 'Gerente Agrícola', false),
+--        (uuid_generate_v4(), 'engenheiro_agronomo', 'Engenheiro Agrônomo', false),
+--        (uuid_generate_v4(), 'tecnico_agricola', 'Técnico Agrícola', false),
+--        (uuid_generate_v4(), 'operador_campo', 'Operador de Campo', false),
+--        (uuid_generate_v4(), 'financeiro', 'Financeiro', false),
+--        (uuid_generate_v4(), 'consultor_externo', 'Consultor Externo', false),
+--        (uuid_generate_v4(), 'auditor', 'Auditor', false);
+--   2. UPDATE role_permissions rp SET role_id = r.id FROM roles r WHERE r.key = rp.role;
+--   3. UPDATE users u SET role_id = r.id FROM roles r WHERE r.key = u.role;
+--   4. ALTER TABLE role_permissions ALTER COLUMN role_id SET NOT NULL, DROP COLUMN role;
+--   5. ALTER TABLE users ALTER COLUMN role_id SET NOT NULL, DROP COLUMN role;
 -- (In this codebase the equivalent seeding is done by
--- RoleService.SeedSystemRolesIfMissing/SeedDefaultsIfMissing at API boot —
--- see internal/api/router.go — since there was no production data to
--- migrate at the time this feature shipped.)
+-- RoleService.SeedDefaultsIfMissing at API boot — see
+-- internal/api/router.go — since there was no production data to migrate
+-- at the time this feature shipped.)
