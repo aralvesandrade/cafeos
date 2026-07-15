@@ -91,7 +91,7 @@ export function Financial() {
 
   return (<div className="space-y-6">
     <div className="flex items-center justify-between flex-wrap gap-4">
-      <div><h1 className="text-2xl font-bold text-primary">Financeiro</h1><p className="text-sm text-muted-foreground">Contas a pagar e receber</p></div>
+      <div><h1 className="font-display text-2xl font-semibold text-foreground">Financeiro</h1><p className="text-sm text-muted-foreground">Contas a pagar e receber</p></div>
       <div className="flex gap-3">
         <Select value={farmFilter} onChange={(e) => setFarmFilter(e.target.value)} className="w-48">
           <option value="">Todas as fazendas</option>

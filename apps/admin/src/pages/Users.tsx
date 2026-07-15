@@ -98,7 +98,7 @@ export function Users() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Usuários</h1>
+          <h1 className="font-display text-2xl font-semibold text-foreground">Usuários</h1>
           <p className="text-sm text-muted-foreground">Gerenciar usuários do sistema</p>
         </div>
         <Button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: '', role: '', organization_id: '', status: 'active' }); setDialogOpen(true) }}>

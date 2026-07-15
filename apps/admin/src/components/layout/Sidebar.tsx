@@ -74,11 +74,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      'flex items-center gap-3 rounded-lg text-sm transition-colors',
+      'flex items-center gap-3 rounded-md text-sm transition-colors border-l-2',
       collapsed ? 'justify-center px-2 py-2' : 'px-3 py-2',
       isActive
-        ? 'bg-sidebar-active-bg text-sidebar-active-foreground font-medium'
-        : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50'
+        ? 'bg-sidebar-active-bg text-sidebar-active-foreground font-medium border-sidebar-accent'
+        : 'border-transparent text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50'
     )
 
   return (
@@ -98,8 +98,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         )}
       >
         <div className={cn('flex items-center h-16 border-b border-sidebar-border', collapsed ? 'justify-center px-2' : 'justify-between px-4')}>
-          <NavLink to="/" className="flex items-center gap-2 font-bold text-lg text-foreground">
-            <span className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+          <NavLink to="/" className="flex items-center gap-2 font-display font-semibold text-lg text-sidebar-active-foreground">
+            <span className="w-7 h-7 rounded-md bg-sidebar-accent text-sidebar-active-foreground flex items-center justify-center shrink-0">
               <Sprout className="h-4 w-4" />
             </span>
             {!collapsed && 'CafeOS'}

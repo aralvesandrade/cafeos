@@ -94,7 +94,7 @@ export function CostCenters() {
 
   return (<div className="space-y-6">
     <div className="flex items-center justify-between">
-      <div><h1 className="text-2xl font-bold text-primary">Centros de Custo</h1><p className="text-sm text-muted-foreground">Plano de contas para receitas e despesas</p></div>
+      <div><h1 className="font-display text-2xl font-semibold text-foreground">Centros de Custo</h1><p className="text-sm text-muted-foreground">Plano de contas para receitas e despesas</p></div>
       <Button onClick={() => { setEditing(null); setForm(emptyForm); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Novo Centro de Custo</Button>
     </div>
     <Table>

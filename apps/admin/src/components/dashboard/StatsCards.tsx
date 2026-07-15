@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Sprout, DollarSign, MapPin, Grid3X3, TrendingUp } from "lucide-react";
 
 interface Stats {
@@ -63,17 +62,17 @@ export function StatsCards({ stats }: { stats: Stats }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {items.map((item) => (
-        <Card key={item.label} title={item.title}>
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-              <item.icon className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">{item.label}</p>
-              <p className="text-xl font-bold text-primary">{item.value}</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div
+          key={item.label}
+          title={item.title}
+          className="bg-card border border-border rounded-lg px-4 pt-3 pb-4 border-t-2 border-t-primary"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground">{item.label}</p>
+            <item.icon className="h-3.5 w-3.5 text-muted-foreground" />
+          </div>
+          <p className="font-mono text-2xl font-medium text-foreground tabular-nums">{item.value}</p>
+        </div>
       ))}
     </div>
   );

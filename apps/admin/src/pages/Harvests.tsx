@@ -79,7 +79,7 @@ export function Harvests() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Safras</h1>
+          <h1 className="font-display text-2xl font-semibold text-foreground">Safras</h1>
           <p className="text-sm text-muted-foreground">Gerencie as safras da sua propriedade</p>
         </div>
         <Button onClick={() => setDialogOpen(true)}><Plus className="h-4 w-4" /> Nova Safra</Button>

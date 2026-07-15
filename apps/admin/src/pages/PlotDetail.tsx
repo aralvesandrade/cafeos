@@ -100,7 +100,7 @@ export function PlotDetail() {
           <Button variant="ghost" size="sm" onClick={() => navigate('/plots')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold text-primary">{plot.name}</h1>
+          <h1 className="font-display text-2xl font-semibold text-foreground">{plot.name}</h1>
         </div>
         <Button variant="outline" size="sm" asChild>
           <Link to={`/plots/${plotId}/edit`}>

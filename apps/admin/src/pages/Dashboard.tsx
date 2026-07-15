@@ -59,7 +59,7 @@ export function Dashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
+          <h1 className="font-display text-2xl font-semibold text-foreground">Dashboard</h1>
           <p className="text-sm text-muted-foreground">Visão geral da sua produção</p>
         </div>
         <div className="flex gap-3">

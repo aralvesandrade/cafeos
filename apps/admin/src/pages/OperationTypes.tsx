@@ -71,7 +71,7 @@ export function OperationTypes() {
 
   return (<div className="space-y-6">
     <div className="flex items-center justify-between">
-      <div><h1 className="text-2xl font-bold text-primary">Tipos de Operação</h1><p className="text-sm text-muted-foreground">Cadastro de tipos de operações agrícolas</p></div>
+      <div><h1 className="font-display text-2xl font-semibold text-foreground">Tipos de Operação</h1><p className="text-sm text-muted-foreground">Cadastro de tipos de operações agrícolas</p></div>
       <Button onClick={() => { setEditing(null); setForm(emptyForm); setDialogOpen(true) }}><Plus className="h-4 w-4" /> Novo Tipo</Button>
     </div>
     <Table>

@@ -97,7 +97,7 @@ export function OperationDetail() {
           <Button variant="ghost" size="sm" onClick={() => navigate('/operations')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold text-primary">Operação</h1>
+          <h1 className="font-display text-2xl font-semibold text-foreground">Operação</h1>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => navigate(`/operations?edit=${operation.id}`)}>

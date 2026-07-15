@@ -173,7 +173,7 @@ export function FarmEdit() {
         <Button variant="ghost" size="sm" onClick={() => navigate('/farms')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-2xl font-bold text-primary">{isEditing ? 'Editar Fazenda' : 'Nova Fazenda'}</h1>
+        <h1 className="font-display text-2xl font-semibold text-foreground">{isEditing ? 'Editar Fazenda' : 'Nova Fazenda'}</h1>
       </div>
 
       <FarmForm

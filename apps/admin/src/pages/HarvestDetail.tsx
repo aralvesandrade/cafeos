@@ -194,7 +194,7 @@ export function HarvestDetail() {
           <Button variant="ghost" size="sm" onClick={() => navigate('/harvests')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
+          <h1 className="font-display text-2xl font-semibold text-foreground flex items-center gap-2">
             <Calendar className="h-6 w-6" />
             Safra {harvest.year}
           </h1>

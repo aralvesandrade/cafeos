@@ -5,7 +5,7 @@ Painel administrativo do CafeOS, plataforma SaaS multi-tenant para cafeicultura.
 ## Stack
 
 - **Vite** + **React** + **TypeScript**
-- **Tailwind CSS v4** com tokens semânticos do CafeOS Design System (shadcn-style, verde `primary` + neutros zinc), suporte a light/dark
+- **Tailwind CSS v4** com tokens semânticos do CafeOS Design System (shadcn-style), identidade visual "armazém/torrefação" compartilhada com o frontend — base `paper`/`ink`, acento `terreiro`/`gold`, tipografia `Fraunces` + `Inter` + `IBM Plex Mono` —, suporte a light/dark
 - **React Router DOM v7** (nested layouts)
 - **Recharts** (gráficos)
 - **Lucide React** (ícones)
@@ -38,6 +38,23 @@ src/
 ## Tema (light/dark)
 
 Tokens semânticos (`background`, `foreground`, `card`, `primary`, `sidebar`, etc.) definidos em `src/index.css` como variáveis CSS, com overrides em `.dark`. `ThemeProvider` (`src/lib/theme.tsx`) alterna a classe `.dark` no `<html>` e persiste a escolha em `localStorage` (`cafeos_theme`); sem preferência salva, segue `prefers-color-scheme`. Toggle disponível no rodapé do Sidebar (área logada) e na tela de login (`AuthLayout`).
+
+## Paleta de Cores
+
+Mesma identidade material do café aplicada no [frontend](../frontend/README.md) — terreiro de secagem, cereja madura, ficha de manifesto/pesagem — adaptada para uma superfície de trabalho densa em dados (fundo claro por padrão, sidebar como "rail" escuro fixo, âncora de marca independente do tema).
+
+| Token                       | Light     | Dark      | Uso                                          |
+| --------------------------- | --------- | --------- | --------------------------------------------- |
+| `--background`               | #F7F2E7   | #171009   | Fundo da página (paper / ink)                 |
+| `--card`                     | #FFFDF8   | #221807   | Superfície de card/tabela                      |
+| `--foreground`               | #1D1409   | #F1E6D2   | Texto principal                                |
+| `--primary`                  | #C1552F   | #D97250   | Ação primária (terreiro)                       |
+| `--gold`                     | #A9782E   | #D2A44C   | Ênfase em valores monetários                   |
+| `--border` / `--muted`       | tons quentes de bege | tons quentes de marrom | Divisores e superfícies neutras |
+| `--sidebar`                  | #1C1307 (fixo) | #120C05 (fixo) | Rail de navegação — sempre escuro, âncora de marca constante nos dois temas |
+| `--sidebar-accent`           | #D97250   | #D97250   | Tick de item ativo no Sidebar                  |
+
+Tipografia: `Fraunces` (display, só em `<h1>` de página — um momento de marca por tela), `Inter` (UI/formulários/tabelas), `IBM Plex Mono` (números — StatsCards em estilo "ficha de pesagem": rule superior terreiro, label mono maiúsculo, valor em mono tabular).
 
 ## Sidebar colapsável
 

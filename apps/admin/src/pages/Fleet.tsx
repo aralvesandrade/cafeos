@@ -102,7 +102,7 @@ export function Fleet() {
 
   return (<div className="space-y-6">
     <div className="flex items-center justify-between flex-wrap gap-4">
-      <div><h1 className="text-2xl font-bold text-primary">Frota</h1><p className="text-sm text-muted-foreground">Veículos e manutenções</p></div>
+      <div><h1 className="font-display text-2xl font-semibold text-foreground">Frota</h1><p className="text-sm text-muted-foreground">Veículos e manutenções</p></div>
       <div className="flex gap-2 flex-wrap">
         <Select value={farmFilter} onChange={(e) => setFarmFilter(e.target.value)} className="w-48">
           <option value="">Todas as fazendas</option>
