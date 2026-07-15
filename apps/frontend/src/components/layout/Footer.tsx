@@ -1,4 +1,16 @@
-import { Sprout, Mail, Globe, ExternalLink } from 'lucide-react'
+import { Sprout, Mail, ArrowUpRight } from 'lucide-react'
+
+const productLinks = [
+  { label: 'Funcionalidades', href: '#features' },
+  { label: 'Ciclo do Café', href: '#coffee-cycle' },
+  { label: 'Indicadores Estratégicos', href: '#indicators' },
+  { label: 'Planos', href: '#plans' },
+]
+
+const companyLinks = [
+  { label: 'Por que o CafeOS?', href: '#about' },
+  { label: 'Acessar plataforma', href: 'http://localhost:5174', external: true },
+]
 
 export function Footer() {
   return (
@@ -6,42 +18,60 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
+            <a href="#" className="flex items-center gap-2 mb-4">
               <Sprout className="h-6 w-6 text-terreiro" />
               <span className="font-display text-lg font-semibold">CafeOS</span>
-            </div>
-            <p className="text-muted text-sm max-w-md">
+            </a>
+            <p className="text-muted text-sm max-w-md mb-6">
               A plataforma especialista em cafeicultura. Gestão operacional,
-              produtiva, financeira e analítica para propriedades cafeeiras.
+              produtiva, financeira e analítica para propriedades cafeeiras —
+              do talhão à colheita, com indicadores precisos em cada fase da
+              safra.
             </p>
+            <a
+              href="mailto:contato@cafeos.com.br"
+              className="inline-flex items-center gap-2 text-sm text-muted hover:text-terreiro-light transition-colors"
+            >
+              <Mail className="h-4 w-4" /> contato@cafeos.com.br
+            </a>
           </div>
 
           <div>
             <h4 className="font-display font-semibold mb-4">Produto</h4>
             <ul className="space-y-2 text-sm text-muted">
-              <li><a href="#features" className="hover:text-parchment transition-colors">Funcionalidades</a></li>
-              <li><a href="#plans" className="hover:text-parchment transition-colors">Planos</a></li>
+              {productLinks.map((link) => (
+                <li key={link.href}>
+                  <a href={link.href} className="hover:text-parchment transition-colors">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
           <div>
-            <h4 className="font-display font-semibold mb-4">Contato</h4>
+            <h4 className="font-display font-semibold mb-4">Empresa</h4>
             <ul className="space-y-2 text-sm text-muted">
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4" /> contato@cafeos.com.br
-              </li>
-              <li className="flex items-center gap-2">
-                <Globe className="h-4 w-4" /> github.com/cafeos
-              </li>
-              <li className="flex items-center gap-2">
-                <ExternalLink className="h-4 w-4" /> linkedin.com/company/cafeos
-              </li>
+              {companyLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    target={link.external ? '_blank' : undefined}
+                    rel={link.external ? 'noopener noreferrer' : undefined}
+                    className="inline-flex items-center gap-1 hover:text-parchment transition-colors"
+                  >
+                    {link.label}
+                    {link.external && <ArrowUpRight className="h-3.5 w-3.5" />}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-rule text-center text-sm text-muted font-mono">
+        <div className="mt-8 pt-8 border-t border-rule flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted font-mono">
           <p>&copy; {new Date().getFullYear()} CafeOS. Todos os direitos reservados.</p>
+          <p className="text-xs tracking-wide">Feito para quem cultiva café, sacas depois de sacas.</p>
         </div>
       </div>
     </footer>

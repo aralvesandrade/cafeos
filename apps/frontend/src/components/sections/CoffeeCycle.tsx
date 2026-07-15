@@ -4,8 +4,8 @@ const phases = [
   { icon: Flower2, label: 'Florada', months: 'Set–Out', color: '#e8dcc0', desc: 'Floração do cafeeiro, definição do potencial produtivo' },
   { icon: Circle, label: 'Chumbinho', months: 'Nov–Dez', color: '#8fae72', desc: 'Formação inicial dos frutos' },
   { icon: Ellipsis, label: 'Granação', months: 'Jan–Mar', color: '#5c7a52', desc: 'Desenvolvimento e enchimento dos grãos' },
-  { icon: Leaf, label: 'Maturação', months: 'Abr–Mai', color: '#d2a44c', desc: 'Amadurecimento dos frutos para colheita' },
-  { icon: Cherry, label: 'Colheita', months: 'Mai–Set', color: '#c1552f', desc: 'Colheita seletiva ou total dos frutos maduros' },
+  { icon: Leaf, label: 'Maturação', months: 'Abr–Jun', color: '#d2a44c', desc: 'Amadurecimento dos frutos para colheita' },
+  { icon: Cherry, label: 'Colheita', months: 'Mai–Ago', color: '#c1552f', desc: 'Colheita seletiva ou total dos frutos maduros' },
 ]
 
 export function CoffeeCycle() {
