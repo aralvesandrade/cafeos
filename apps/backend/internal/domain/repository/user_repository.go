@@ -11,4 +11,5 @@ type UserRepository interface {
 	Update(user *entity.User) error
 	Delete(id string) error
 	CountByRole(roleID string) (int64, error)
+	CountByOrganization(organizationID string) (int64, error)
 }

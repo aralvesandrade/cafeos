@@ -31,13 +31,17 @@ var defaultMatrix = map[entity.ModuleKey]map[string]entity.AccessLevel{
 		"consultor_externo":                entity.AccessRead,
 		"auditor":                          entity.AccessRead,
 	},
+	// Only organization_admin (besides platform_owner) registers farms by
+	// default — everyone else can view but not create/edit/delete. Also
+	// gates the farm↔user links (Farm.Producers), since those are set
+	// through the same create/update endpoints.
 	entity.ModuleFarms: {
 		entity.SystemRolePlatformOwner:     entity.AccessWrite,
 		entity.SystemRoleOrganizationAdmin: entity.AccessWrite,
-		"proprietario":                     entity.AccessWrite,
-		"gerente_agricola":                 entity.AccessWrite,
-		"engenheiro_agronomo":              entity.AccessWrite,
-		"tecnico_agricola":                 entity.AccessWrite,
+		"proprietario":                     entity.AccessRead,
+		"gerente_agricola":                 entity.AccessRead,
+		"engenheiro_agronomo":              entity.AccessRead,
+		"tecnico_agricola":                 entity.AccessRead,
 		"operador_campo":                   entity.AccessRead,
 		"financeiro":                       entity.AccessRead,
 		"consultor_externo":                entity.AccessRead,
@@ -94,10 +98,12 @@ var defaultMatrix = map[entity.ModuleKey]map[string]entity.AccessLevel{
 	// Users covers the org-scoped team roster (POST/GET/PUT/DELETE
 	// /{organization_id}/users) — distinct from the cross-tenant
 	// /admin/users screen, which stays platform_owner-only regardless.
+	// Only organization_admin registers new users by default; proprietario
+	// can still view the roster but not create/edit/delete.
 	entity.ModuleUsers: {
 		entity.SystemRolePlatformOwner:     entity.AccessWrite,
 		entity.SystemRoleOrganizationAdmin: entity.AccessWrite,
-		"proprietario":                     entity.AccessWrite,
+		"proprietario":                     entity.AccessRead,
 		"gerente_agricola":                 entity.AccessNone,
 		"engenheiro_agronomo":              entity.AccessNone,
 		"tecnico_agricola":                 entity.AccessNone,

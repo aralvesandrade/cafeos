@@ -58,3 +58,9 @@ func (r *UserRepository) CountByRole(roleID string) (int64, error) {
 	err := r.db.Model(&entity.User{}).Where("role_id = ?", roleID).Count(&count).Error
 	return count, err
 }
+
+func (r *UserRepository) CountByOrganization(organizationID string) (int64, error) {
+	var count int64
+	err := r.db.Model(&entity.User{}).Where("organization_id = ?", organizationID).Count(&count).Error
+	return count, err
+}

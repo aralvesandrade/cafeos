@@ -62,6 +62,25 @@ func (h *UserHandler) resolveRoleID(roleID, roleKey string) (string, error) {
 	return role.ID, nil
 }
 
+// resolveRoleIDForCreate is like resolveRoleID, but the organization's very
+// first user always becomes organization_admin regardless of what was
+// requested — every organization needs one administrator able to register
+// farms and other users, and nothing else guarantees that today.
+func (h *UserHandler) resolveRoleIDForCreate(organizationID, roleID, roleKey string) (string, error) {
+	count, err := h.repo.CountByOrganization(organizationID)
+	if err != nil {
+		return "", err
+	}
+	if count == 0 {
+		role, err := h.roleSvc.FindByKey(entity.SystemRoleOrganizationAdmin)
+		if err != nil {
+			return "", err
+		}
+		return role.ID, nil
+	}
+	return h.resolveRoleID(roleID, roleKey)
+}
+
 // List retorna todos os usuários
 // @Summary Listar usuários
 // @Description Lista todos os usuários (somente platform_owner)
@@ -106,7 +125,7 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roleID, err := h.resolveRoleID(req.RoleID, req.Role)
+	roleID, err := h.resolveRoleIDForCreate(req.OrganizationID, req.RoleID, req.Role)
 	if err != nil {
 		writeError(w, "invalid role", http.StatusBadRequest)
 		return
@@ -292,7 +311,7 @@ func (h *UserHandler) CreateForOrg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roleID, err := h.resolveRoleID(req.RoleID, req.Role)
+	roleID, err := h.resolveRoleIDForCreate(organizationID, req.RoleID, req.Role)
 	if err != nil {
 		writeError(w, "invalid role", http.StatusBadRequest)
 		return

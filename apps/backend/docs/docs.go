@@ -6197,6 +6197,9 @@ const docTemplate = `{
                 "rg": {
                     "type": "string"
                 },
+                "role_id": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
                 },
@@ -6748,8 +6751,11 @@ const docTemplate = `{
                         "$ref": "#/definitions/entity.Plot"
                     }
                 },
-                "producer": {
-                    "$ref": "#/definitions/entity.Producer"
+                "producers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Producer"
+                    }
                 },
                 "production_system": {
                     "type": "string"
@@ -7149,8 +7155,11 @@ const docTemplate = `{
                 "planted_area_ha": {
                     "type": "number"
                 },
-                "producer": {
-                    "$ref": "#/definitions/handler.producerRequest"
+                "producers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.producerRequest"
+                    }
                 },
                 "production_system": {
                     "type": "string"
@@ -7654,6 +7663,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "rg": {
+                    "type": "string"
+                },
+                "role_id": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "string"
                 }
             }
