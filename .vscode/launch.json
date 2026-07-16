@@ -87,6 +87,14 @@
   ],
   "compounds": [
     {
+      "name": "API + Admin Panel",
+      "configurations": ["Backend API", "Admin Panel"]
+    },
+    {
+      "name": "API + Frontend",
+      "configurations": ["Backend API", "Frontend"]
+    },
+    {
       "name": "Full Stack",
       "configurations": ["Backend API", "Admin Panel", "Frontend"]
     },
