@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
+import { Field } from '@/components/ui/field'
+import { RequiredLegend } from '@/components/ui/required-legend'
 
 export interface PlotData {
   name: string
@@ -88,15 +90,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-foreground mb-1">{label}</label>
-      {children}
-    </div>
-  )
-}
-
 export function PlotForm({ initial, farms, onSave, onCancel, loading }: PlotFormProps) {
   const [form, setForm] = useState<PlotData>(emptyPlot)
 
@@ -119,20 +112,20 @@ export function PlotForm({ initial, farms, onSave, onCancel, loading }: PlotForm
             <input type="checkbox" checked={form.leased} onChange={(e) => set('leased', e.target.checked)} />
             Arrendado?
           </label>
-          <Field label="Nome do talhão">
+          <Field label="Nome do talhão" required>
             <Input value={form.name} onChange={(e) => set('name', e.target.value)} required />
           </Field>
-          <Field label="Fazenda">
+          <Field label="Fazenda" required>
             <Select value={form.farm_id} onChange={(e) => set('farm_id', e.target.value)} required>
               <option value="">Selecione...</option>
               {farms.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
             </Select>
           </Field>
-          <Field label="Área (ha)">
+          <Field label="Área (ha)" required>
             <Input type="number" step="0.01" value={form.area} onChange={(e) => set('area', e.target.value)} required />
           </Field>
           <Field label="Estágio">
-            <Select value={form.stage} onChange={(e) => set('stage', e.target.value)} required>
+            <Select value={form.stage} onChange={(e) => set('stage', e.target.value)}>
               <option value="formacao">Formação</option>
               <option value="producao">Produção</option>
             </Select>
@@ -229,11 +222,14 @@ export function PlotForm({ initial, farms, onSave, onCancel, loading }: PlotForm
         </div>
       </Section>
 
-      <div className="flex justify-end gap-3 pt-2 sticky bottom-0 bg-background pb-2">
-        <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
-        <Button type="submit" disabled={loading}>
-          {loading ? 'Salvando...' : 'Salvar'}
-        </Button>
+      <div className="flex items-center justify-between gap-3 pt-2 sticky bottom-0 bg-background pb-2">
+        <RequiredLegend />
+        <div className="flex gap-3">
+          <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar'}
+          </Button>
+        </div>
       </div>
     </form>
   )
