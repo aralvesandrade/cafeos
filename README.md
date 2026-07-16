@@ -53,8 +53,7 @@ internal/
     ├── config/           # Configuração via environment variables
     ├── db/
     │   ├── postgres/     # Conexão GORM + AutoMigrate + Transactor
-    │   ├── repository/   # Implementações dos repositórios (GORM + WithTx)
-    │   └── migration/    # Migrations SQL (legado)
+    │   └── repository/   # Implementações dos repositórios (GORM + WithTx)
     └── messaging/        # Integração RabbitMQ (futuro)
 ```
 
@@ -320,7 +319,7 @@ cd apps/backend && go run ./cmd/worker/main.go
 ./scripts/dev.sh mobile    # App mobile na :8081
 
 # Utilitários
-./scripts/dev.sh db:migrate  # Rodar migrations
+./scripts/dev.sh db:migrate  # Aplicar schema via GORM AutoMigrate
 ./scripts/dev.sh db:reset    # Resetar banco
 ./scripts/dev.sh db:seed     # Seed dados iniciais
 ./scripts/dev.sh test        # Testes backend

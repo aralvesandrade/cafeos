@@ -30,7 +30,7 @@ Local infra + services are orchestrated through `scripts/dev.sh` (run from repo 
 ./scripts/dev.sh worker      # RabbitMQ sync worker (go run ./cmd/worker/main.go)
 ./scripts/dev.sh admin       # admin panel dev server
 ./scripts/dev.sh mobile      # expo start --web
-./scripts/dev.sh db:migrate  # apply SQL migrations
+./scripts/dev.sh db:migrate  # apply schema via GORM AutoMigrate (no SQL files)
 ./scripts/dev.sh db:reset    # drop+recreate public schema, re-migrate
 ./scripts/dev.sh db:seed     # go run ./cmd/seed
 ./scripts/dev.sh test        # go test ./... -v (backend)

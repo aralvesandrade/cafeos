@@ -55,13 +55,15 @@ case "${1:-help}" in
     npx expo start --web
     ;;
   db:migrate)
-    echo "Running migrations..."
-    docker compose -f "$ROOT_DIR/docker-compose.yml" exec -T postgres psql -U cafeos -d cafeos < "$ROOT_DIR/apps/backend/internal/infra/db/migration/001_initial_schema.sql"
+    echo "Applying GORM AutoMigrate (schema sync only, no seed data)..."
+    cd "$ROOT_DIR/apps/backend"
+    go run ./cmd/migrate
     ;;
   db:reset)
     echo "Resetting database..."
     docker compose -f "$ROOT_DIR/docker-compose.yml" exec -T postgres psql -U cafeos -d cafeos -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
-    docker compose -f "$ROOT_DIR/docker-compose.yml" exec -T postgres psql -U cafeos -d cafeos < "$ROOT_DIR/apps/backend/internal/infra/db/migration/001_initial_schema.sql"
+    cd "$ROOT_DIR/apps/backend"
+    go run ./cmd/migrate
     ;;
   db:seed)
     echo "Running seed..."
