@@ -29,21 +29,21 @@ const indicators = [
 
 export function Indicators() {
   return (
-    <section className="py-20 bg-ink-raised" id="indicators">
+    <section className="py-20 bg-card" id="indicators">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <h2 className="font-display text-3xl sm:text-4xl font-semibold text-parchment mb-4">
+          <h2 className="font-display text-3xl sm:text-4xl font-semibold text-foreground mb-4">
             Indicadores Estratégicos
           </h2>
-          <p className="text-lg text-muted">
+          <p className="text-lg text-muted-foreground">
             Acompanhe os principais indicadores da sua produção e tome decisões
             baseadas em dados precisos.
           </p>
         </div>
 
         {/* Ficha de pesagem — mesma linguagem do manifesto do Hero, em destaque */}
-        <div className="relative bg-ink border border-rule rounded-sm p-8 sm:p-10">
-          <div className="absolute -top-3 right-6 sm:right-10 bg-gold text-ink text-[10px] font-mono uppercase tracking-widest px-3 py-1 rounded-sm rotate-2 shadow-md">
+        <div className="relative bg-background border border-border rounded-sm p-8 sm:p-10">
+          <div className="absolute -top-3 right-6 sm:right-10 bg-gold text-gold-foreground text-[10px] font-mono uppercase tracking-widest px-3 py-1 rounded-sm rotate-2 shadow-md">
             Safra 2025 · Certificado CafeOS
           </div>
 
@@ -51,14 +51,14 @@ export function Indicators() {
             {indicators.map((indicator, i) => (
               <div
                 key={indicator.label}
-                className={`font-mono ${i > 0 ? 'sm:pl-8 sm:border-l sm:border-rule' : ''}`}
+                className={`font-mono ${i > 0 ? 'sm:pl-8 sm:border-l sm:border-border' : ''}`}
               >
-                <div className="flex items-center gap-2 text-[10px] tracking-widest text-muted mb-2">
-                  <indicator.icon className="h-3.5 w-3.5 text-terreiro-light" />
+                <div className="flex items-center gap-2 text-[10px] tracking-widest text-muted-foreground mb-2">
+                  <indicator.icon className="h-3.5 w-3.5 text-primary" />
                   {indicator.label.toUpperCase()}
                 </div>
                 <div className="text-2xl text-gold font-medium mb-1">{indicator.value}</div>
-                <p className="text-xs text-muted font-sans">{indicator.desc}</p>
+                <p className="text-xs text-muted-foreground font-sans">{indicator.desc}</p>
               </div>
             ))}
           </div>

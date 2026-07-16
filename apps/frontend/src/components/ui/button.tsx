@@ -17,13 +17,13 @@ export function Button({
       className={cn(
         'inline-flex items-center justify-center font-medium rounded-sm transition-all duration-200 cursor-pointer',
         {
-          'bg-terreiro text-parchment hover:bg-terreiro-light shadow-sm hover:shadow-md':
+          'bg-primary text-primary-foreground hover:bg-primary-hover shadow-sm hover:shadow-md':
             variant === 'primary',
-          'bg-gold text-ink hover:brightness-110':
+          'bg-gold text-gold-foreground hover:brightness-110':
             variant === 'secondary',
-          'border border-muted/40 text-parchment hover:border-terreiro hover:text-terreiro':
+          'border border-border text-foreground hover:border-primary hover:text-primary':
             variant === 'outline',
-          'text-muted hover:text-parchment': variant === 'ghost',
+          'text-muted-foreground hover:text-foreground': variant === 'ghost',
         },
         {
           'px-4 py-2 text-sm': size === 'sm',

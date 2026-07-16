@@ -14,12 +14,12 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-ink/90 backdrop-blur-md border-b border-rule">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <a href="#" className="flex items-center gap-2">
-            <Sprout className="h-7 w-7 text-terreiro" />
-            <span className="text-xl font-display font-semibold text-parchment">CafeOS</span>
+            <Sprout className="h-7 w-7 text-primary" />
+            <span className="text-xl font-display font-semibold text-foreground">CafeOS</span>
           </a>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -27,7 +27,7 @@ export function Header() {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm text-muted hover:text-parchment transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 {link.label}
               </a>
@@ -41,7 +41,7 @@ export function Header() {
           </div>
 
           <button
-            className="md:hidden p-2 text-parchment"
+            className="md:hidden p-2 text-foreground"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Menu"
           >
@@ -55,7 +55,7 @@ export function Header() {
               <a
                 key={link.href}
                 href={link.href}
-                className="block py-2 text-muted hover:text-parchment"
+                className="block py-2 text-muted-foreground hover:text-foreground"
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}

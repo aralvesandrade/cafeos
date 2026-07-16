@@ -10,7 +10,7 @@ import { CtaSection } from '@/components/sections/CtaSection'
 
 function App() {
   return (
-    <div className="min-h-screen bg-ink text-parchment">
+    <div className="min-h-screen bg-background text-foreground">
       <Header />
 
       <main>

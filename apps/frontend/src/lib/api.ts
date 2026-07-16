@@ -26,3 +26,33 @@ export async function fetchPlans(): Promise<Plan[]> {
   const plans: Plan[] = await res.json()
   return [...plans].sort((a, b) => a.display_order - b.display_order)
 }
+
+export interface RegisterPayload {
+  name: string
+  email: string
+  password: string
+  phone: string
+  farm_name: string
+  state: string
+  city: string
+  main_crop: string
+  total_area_ha: number
+}
+
+export interface RegisterResponse {
+  user_id: string
+  farm_id: string
+}
+
+export async function registerSignup(payload: RegisterPayload): Promise<RegisterResponse> {
+  const res = await fetch(`${API_BASE}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.error || 'falha ao realizar cadastro')
+  }
+  return res.json()
+}

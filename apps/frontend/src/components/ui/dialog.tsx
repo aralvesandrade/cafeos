@@ -30,14 +30,14 @@ export function Dialog({ open, onClose, title, children }: DialogProps) {
       }}
     >
       <div className="min-h-full flex items-center justify-center">
-        <div className="relative w-full max-w-md rounded-sm bg-parchment p-6 shadow-lg my-8">
+        <div className="relative w-full max-w-md rounded-sm bg-card p-6 shadow-lg my-8">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-ink/40 hover:text-ink"
+          className="absolute top-4 right-4 text-card-foreground/40 hover:text-card-foreground"
         >
           <X className="h-5 w-5" />
         </button>
-        <h2 className="font-display text-lg font-semibold text-ink mb-4">{title}</h2>
+        <h2 className="font-display text-lg font-semibold text-card-foreground mb-4">{title}</h2>
         {children}
       </div>
       </div>

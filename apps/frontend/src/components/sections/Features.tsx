@@ -60,13 +60,13 @@ const features = [
 
 export function Features() {
   return (
-    <section className="py-20 bg-ink-raised" id="features">
+    <section className="py-20 bg-card" id="features">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="font-display text-3xl sm:text-4xl font-semibold text-parchment mb-4">
+          <h2 className="font-display text-3xl sm:text-4xl font-semibold text-foreground mb-4">
             Funcionalidades
           </h2>
-          <p className="text-lg text-muted">
+          <p className="text-lg text-muted-foreground">
             Tudo que você precisa para gerenciar sua propriedade cafeeira do
             plantio à colheita.
           </p>
@@ -76,14 +76,14 @@ export function Features() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="relative bg-ink border border-rule rounded-sm p-6 hover:border-terreiro/50 transition-colors"
+              className="relative bg-background border border-border rounded-sm p-6 hover:border-primary/50 transition-colors"
             >
-              <div className="absolute top-4 left-4 w-1.5 h-1.5 rounded-full bg-rule" />
-              <div className="inline-flex items-center justify-center w-11 h-11 rounded-sm bg-terreiro/10 text-terreiro-light mb-4 mt-2">
+              <div className="absolute top-4 left-4 w-1.5 h-1.5 rounded-full bg-border" />
+              <div className="inline-flex items-center justify-center w-11 h-11 rounded-sm bg-primary/10 text-primary mb-4 mt-2">
                 <feature.icon className="h-5 w-5" />
               </div>
-              <h3 className="font-display font-semibold text-parchment mb-2">{feature.title}</h3>
-              <p className="text-sm text-muted">{feature.desc}</p>
+              <h3 className="font-display font-semibold text-foreground mb-2">{feature.title}</h3>
+              <p className="text-sm text-muted-foreground">{feature.desc}</p>
             </div>
           ))}
         </div>

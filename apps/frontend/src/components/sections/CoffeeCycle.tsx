@@ -10,13 +10,13 @@ const phases = [
 
 export function CoffeeCycle() {
   return (
-    <section className="py-20 bg-ink" id="coffee-cycle">
+    <section className="py-20 bg-background" id="coffee-cycle">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="font-display text-3xl sm:text-4xl font-semibold text-parchment mb-4">
+          <h2 className="font-display text-3xl sm:text-4xl font-semibold text-foreground mb-4">
             Ciclo do Café
           </h2>
-          <p className="text-lg text-muted">
+          <p className="text-lg text-muted-foreground">
             Acompanhe cada fase do ciclo agronômico do cafeeiro, do calendário
             real da arábica brasileira, com suporte especializado da plataforma.
           </p>
@@ -38,13 +38,13 @@ export function CoffeeCycle() {
               >
                 <phase.icon className="h-6 w-6" style={{ color: phase.color }} />
               </div>
-              <span className="text-[10px] font-mono tracking-widest text-muted mb-1">
+              <span className="text-[10px] font-mono tracking-widest text-muted-foreground mb-1">
                 FASE {index + 1} · {phase.months.toUpperCase()}
               </span>
-              <h3 className="font-display font-semibold text-parchment text-sm mb-1">
+              <h3 className="font-display font-semibold text-foreground text-sm mb-1">
                 {phase.label}
               </h3>
-              <p className="text-xs text-muted">{phase.desc}</p>
+              <p className="text-xs text-muted-foreground">{phase.desc}</p>
             </div>
           ))}
         </div>
