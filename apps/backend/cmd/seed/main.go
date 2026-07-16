@@ -180,18 +180,14 @@ func seed(db *gorm.DB) error {
 	}
 
 	// Users
-	// João e Maria são usuários principais independentes: cada um dono do
-	// próprio grupo de fazendas e responsável pelo próprio Plan. Carlos e
-	// Ana são sub-usuários de João (ManagedByUserID setado após a criação,
-	// já que o auto-FK exige que o principal já exista). Rodrigo é
-	// sub-usuário de Maria. Fernanda é admin do tenant (organization_admin),
-	// sem farms/plano próprio.
+	// João (proprietario) dono das fazendas, com sub-usuários Carlos e Ana.
+	// Maria (gerente_agricola) sub-usuário Rodrigo vinculado a ela.
+	// Fernanda é admin do tenant (organization_admin), sem farms/plano.
 	proPlanID := planIDBySlug["pro"]
-	essencialPlanID := planIDBySlug["essencial"]
 	users := []entity.User{
 		{OrganizationID: organization.ID, Name: "Administrador", Email: adminEmail, PasswordHash: hash(adminPass), RoleID: roleIDByKey[entity.SystemRolePlatformOwner], IsActive: true},
 		{OrganizationID: organization.ID, Name: "João Silva", Email: "joao@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.RoleKeyProprietario], IsActive: true, PlanID: &proPlanID},
-		{OrganizationID: organization.ID, Name: "Maria Oliveira", Email: "maria@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.RoleKeyProprietario], IsActive: true, PlanID: &essencialPlanID},
+		{OrganizationID: organization.ID, Name: "Maria Oliveira", Email: "maria@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey["gerente_agricola"], IsActive: true},
 		{OrganizationID: organization.ID, Name: "Carlos Santos", Email: "carlos@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey["engenheiro_agronomo"], IsActive: true},
 		{OrganizationID: organization.ID, Name: "Ana Costa", Email: "ana@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey["operador_campo"], IsActive: true},
 		{OrganizationID: organization.ID, Name: "Fernanda Lima", Email: "fernanda@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.SystemRoleOrganizationAdmin], IsActive: true},

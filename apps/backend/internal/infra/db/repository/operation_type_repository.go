@@ -27,6 +27,12 @@ func (r *OperationTypeRepository) GetByID(id string) (*entity.OperationType, err
 	return &ot, err
 }
 
+func (r *OperationTypeRepository) GetByOrganizationAndCode(organizationID, code string) (*entity.OperationType, error) {
+	var ot entity.OperationType
+	err := r.db.Where("organization_id = ? AND code = ?", organizationID, code).First(&ot).Error
+	return &ot, err
+}
+
 func (r *OperationTypeRepository) ListByOrganization(organizationID string) ([]*entity.OperationType, error) {
 	var ots []*entity.OperationType
 	err := r.db.Where("organization_id = ?", organizationID).Order("name").Find(&ots).Error

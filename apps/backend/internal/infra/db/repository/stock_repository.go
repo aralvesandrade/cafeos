@@ -57,6 +57,12 @@ func (r *StockMovementRepository) Create(mov *entity.StockMovement) error {
 	return r.db.Create(mov).Error
 }
 
+func (r *StockMovementRepository) GetByID(id string) (*entity.StockMovement, error) {
+	var mov entity.StockMovement
+	err := r.db.First(&mov, "id = ?", id).Error
+	return &mov, err
+}
+
 func (r *StockMovementRepository) ListByOrganization(organizationID string) ([]*entity.StockMovement, error) {
 	var movs []*entity.StockMovement
 	err := r.db.Where("organization_id = ?", organizationID).Order("date DESC").Find(&movs).Error

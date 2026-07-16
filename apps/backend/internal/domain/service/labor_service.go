@@ -123,6 +123,10 @@ func (s *LaborService) CreateWorkShift(organizationID, workerID, operationID, no
 	return ws, nil
 }
 
+func (s *LaborService) GetWorkShiftByID(id string) (*entity.WorkShift, error) {
+	return s.shiftRepo.GetByID(id)
+}
+
 func (s *LaborService) ListWorkShifts(organizationID string) ([]*entity.WorkShift, error) {
 	return s.shiftRepo.ListByOrganization(organizationID)
 }

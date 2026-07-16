@@ -12,6 +12,7 @@ type StockItemRepository interface {
 
 type StockMovementRepository interface {
 	Create(mov *entity.StockMovement) error
+	GetByID(id string) (*entity.StockMovement, error)
 	ListByOrganization(organizationID string) ([]*entity.StockMovement, error)
 	ListByItem(itemID string) ([]*entity.StockMovement, error)
 }

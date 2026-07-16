@@ -279,6 +279,27 @@ func (h *StockHandler) RecordMovement(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, mov, http.StatusCreated)
 }
 
+// GetMovementByID retorna uma movimentação de estoque pelo seu ID
+// @Summary Obter movimentação de estoque por ID
+// @Description Retorna uma única movimentação de estoque
+// @Tags stock (Estoque)
+// @Produce json
+// @Param organization_id path string true "ID da Organização"
+// @Param id path string true "ID da Movimentação"
+// @Success 200 {object} entity.StockMovement
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{organization_id}/stock/movements/{id} [get]
+func (h *StockHandler) GetMovementByID(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	mov, err := h.svc.GetMovementByID(id)
+	if err != nil {
+		writeError(w, "movement not found", http.StatusNotFound)
+		return
+	}
+	writeJSON(w, mov, http.StatusOK)
+}
+
 // ListMovements retorna todas as movimentações de estoque da organização autenticada
 // @Summary Listar movimentações de estoque
 // @Description Lista todas as movimentações de estoque pertencentes à organização

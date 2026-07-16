@@ -107,9 +107,11 @@ apps/
 |------|-------|----------|------|
 | Admin | admin@cafeos.com.br | admin123 | platform_owner |
 | Proprietário | joao@cafeos.com.br | 123456 | proprietario |
-| Gerente | maria@cafeos.com.br | 123456 | gerente_agricola |
+| Gerente Agrícola | maria@cafeos.com.br | 123456 | gerente_agricola |
 | Engenheiro | carlos@cafeos.com.br | 123456 | engenheiro_agronomo |
 | Operador | ana@cafeos.com.br | 123456 | operador_campo |
+| Admin Organização | fernanda@cafeos.com.br | 123456 | organization_admin |
+| Consultor | rodrigo@cafeos.com.br | 123456 | consultor_externo |
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,

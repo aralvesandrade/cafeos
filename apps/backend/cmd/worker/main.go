@@ -103,7 +103,7 @@ func processMessage(msg messaging.SyncMessage) error {
 
 type operationPayload struct {
 	PlotID      string  `json:"plot_id"`
-	TypeID      string  `json:"type_id"`
+	Type        string  `json:"type"`
 	Date        string  `json:"date"`
 	Responsible string  `json:"responsible"`
 	ProductUsed string  `json:"product_used"`
@@ -117,12 +117,17 @@ func processOperationCreated(organizationID string, payload []byte) error {
 	if err := json.Unmarshal(payload, &p); err != nil {
 		return err
 	}
+	otRepo := infraRepo.NewOperationTypeRepository(db)
+	ot, err := otRepo.GetByOrganizationAndCode(organizationID, p.Type)
+	if err != nil {
+		return fmt.Errorf("resolve operation type %q: %w", p.Type, err)
+	}
 	repo := infraRepo.NewOperationRepository(db)
 	op := &entity.Operation{
 		ID:             uuid.New().String(),
 		OrganizationID: organizationID,
 		PlotID:         p.PlotID,
-		TypeID:         p.TypeID,
+		TypeID:         ot.ID,
 		Date:           parseTime(p.Date),
 		Responsible:    p.Responsible,
 		ProductUsed:    p.ProductUsed,

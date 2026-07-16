@@ -60,6 +60,10 @@ func (s *StockService) DeleteItem(id string) error {
 	return s.itemRepo.Delete(id)
 }
 
+func (s *StockService) GetMovementByID(id string) (*entity.StockMovement, error) {
+	return s.movRepo.GetByID(id)
+}
+
 func (s *StockService) RecordMovement(organizationID, itemID, movType, reference, notes string, quantity float64, date time.Time) (*entity.StockMovement, error) {
 	if quantity <= 0 {
 		return nil, errors.New("quantity must be greater than zero")

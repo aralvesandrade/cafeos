@@ -72,6 +72,27 @@ func (h *LaborHandler) ListTeams(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, teams, http.StatusOK)
 }
 
+// GetTeamByID retorna uma equipe de trabalho pelo seu ID
+// @Summary Obter equipe de trabalho por ID
+// @Description Retorna uma única equipe de trabalho
+// @Tags labor (Mão de Obra)
+// @Produce json
+// @Param organization_id path string true "ID da Organização"
+// @Param id path string true "ID da Equipe"
+// @Success 200 {object} entity.Team
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{organization_id}/labor/teams/{id} [get]
+func (h *LaborHandler) GetTeamByID(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	team, err := h.svc.GetTeamByID(id)
+	if err != nil {
+		writeError(w, "team not found", http.StatusNotFound)
+		return
+	}
+	writeJSON(w, team, http.StatusOK)
+}
+
 // UpdateTeam atualiza uma equipe de trabalho existente
 // @Summary Atualizar equipe de trabalho
 // @Description Atualiza dados da equipe de trabalho por ID (atualização parcial - somente os campos informados são alterados)
@@ -191,6 +212,27 @@ func (h *LaborHandler) ListWorkers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, workers, http.StatusOK)
+}
+
+// GetWorkerByID retorna um trabalhador pelo seu ID
+// @Summary Obter trabalhador por ID
+// @Description Retorna um único trabalhador
+// @Tags labor (Mão de Obra)
+// @Produce json
+// @Param organization_id path string true "ID da Organização"
+// @Param id path string true "ID do Trabalhador"
+// @Success 200 {object} entity.Worker
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{organization_id}/labor/workers/{id} [get]
+func (h *LaborHandler) GetWorkerByID(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	worker, err := h.svc.GetWorkerByID(id)
+	if err != nil {
+		writeError(w, "worker not found", http.StatusNotFound)
+		return
+	}
+	writeJSON(w, worker, http.StatusOK)
 }
 
 // UpdateWorker atualiza um trabalhador existente
@@ -322,6 +364,27 @@ func (h *LaborHandler) ListWorkShifts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, shifts, http.StatusOK)
+}
+
+// GetWorkShiftByID retorna um turno de trabalho pelo seu ID
+// @Summary Obter turno de trabalho por ID
+// @Description Retorna um único turno de trabalho
+// @Tags labor (Mão de Obra)
+// @Produce json
+// @Param organization_id path string true "ID da Organização"
+// @Param id path string true "ID do Turno de Trabalho"
+// @Success 200 {object} entity.WorkShift
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{organization_id}/labor/shifts/{id} [get]
+func (h *LaborHandler) GetWorkShiftByID(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	shift, err := h.svc.GetWorkShiftByID(id)
+	if err != nil {
+		writeError(w, "work shift not found", http.StatusNotFound)
+		return
+	}
+	writeJSON(w, shift, http.StatusOK)
 }
 
 // DeleteWorkShift remove um turno de trabalho pelo seu ID

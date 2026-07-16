@@ -200,6 +200,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	mux.Handle("DELETE /api/v1/{organization_id}/stock/items/{id}", mchain(entity.ModuleResources, write, stockH.DeleteItem))
 	mux.Handle("POST /api/v1/{organization_id}/stock/movements", mchain(entity.ModuleResources, write, stockH.RecordMovement))
 	mux.Handle("GET /api/v1/{organization_id}/stock/movements", mchain(entity.ModuleResources, read, stockH.ListMovements))
+	mux.Handle("GET /api/v1/{organization_id}/stock/movements/{id}", mchain(entity.ModuleResources, read, stockH.GetMovementByID))
 
 	// Fleet (Phase 2)
 	mux.Handle("POST /api/v1/{organization_id}/fleet/vehicles", mchain(entity.ModuleResources, write, fleetH.CreateVehicle))
@@ -224,6 +225,9 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	mux.Handle("POST /api/v1/{organization_id}/labor/shifts", mchain(entity.ModuleResources, write, laborH.CreateWorkShift))
 	mux.Handle("GET /api/v1/{organization_id}/labor/shifts", mchain(entity.ModuleResources, read, laborH.ListWorkShifts))
 	mux.Handle("DELETE /api/v1/{organization_id}/labor/shifts/{id}", mchain(entity.ModuleResources, write, laborH.DeleteWorkShift))
+	mux.Handle("GET /api/v1/{organization_id}/labor/teams/{id}", mchain(entity.ModuleResources, read, laborH.GetTeamByID))
+	mux.Handle("GET /api/v1/{organization_id}/labor/workers/{id}", mchain(entity.ModuleResources, read, laborH.GetWorkerByID))
+	mux.Handle("GET /api/v1/{organization_id}/labor/shifts/{id}", mchain(entity.ModuleResources, read, laborH.GetWorkShiftByID))
 
 	// Admin — Organization management (platform_owner only)
 	adminChain := func(h http.HandlerFunc) http.Handler {
