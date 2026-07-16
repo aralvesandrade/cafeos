@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Field } from '@/components/ui/field'
 import { RequiredLegend } from '@/components/ui/required-legend'
+import { Checkbox } from '@cafeos/shared/components/ui/checkbox.tsx'
 
 export interface PlotData {
   name: string
@@ -108,10 +109,12 @@ export function PlotForm({ initial, farms, onSave, onCancel, loading }: PlotForm
     <form onSubmit={handleSubmit} className="space-y-6">
       <Section title="Informações do talhão">
         <div className="grid grid-cols-2 gap-4">
-          <label className="flex items-center gap-2 text-sm text-foreground col-span-2">
-            <input type="checkbox" checked={form.leased} onChange={(e) => set('leased', e.target.checked)} />
-            Arrendado?
-          </label>
+          <Checkbox
+            checked={form.leased}
+            onChange={(e) => set('leased', e.target.checked)}
+            label="Arrendado?"
+            className="col-span-2 text-foreground"
+          />
           <Field label="Nome do talhão" required>
             <Input value={form.name} onChange={(e) => set('name', e.target.value)} required />
           </Field>
@@ -142,10 +145,12 @@ export function PlotForm({ initial, farms, onSave, onCancel, loading }: PlotForm
           <Field label="Data Desativação">
             <Input type="date" value={form.deactivation_date} onChange={(e) => set('deactivation_date', e.target.value)} />
           </Field>
-          <label className="flex items-center gap-2 text-sm text-foreground">
-            <input type="checkbox" checked={form.intercropped} onChange={(e) => set('intercropped', e.target.checked)} />
-            Consorciada
-          </label>
+          <Checkbox
+            checked={form.intercropped}
+            onChange={(e) => set('intercropped', e.target.checked)}
+            label="Consorciada"
+            className="text-foreground"
+          />
           <Field label="Cultura Secundária">
             <Input value={form.secondary_crop} onChange={(e) => set('secondary_crop', e.target.value)} />
           </Field>

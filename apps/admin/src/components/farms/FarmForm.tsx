@@ -7,6 +7,7 @@ import { Select } from '@/components/ui/select'
 import { Field } from '@/components/ui/field'
 import { RequiredLegend } from '@/components/ui/required-legend'
 import { Tabs } from '@/components/ui/tabs'
+import { Checkbox } from '@cafeos/shared/components/ui/checkbox.tsx'
 import { Plus, Trash2 } from 'lucide-react'
 
 export interface ProducerData {
@@ -156,10 +157,12 @@ function DocField({
     <div>
       <div className="flex items-center justify-between mb-1">
         <label className="block text-sm font-medium text-foreground">{label}</label>
-        <label className="flex items-center gap-1 text-xs text-muted-foreground">
-          <input type="checkbox" checked={hasNone} onChange={(e) => onHasNoneChange(e.target.checked)} />
-          Não possui
-        </label>
+        <Checkbox
+          checked={hasNone}
+          onChange={(e) => onHasNoneChange(e.target.checked)}
+          label="Não possui"
+          className="text-xs text-muted-foreground"
+        />
       </div>
       <Input value={value} disabled={hasNone} onChange={(e) => onValueChange(e.target.value)} />
     </div>
@@ -253,10 +256,12 @@ export function FarmForm({ initial, onSave, onCancel, loading }: FarmFormProps) 
                 <Field label="Valor da terra nua/ha (R$)">
                   <Input type="number" step="0.01" value={form.land_value_per_ha} onChange={(e) => set('land_value_per_ha', e.target.value)} />
                 </Field>
-                <label className="flex items-center gap-2 text-sm text-foreground">
-                  <input type="checkbox" checked={form.fully_leased} onChange={(e) => set('fully_leased', e.target.checked)} />
-                  Propriedade totalmente arrendada?
-                </label>
+                <Checkbox
+                  checked={form.fully_leased}
+                  onChange={(e) => set('fully_leased', e.target.checked)}
+                  label="Propriedade totalmente arrendada?"
+                  className="text-foreground"
+                />
               </div>
             )}
 

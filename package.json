@@ -1,0 +1,8 @@
+{
+  "name": "coffee-manager",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
