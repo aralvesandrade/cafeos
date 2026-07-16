@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
+import { Field } from '@/components/ui/field'
+import { RequiredLegend } from '@/components/ui/required-legend'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Pencil, Trash2, Tractor } from 'lucide-react'
@@ -49,7 +51,8 @@ export function OperationTypes() {
 
   useEffect(() => { load() }, [load])
 
-  const handleSave = async () => {
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
     setSaving(true)
     try {
       if (editing) await apiRequest(`/operation-types/${editing.id}`, { method: 'PUT', body: form })
@@ -93,18 +96,22 @@ export function OperationTypes() {
       </TableBody>
     </Table>
     <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Tipo de Operação' : 'Novo Tipo de Operação'}>
-      <div className="space-y-4">
-        <div><label className="block text-sm font-medium text-foreground mb-1">Nome</label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
-        <div><label className="block text-sm font-medium text-foreground mb-1">Código</label><Input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} placeholder="EX: adubacao" required /></div>
-        <div><label className="block text-sm font-medium text-foreground mb-1">Cor</label>
+      <form onSubmit={handleSave} className="space-y-4">
+        <Field label="Nome" required><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></Field>
+        <Field label="Código" required><Input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} placeholder="EX: adubacao" required /></Field>
+        <Field label="Cor">
           <Select value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })}>
             {Object.entries(colorLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-          </Select></div>
-        <div className="flex justify-end gap-3 pt-2">
-          <Button variant="outline" onClick={() => { setDialogOpen(false); setEditing(null) }}>Cancelar</Button>
-          <Button onClick={handleSave} disabled={saving}>{saving ? 'Salvando...' : 'Salvar'}</Button>
+          </Select>
+        </Field>
+        <div className="flex items-center justify-between gap-3 pt-2">
+          <RequiredLegend />
+          <div className="flex gap-3">
+            <Button type="button" variant="outline" onClick={() => { setDialogOpen(false); setEditing(null) }}>Cancelar</Button>
+            <Button type="submit" disabled={saving}>{saving ? 'Salvando...' : 'Salvar'}</Button>
+          </div>
         </div>
-      </div>
+      </form>
     </Dialog>
   </div>)
 }

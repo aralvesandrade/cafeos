@@ -5,6 +5,9 @@ import { useConfirm } from '@/lib/confirm'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
+import { Field } from '@/components/ui/field'
+import { RequiredLegend } from '@/components/ui/required-legend'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Pencil, Trash2, User, Building2 } from 'lucide-react'
@@ -51,7 +54,8 @@ export function Users() {
 
   useEffect(() => { load() }, [load])
 
-  const handleSave = async () => {
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
     setSaving(true)
     try {
       if (editing) {
@@ -148,51 +152,50 @@ export function Users() {
       </Table>
 
       <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Usuário' : 'Novo Usuário'}>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Nome</label>
+        <form onSubmit={handleSave} className="space-y-4">
+          <Field label="Nome" required>
             <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Email</label>
+          </Field>
+          <Field label="Email" required>
             <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-          </div>
+          </Field>
           {!editing && (
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Senha</label>
+            <Field label="Senha" required>
               <Input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
-            </div>
+            </Field>
           )}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Perfil (chave do papel)</label>
-            <Input value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} placeholder="ex: operador_campo, proprietario, platform_owner" />
+            <Field label="Perfil (chave do papel)">
+              <Input value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} placeholder="ex: operador_campo, proprietario, platform_owner" />
+            </Field>
             <p className="text-xs text-muted-foreground mt-1">Papéis são específicos de cada organização — consulte a tela de Papéis da organização de destino.</p>
           </div>
           {editing && (
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Status</label>
-              <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+            <Field label="Status">
+              <Select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
                 <option value="active">Ativo</option>
                 <option value="inactive">Inativo</option>
-              </select>
-            </div>
+              </Select>
+            </Field>
           )}
           {!editing && (
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Organização</label>
-              <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.organization_id} onChange={(e) => setForm({ ...form, organization_id: e.target.value })}>
+            <Field label="Organização" required>
+              <Select value={form.organization_id} onChange={(e) => setForm({ ...form, organization_id: e.target.value })} required>
                 <option value="">Selecione uma organização</option>
                 {organizations.map((o) => (
                   <option key={o.id} value={o.id}>{o.name}</option>
                 ))}
-              </select>
-            </div>
+              </Select>
+            </Field>
           )}
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="outline" onClick={() => { setDialogOpen(false); setEditing(null) }}>Cancelar</Button>
-            <Button onClick={handleSave} disabled={saving}>{saving ? 'Salvando...' : 'Salvar'}</Button>
+          <div className="flex items-center justify-between gap-3 pt-2">
+            <RequiredLegend />
+            <div className="flex gap-3">
+              <Button type="button" variant="outline" onClick={() => { setDialogOpen(false); setEditing(null) }}>Cancelar</Button>
+              <Button type="submit" disabled={saving}>{saving ? 'Salvando...' : 'Salvar'}</Button>
+            </div>
           </div>
-        </div>
+        </form>
       </Dialog>
     </div>
   )

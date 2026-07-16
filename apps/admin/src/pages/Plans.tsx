@@ -5,6 +5,9 @@ import { useConfirm } from '@/lib/confirm'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
+import { Field } from '@/components/ui/field'
+import { RequiredLegend } from '@/components/ui/required-legend'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Pencil, Trash2, CreditCard } from 'lucide-react'
@@ -104,7 +107,8 @@ export function Plans() {
     display_order: parseInt(form.display_order, 10) || 0,
   })
 
-  const handleSave = async () => {
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
     setSaving(true)
     try {
       const body = buildBody()
@@ -217,76 +221,68 @@ export function Plans() {
       </Table>
 
       <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Plano' : 'Novo Plano'}>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Nome</label>
+        <form onSubmit={handleSave} className="space-y-4">
+          <Field label="Nome" required>
             <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Slug</label>
+          </Field>
+          <Field label="Slug" required>
             <Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="ex: pro" required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Descrição</label>
+          </Field>
+          <Field label="Descrição">
             <Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-          </div>
+          </Field>
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Preço (R$)</label>
+            <Field label="Preço (R$)">
               <Input type="number" step="0.01" min="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Intervalo</label>
-              <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.billing_interval} onChange={(e) => setForm({ ...form, billing_interval: e.target.value })}>
+            </Field>
+            <Field label="Intervalo">
+              <Select value={form.billing_interval} onChange={(e) => setForm({ ...form, billing_interval: e.target.value })}>
                 <option value="monthly">Mensal</option>
                 <option value="yearly">Anual</option>
-              </select>
-            </div>
+              </Select>
+            </Field>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Máx. fazendas (0 = ilimitado)</label>
+            <Field label="Máx. fazendas (0 = ilimitado)">
               <Input type="number" min="0" value={form.max_farms} onChange={(e) => setForm({ ...form, max_farms: e.target.value })} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Máx. usuários (0 = ilimitado)</label>
+            </Field>
+            <Field label="Máx. usuários (0 = ilimitado)">
               <Input type="number" min="0" value={form.max_users} onChange={(e) => setForm({ ...form, max_users: e.target.value })} />
-            </div>
+            </Field>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Features (uma por linha; prefixe com "-" para marcar como não incluída)</label>
+          <Field label='Features (uma por linha; prefixe com "-" para marcar como não incluída)'>
             <textarea
               className="flex min-h-[120px] w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:border-ring"
               value={form.features}
               onChange={(e) => setForm({ ...form, features: e.target.value })}
               placeholder={'Relatórios CSV/PDF\n-White Label\nSuporte prioritário'}
             />
-          </div>
+          </Field>
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Status</label>
-              <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.active} onChange={(e) => setForm({ ...form, active: e.target.value })}>
+            <Field label="Status">
+              <Select value={form.active} onChange={(e) => setForm({ ...form, active: e.target.value })}>
                 <option value="true">Ativo</option>
                 <option value="false">Inativo</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Ordem de exibição</label>
+              </Select>
+            </Field>
+            <Field label="Ordem de exibição">
               <Input type="number" value={form.display_order} onChange={(e) => setForm({ ...form, display_order: e.target.value })} />
-            </div>
+            </Field>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Destaque ("Mais Popular" na landing page)</label>
-            <select className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground" value={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.value })}>
+          <Field label='Destaque ("Mais Popular" na landing page)'>
+            <Select value={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.value })}>
               <option value="false">Não</option>
               <option value="true">Sim</option>
-            </select>
+            </Select>
+          </Field>
+          <div className="flex items-center justify-between gap-3 pt-2">
+            <RequiredLegend />
+            <div className="flex gap-3">
+              <Button type="button" variant="outline" onClick={() => { setDialogOpen(false); setEditing(null) }}>Cancelar</Button>
+              <Button type="submit" disabled={saving}>{saving ? 'Salvando...' : 'Salvar'}</Button>
+            </div>
           </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="outline" onClick={() => { setDialogOpen(false); setEditing(null) }}>Cancelar</Button>
-            <Button onClick={handleSave} disabled={saving}>{saving ? 'Salvando...' : 'Salvar'}</Button>
-          </div>
-        </div>
+        </form>
       </Dialog>
     </div>
   )

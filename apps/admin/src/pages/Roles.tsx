@@ -7,6 +7,8 @@ import { useModuleAccess } from '@/lib/permissions'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Field } from '@/components/ui/field'
+import { RequiredLegend } from '@/components/ui/required-legend'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Pencil, Trash2, Shield } from 'lucide-react'
@@ -21,7 +23,8 @@ export function Roles() {
   const confirm = useConfirm()
   const canEdit = useModuleAccess('permissions') === 'write'
 
-  const handleSave = async () => {
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
     setSaving(true)
     try {
       if (editing) {
@@ -112,26 +115,28 @@ export function Roles() {
       </Table>
 
       <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Papel' : 'Novo Papel'}>
-        <div className="space-y-4">
+        <form onSubmit={handleSave} className="space-y-4">
           {!editing && (
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Chave</label>
+            <Field label="Chave" required>
               <Input
                 value={form.key}
                 onChange={(e) => setForm({ ...form, key: e.target.value.trim().toLowerCase().replace(/\s+/g, '_') })}
                 placeholder="ex: colhedor_chefe"
                 required
               />
-            </div>
+            </Field>
           )}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Nome</label>
+          <Field label="Nome" required>
             <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="ex: Colhedor Chefe" required />
+          </Field>
+          <div className="flex items-center justify-between gap-3 pt-2">
+            <RequiredLegend />
+            <div className="flex gap-3">
+              <Button type="button" variant="outline" onClick={() => { setDialogOpen(false); setEditing(null) }}>Cancelar</Button>
+              <Button type="submit" disabled={saving}>{saving ? 'Salvando...' : 'Salvar'}</Button>
+            </div>
           </div>
-          <Button className="w-full" onClick={handleSave} disabled={saving || !form.name || (!editing && !form.key)}>
-            {saving ? 'Salvando...' : 'Salvar'}
-          </Button>
-        </div>
+        </form>
       </Dialog>
     </div>
   )
