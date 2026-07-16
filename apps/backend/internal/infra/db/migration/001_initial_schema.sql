@@ -9,7 +9,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS organizations (
     id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name        VARCHAR(255) NOT NULL,
-    slug        VARCHAR(100) NOT NULL UNIQUE,
+    slug        VARCHAR(100) NOT NULL CONSTRAINT uni_organizations_slug UNIQUE,
     brand_name  VARCHAR(255) NOT NULL DEFAULT '',
     logo_url    TEXT NOT NULL DEFAULT '',
     primary_color VARCHAR(50) NOT NULL DEFAULT '#2E7D32',

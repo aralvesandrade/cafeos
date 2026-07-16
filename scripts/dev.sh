@@ -8,7 +8,7 @@ echo "=== CafeOS Development Environment ==="
 case "${1:-help}" in
   up)
     echo "Starting infrastructure (PostgreSQL, Redis, RabbitMQ)..."
-    docker compose -f "$ROOT_DIR/infra/dev/docker-compose.yml" up -d
+    docker compose -f "$ROOT_DIR/docker-compose.yml" up -d
     echo "Waiting for services..."
     sleep 4
     echo "Starting API server (background)..."
@@ -31,7 +31,7 @@ case "${1:-help}" in
     ;;
   down)
     echo "Stopping infrastructure..."
-    docker compose -f "$ROOT_DIR/infra/dev/docker-compose.yml" down --remove-orphans
+    docker compose -f "$ROOT_DIR/docker-compose.yml" down --remove-orphans
     echo "Done."
     ;;
   api)
@@ -56,12 +56,12 @@ case "${1:-help}" in
     ;;
   db:migrate)
     echo "Running migrations..."
-    docker compose -f "$ROOT_DIR/infra/dev/docker-compose.yml" exec -T postgres psql -U cafeos -d cafeos -f /docker-entrypoint-initdb.d/001_initial_schema.sql
+    docker compose -f "$ROOT_DIR/docker-compose.yml" exec -T postgres psql -U cafeos -d cafeos < "$ROOT_DIR/apps/backend/internal/infra/db/migration/001_initial_schema.sql"
     ;;
   db:reset)
     echo "Resetting database..."
-    docker compose -f "$ROOT_DIR/infra/dev/docker-compose.yml" exec -T postgres psql -U cafeos -d cafeos -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
-    docker compose -f "$ROOT_DIR/infra/dev/docker-compose.yml" exec -T postgres psql -U cafeos -d cafeos -f /docker-entrypoint-initdb.d/001_initial_schema.sql
+    docker compose -f "$ROOT_DIR/docker-compose.yml" exec -T postgres psql -U cafeos -d cafeos -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+    docker compose -f "$ROOT_DIR/docker-compose.yml" exec -T postgres psql -U cafeos -d cafeos < "$ROOT_DIR/apps/backend/internal/infra/db/migration/001_initial_schema.sql"
     ;;
   db:seed)
     echo "Running seed..."
