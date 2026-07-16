@@ -117,6 +117,26 @@ func (r *InMemoryProducerRepo) Update(p *entity.Producer) error {
 	return nil
 }
 
+func (r *InMemoryProducerRepo) CreateBatch(producers []*entity.Producer) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	for _, p := range producers {
+		r.producers[p.ID] = p
+	}
+	return nil
+}
+
+func (r *InMemoryProducerRepo) DeleteByUserID(userID string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	for id, p := range r.producers {
+		if p.UserID == userID {
+			delete(r.producers, id)
+		}
+	}
+	return nil
+}
+
 func (r *InMemoryProducerRepo) DeleteByFarmID(farmID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
