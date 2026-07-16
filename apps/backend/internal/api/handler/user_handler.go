@@ -16,10 +16,11 @@ import (
 type UserHandler struct {
 	repo    repository.UserRepository
 	roleSvc *service.RoleService
+	userSvc *service.UserService
 }
 
-func NewUserHandler(repo repository.UserRepository, roleSvc *service.RoleService) *UserHandler {
-	return &UserHandler{repo: repo, roleSvc: roleSvc}
+func NewUserHandler(repo repository.UserRepository, roleSvc *service.RoleService, userSvc *service.UserService) *UserHandler {
+	return &UserHandler{repo: repo, roleSvc: roleSvc, userSvc: userSvc}
 }
 
 type createUserRequest struct {
@@ -236,14 +237,17 @@ func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 type userResponse struct {
-	ID             string `json:"id"`
-	OrganizationID string `json:"organization_id"`
-	Name           string `json:"name"`
-	Email          string `json:"email"`
-	RoleID         string `json:"role_id"`
-	Role           string `json:"role"`
-	IsActive       bool   `json:"is_active"`
-	Status         string `json:"status"`
+	ID              string  `json:"id"`
+	OrganizationID  string  `json:"organization_id"`
+	Name            string  `json:"name"`
+	Email           string  `json:"email"`
+	RoleID          string  `json:"role_id"`
+	Role            string  `json:"role"`
+	IsActive        bool    `json:"is_active"`
+	Status          string  `json:"status"`
+	ManagedByUserID *string `json:"managed_by_user_id"`
+	IsPrincipal     bool    `json:"is_principal"`
+	PlanID          *string `json:"plan_id,omitempty"`
 }
 
 func toUserResponse(u *entity.User) userResponse {
@@ -252,14 +256,17 @@ func toUserResponse(u *entity.User) userResponse {
 		status = "inactive"
 	}
 	return userResponse{
-		ID:             u.ID,
-		OrganizationID: u.OrganizationID,
-		Name:           u.Name,
-		Email:          u.Email,
-		RoleID:         u.RoleID,
-		Role:           u.Role.Key,
-		IsActive:       u.IsActive,
-		Status:         status,
+		ID:              u.ID,
+		OrganizationID:  u.OrganizationID,
+		Name:            u.Name,
+		Email:           u.Email,
+		RoleID:          u.RoleID,
+		Role:            u.Role.Key,
+		IsActive:        u.IsActive,
+		Status:          status,
+		ManagedByUserID: u.ManagedByUserID,
+		IsPrincipal:     u.ManagedByUserID == nil,
+		PlanID:          u.PlanID,
 	}
 }
 
@@ -300,6 +307,8 @@ func (h *UserHandler) ListForOrg(w http.ResponseWriter, r *http.Request) {
 // @Router /api/v1/{organization_id}/users [post]
 func (h *UserHandler) CreateForOrg(w http.ResponseWriter, r *http.Request) {
 	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	callerUserID, _ := r.Context().Value(middleware.UserIDKey).(string)
+	callerRole, _ := r.Context().Value(middleware.RoleKey).(string)
 
 	var req createUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -309,6 +318,26 @@ func (h *UserHandler) CreateForOrg(w http.ResponseWriter, r *http.Request) {
 	if req.Name == "" || req.Email == "" || req.Password == "" {
 		writeError(w, "name, email, and password are required", http.StatusBadRequest)
 		return
+	}
+
+	// A organização pode não ter nenhum usuário ainda (primeiro usuário
+	// vira principal automaticamente) — só exige IsPrincipal quando já
+	// existe alguém na organização. platform_owner sempre pode criar.
+	count, err := h.repo.CountByOrganization(organizationID)
+	if err != nil {
+		writeError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if count > 0 && callerRole != entity.SystemRolePlatformOwner {
+		isPrincipal, err := h.userSvc.IsPrincipal(callerUserID)
+		if err != nil {
+			writeError(w, "invalid caller", http.StatusBadRequest)
+			return
+		}
+		if !isPrincipal {
+			writeError(w, service.ErrNotPrincipal.Error(), http.StatusForbidden)
+			return
+		}
 	}
 
 	roleID, err := h.resolveRoleIDForCreate(organizationID, req.RoleID, req.Role)
@@ -333,6 +362,14 @@ func (h *UserHandler) CreateForOrg(w http.ResponseWriter, r *http.Request) {
 		IsActive:       true,
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
+	}
+	// Sub-usuário: o primeiro usuário da organização (count==0) é sempre
+	// principal (ManagedByUserID nulo); os demais ficam vinculados ao
+	// principal que os criou — nunca são principais por si mesmos.
+	// (platform_owner criando via bypass não vira "gerente" de ninguém —
+	// nesse caso o usuário nasce como um novo principal independente.)
+	if count > 0 && callerRole != entity.SystemRolePlatformOwner {
+		user.ManagedByUserID = &callerUserID
 	}
 
 	if err := h.repo.Create(user); err != nil {
@@ -432,4 +469,65 @@ func (h *UserHandler) DeleteForOrg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+}
+
+type assignPlanRequest struct {
+	PlanID string `json:"plan_id"`
+}
+
+// AssignPlanForOrg vincula um Plan ao usuário principal (dono do grupo de
+// fazendas), responsável pelo pagamento — sub-usuário nunca tem plano
+// próprio.
+// @Summary Atribuir plano ao usuário principal
+// @Description Vincula um Plan ao usuário — só permitido para o próprio usuário principal ou platform_owner
+// @Tags users (Usuários)
+// @Accept json
+// @Produce json
+// @Param organization_id path string true "ID da Organização"
+// @Param id path string true "ID do Usuário"
+// @Param plan body assignPlanRequest true "Plano a atribuir"
+// @Success 200 {object} entity.User
+// @Failure 400 {object} map[string]string
+// @Failure 403 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{organization_id}/users/{id}/plan [patch]
+func (h *UserHandler) AssignPlanForOrg(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	callerUserID, _ := r.Context().Value(middleware.UserIDKey).(string)
+	callerRole, _ := r.Context().Value(middleware.RoleKey).(string)
+	id := r.PathValue("id")
+
+	existing, err := h.repo.GetByID(id)
+	if err != nil || existing.OrganizationID != organizationID {
+		writeError(w, "user not found", http.StatusNotFound)
+		return
+	}
+
+	if callerRole != entity.SystemRolePlatformOwner && callerUserID != id {
+		writeError(w, "only the principal user themselves (or platform_owner) can assign their plan", http.StatusForbidden)
+		return
+	}
+
+	var req assignPlanRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.PlanID == "" {
+		writeError(w, "plan_id is required", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.userSvc.AssignPlan(id, req.PlanID); err != nil {
+		if err == service.ErrNotPrincipal {
+			writeError(w, err.Error(), http.StatusForbidden)
+			return
+		}
+		writeError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	updated, err := h.repo.GetByID(id)
+	if err != nil {
+		writeError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	writeJSON(w, toUserResponse(updated), http.StatusOK)
 }

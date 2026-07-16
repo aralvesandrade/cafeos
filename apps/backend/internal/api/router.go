@@ -84,7 +84,8 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 		}
 	}
 
-	farmH := handler.NewFarmHandler(farmSvc)
+	userSvc := domainSvc.NewUserService(userRepo, planRepo)
+	farmH := handler.NewFarmHandler(farmSvc, userSvc, roleSvc)
 	plotH := handler.NewPlotHandler(plotSvc, farmSvc)
 	opH := handler.NewOperationHandler(opSvc, plotSvc, farmSvc)
 	harvestH := handler.NewHarvestHandler(harvestSvc, plotSvc, farmSvc, indicatorRepo)
@@ -92,7 +93,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	authH := handler.NewAuthHandler(userRepo, organizationRepo, jwtSecret)
 	organizationH := handler.NewOrganizationHandler(organizationRepo, permSvc)
 	planH := handler.NewPlanHandler(planSvc)
-	userH := handler.NewUserHandler(userRepo, roleSvc)
+	userH := handler.NewUserHandler(userRepo, roleSvc, userSvc)
 	finH := handler.NewFinancialHandler(finSvc, farmSvc)
 	stockH := handler.NewStockHandler(stockSvc, farmSvc)
 	fleetH := handler.NewFleetHandler(fleetSvc, farmSvc)
@@ -289,6 +290,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	mux.Handle("GET /api/v1/{organization_id}/users", mchain(entity.ModuleUsers, read, userH.ListForOrg))
 	mux.Handle("PUT /api/v1/{organization_id}/users/{id}", mchain(entity.ModuleUsers, write, userH.UpdateForOrg))
 	mux.Handle("DELETE /api/v1/{organization_id}/users/{id}", mchain(entity.ModuleUsers, write, userH.DeleteForOrg))
+	mux.Handle("PATCH /api/v1/{organization_id}/users/{id}/plan", authMw(http.HandlerFunc(userH.AssignPlanForOrg)))
 
 	// Sync — offline mobile (requires RabbitMQ publisher)
 	if publisher != nil {

@@ -344,10 +344,6 @@ definitions:
         type: string
       name:
         type: string
-      plan:
-        type: string
-      plan_id:
-        type: string
       primary_color:
         type: string
       slug:
@@ -642,9 +638,20 @@ definitions:
         type: string
       is_active:
         type: boolean
+      managed_by_user_id:
+        description: |-
+          ManagedByUserID nulo marca o usuário como "principal": dono de um
+          grupo de fazendas, responsável pelo próprio Plan, e o único que pode
+          criar sub-usuários (que recebem este campo apontando para ele).
+          Sub-usuário nunca cria outro usuário nem tem PlanID próprio.
+        type: string
       name:
         type: string
       organization_id:
+        type: string
+      plan:
+        $ref: '#/definitions/entity.Plan'
+      plan_id:
         type: string
       role:
         $ref: '#/definitions/entity.Role'
@@ -1029,6 +1036,11 @@ definitions:
       useful_life_years:
         type: integer
     type: object
+  handler.assignPlanRequest:
+    properties:
+      plan_id:
+        type: string
+    type: object
   handler.createAllocationRequest:
     properties:
       cost_center_id:
@@ -1236,10 +1248,6 @@ definitions:
       brand_name:
         type: string
       name:
-        type: string
-      plan:
-        type: string
-      plan_id:
         type: string
     type: object
   handler.createPlanRequest:
@@ -1568,10 +1576,6 @@ definitions:
       brand_name:
         type: string
       name:
-        type: string
-      plan:
-        type: string
-      plan_id:
         type: string
       status:
         type: string
@@ -4749,6 +4753,59 @@ paths:
       security:
       - BearerAuth: []
       summary: Atualizar usuário da organização
+      tags:
+      - users (Usuários)
+  /api/v1/{organization_id}/users/{id}/plan:
+    patch:
+      consumes:
+      - application/json
+      description: Vincula um Plan ao usuário — só permitido para o próprio usuário
+        principal ou platform_owner
+      parameters:
+      - description: ID da Organização
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: ID do Usuário
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Plano a atribuir
+        in: body
+        name: plan
+        required: true
+        schema:
+          $ref: '#/definitions/handler.assignPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atribuir plano ao usuário principal
       tags:
       - users (Usuários)
   /api/v1/admin/organizations:

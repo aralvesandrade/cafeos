@@ -137,36 +137,18 @@ func seed(db *gorm.DB) error {
 	}
 	fmt.Println("  ✓ Plans: free, pro, cooperativa, consultoria")
 
-	// Organization
-	proPlanID := planIDBySlug["pro"]
+	// Organization (tenant/whitelabel — plano não é mais campo da organização,
+	// e sim de cada usuário principal dentro dela).
 	organization := entity.Organization{
 		Name:         "CafeOS Padrão",
 		Slug:         "cafeos",
 		BrandName:    "CafeOS",
-		Plan:         "pro",
-		PlanID:       &proPlanID,
 		PrimaryColor: "#2E7D32",
 	}
 	if err := db.Create(&organization).Error; err != nil {
 		return fmt.Errorf("create organization: %w", err)
 	}
 	fmt.Println("  ✓ Organization: CafeOS Padrão (cafeos)")
-
-	// Backfill: qualquer organização existente sem plan_id recebe o PlanID
-	// correspondente ao seu campo legado `plan` (texto livre), por slug.
-	var orgsToBackfill []entity.Organization
-	if err := db.Where("plan_id IS NULL").Find(&orgsToBackfill).Error; err != nil {
-		return fmt.Errorf("list organizations for plan backfill: %w", err)
-	}
-	for _, org := range orgsToBackfill {
-		planID, ok := planIDBySlug[org.Plan]
-		if !ok {
-			continue
-		}
-		if err := db.Model(&entity.Organization{}).Where("id = ?", org.ID).Update("plan_id", planID).Error; err != nil {
-			return fmt.Errorf("backfill plan_id for organization %s: %w", org.ID, err)
-		}
-	}
 
 	roleRepo := infraRepo.NewRoleRepository(db)
 	userRepo := infraRepo.NewUserRepository(db)
@@ -198,10 +180,18 @@ func seed(db *gorm.DB) error {
 	}
 
 	// Users
+	// João e Maria são usuários principais independentes: cada um dono do
+	// próprio grupo de fazendas e responsável pelo próprio Plan. Carlos e
+	// Ana são sub-usuários de João (ManagedByUserID setado após a criação,
+	// já que o auto-FK exige que o principal já exista). Rodrigo é
+	// sub-usuário de Maria. Fernanda é admin do tenant (organization_admin),
+	// sem farms/plano próprio.
+	proPlanID := planIDBySlug["pro"]
+	freePlanID := planIDBySlug["free"]
 	users := []entity.User{
 		{OrganizationID: organization.ID, Name: "Administrador", Email: adminEmail, PasswordHash: hash(adminPass), RoleID: roleIDByKey[entity.SystemRolePlatformOwner], IsActive: true},
-		{OrganizationID: organization.ID, Name: "João Silva", Email: "joao@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.RoleKeyProprietario], IsActive: true},
-		{OrganizationID: organization.ID, Name: "Maria Oliveira", Email: "maria@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.RoleKeyProprietario], IsActive: true},
+		{OrganizationID: organization.ID, Name: "João Silva", Email: "joao@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.RoleKeyProprietario], IsActive: true, PlanID: &proPlanID},
+		{OrganizationID: organization.ID, Name: "Maria Oliveira", Email: "maria@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.RoleKeyProprietario], IsActive: true, PlanID: &freePlanID},
 		{OrganizationID: organization.ID, Name: "Carlos Santos", Email: "carlos@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey["engenheiro_agronomo"], IsActive: true},
 		{OrganizationID: organization.ID, Name: "Ana Costa", Email: "ana@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey["operador_campo"], IsActive: true},
 		{OrganizationID: organization.ID, Name: "Fernanda Lima", Email: "fernanda@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.SystemRoleOrganizationAdmin], IsActive: true},
@@ -213,6 +203,15 @@ func seed(db *gorm.DB) error {
 		}
 	}
 	fmt.Printf("  ✓ Usuários: %d criados\n", len(users))
+
+	joaoUserID, mariaUserID := users[1].ID, users[2].ID
+	subUserManagers := map[int]string{3: joaoUserID, 4: joaoUserID, 6: mariaUserID}
+	for idx, managerID := range subUserManagers {
+		if err := db.Model(&entity.User{}).Where("id = ?", users[idx].ID).Update("managed_by_user_id", managerID).Error; err != nil {
+			return fmt.Errorf("link sub-user %s to principal: %w", users[idx].Email, err)
+		}
+	}
+	fmt.Println("  ✓ Hierarquia principal/sub-usuário vinculada")
 
 	// Agricultural Products
 	products := []entity.AgriculturalProduct{
@@ -245,8 +244,6 @@ func seed(db *gorm.DB) error {
 	// Producers — Farm↔User links, each with a role scoped to that farm.
 	// Recanto Verde demonstrates multiple links: João as proprietário, Ana
 	// as operador de campo.
-	joaoUserID := users[1].ID
-	mariaUserID := users[2].ID
 	anaUserID := users[4].ID
 	producers := []entity.Producer{
 		{OrganizationID: organization.ID, FarmID: farms[0].ID, UserID: joaoUserID, RoleID: roleIDByKey[entity.RoleKeyProprietario], CPF: "123.456.789-00", Name: "João Silva", Phone: "(35) 99999-0001", Email: "joao@cafeos.com.br"},

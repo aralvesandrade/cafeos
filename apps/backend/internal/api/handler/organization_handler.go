@@ -23,17 +23,13 @@ func NewOrganizationHandler(repo repository.OrganizationRepository, permSvc *ser
 }
 
 type createOrganizationRequest struct {
-	Name      string  `json:"name"`
-	BrandName string  `json:"brand_name"`
-	Plan      string  `json:"plan"`
-	PlanID    *string `json:"plan_id"`
+	Name      string `json:"name"`
+	BrandName string `json:"brand_name"`
 }
 
 type updateOrganizationRequest struct {
 	Name      *string `json:"name"`
 	BrandName *string `json:"brand_name"`
-	Plan      *string `json:"plan"`
-	PlanID    *string `json:"plan_id"`
 	Status    *string `json:"status"`
 }
 
@@ -84,8 +80,6 @@ func (h *OrganizationHandler) Create(w http.ResponseWriter, r *http.Request) {
 		Name:         req.Name,
 		Slug:         slug,
 		BrandName:    req.BrandName,
-		Plan:         req.Plan,
-		PlanID:       req.PlanID,
 		Status:       "active",
 		PrimaryColor: "#2E7D32",
 		CreatedAt:    time.Now(),
@@ -156,12 +150,6 @@ func (h *OrganizationHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.BrandName != nil {
 		existing.BrandName = *req.BrandName
-	}
-	if req.Plan != nil {
-		existing.Plan = *req.Plan
-	}
-	if req.PlanID != nil {
-		existing.PlanID = req.PlanID
 	}
 	if req.Status != nil {
 		existing.Status = *req.Status

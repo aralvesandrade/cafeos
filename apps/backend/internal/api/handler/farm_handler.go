@@ -22,11 +22,13 @@ type (
 )
 
 type FarmHandler struct {
-	svc *service.FarmService
+	svc     *service.FarmService
+	userSvc *service.UserService
+	roleSvc *service.RoleService
 }
 
-func NewFarmHandler(svc *service.FarmService) *FarmHandler {
-	return &FarmHandler{svc: svc}
+func NewFarmHandler(svc *service.FarmService, userSvc *service.UserService, roleSvc *service.RoleService) *FarmHandler {
+	return &FarmHandler{svc: svc, userSvc: userSvc, roleSvc: roleSvc}
 }
 
 type producerRequest struct {
@@ -184,6 +186,20 @@ func (req *createFarmRequest) toEntity(organizationID string) *entity.Farm {
 // @Router /api/v1/{organization_id}/farms [post]
 func (h *FarmHandler) Create(w http.ResponseWriter, r *http.Request) {
 	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	callerUserID, _ := r.Context().Value(middleware.UserIDKey).(string)
+	callerRole, _ := r.Context().Value(middleware.RoleKey).(string)
+
+	if callerRole != entity.SystemRolePlatformOwner {
+		isPrincipal, err := h.userSvc.IsPrincipal(callerUserID)
+		if err != nil {
+			writeError(w, "invalid caller", http.StatusBadRequest)
+			return
+		}
+		if !isPrincipal {
+			writeError(w, service.ErrNotPrincipal.Error(), http.StatusForbidden)
+			return
+		}
+	}
 
 	var req createFarmRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -195,6 +211,35 @@ func (h *FarmHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		writeError(w, "invalid producer birth_date, expected YYYY-MM-DD", http.StatusBadRequest)
 		return
+	}
+
+	// Cada user_id vinculado no payload precisa ser o próprio principal ou
+	// um sub-usuário dele — nunca um usuário de fora da sua hierarquia.
+	if callerRole != entity.SystemRolePlatformOwner {
+		hasCallerAsProducer := false
+		for _, p := range producers {
+			if p.UserID == callerUserID {
+				hasCallerAsProducer = true
+				continue
+			}
+			if err := h.userSvc.EnsureManages(callerUserID, p.UserID); err != nil {
+				writeError(w, "user_id must be the principal themselves or one of their sub-users", http.StatusForbidden)
+				return
+			}
+		}
+		if !hasCallerAsProducer {
+			role, err := h.roleSvc.FindByKey(entity.RoleKeyProprietario)
+			if err != nil {
+				writeError(w, "failed to resolve owner role", http.StatusInternalServerError)
+				return
+			}
+			caller, err := h.userSvc.Get(callerUserID)
+			if err != nil {
+				writeError(w, "invalid caller", http.StatusBadRequest)
+				return
+			}
+			producers = append(producers, &entity.Producer{UserID: callerUserID, RoleID: role.ID, Name: caller.Name, Email: caller.Email})
+		}
 	}
 
 	farm, err := h.svc.Create(req.toEntity(organizationID), producers)
@@ -467,11 +512,38 @@ func (h *FarmHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if input.Producers != nil {
+		callerUserID, _ := r.Context().Value(middleware.UserIDKey).(string)
+		callerRole, _ := r.Context().Value(middleware.RoleKey).(string)
+		if callerRole != entity.SystemRolePlatformOwner {
+			isPrincipal, err := h.userSvc.IsPrincipal(callerUserID)
+			if err != nil {
+				writeError(w, "invalid caller", http.StatusBadRequest)
+				return
+			}
+			if !isPrincipal || !h.svc.IsOwner(existing.ID, callerUserID) {
+				writeError(w, "only a principal that owns this farm can link users to it", http.StatusForbidden)
+				return
+			}
+		}
+
 		producers, err := toProducerEntities(*input.Producers)
 		if err != nil {
 			writeError(w, "invalid producer birth_date, expected YYYY-MM-DD", http.StatusBadRequest)
 			return
 		}
+
+		if callerRole != entity.SystemRolePlatformOwner {
+			for _, p := range producers {
+				if p.UserID == callerUserID {
+					continue
+				}
+				if err := h.userSvc.EnsureManages(callerUserID, p.UserID); err != nil {
+					writeError(w, "user_id must be the principal themselves or one of their sub-users", http.StatusForbidden)
+					return
+				}
+			}
+		}
+
 		saved, err := h.svc.SetProducers(existing.ID, producers)
 		if err != nil {
 			writeError(w, err.Error(), http.StatusBadRequest)

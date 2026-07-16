@@ -10,10 +10,18 @@ type User struct {
 	PasswordHash   string       `json:"-" gorm:"not null"`
 	RoleID         string       `json:"role_id" gorm:"type:uuid;not null"`
 	IsActive       bool         `json:"is_active" gorm:"default:true"`
-	CreatedAt      time.Time    `json:"created_at"`
-	UpdatedAt      time.Time    `json:"updated_at"`
-	Organization   Organization `json:"-" gorm:"foreignKey:OrganizationID"`
-	Role           Role         `json:"role" gorm:"foreignKey:RoleID"`
+	// ManagedByUserID nulo marca o usuário como "principal": dono de um
+	// grupo de fazendas, responsável pelo próprio Plan, e o único que pode
+	// criar sub-usuários (que recebem este campo apontando para ele).
+	// Sub-usuário nunca cria outro usuário nem tem PlanID próprio.
+	ManagedByUserID *string      `json:"managed_by_user_id" gorm:"type:uuid;index"`
+	PlanID          *string      `json:"plan_id" gorm:"type:uuid"`
+	CreatedAt       time.Time    `json:"created_at"`
+	UpdatedAt       time.Time    `json:"updated_at"`
+	Organization    Organization `json:"-" gorm:"foreignKey:OrganizationID"`
+	Role            Role         `json:"role" gorm:"foreignKey:RoleID"`
+	ManagedByUser   *User        `json:"-" gorm:"foreignKey:ManagedByUserID"`
+	Plan            *Plan        `json:"plan,omitempty" gorm:"foreignKey:PlanID"`
 }
 
 func (User) TableName() string {

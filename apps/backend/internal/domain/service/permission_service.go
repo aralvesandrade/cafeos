@@ -31,14 +31,16 @@ var defaultMatrix = map[entity.ModuleKey]map[string]entity.AccessLevel{
 		"consultor_externo":                entity.AccessRead,
 		"auditor":                          entity.AccessRead,
 	},
-	// Only organization_admin (besides platform_owner) registers farms by
-	// default — everyone else can view but not create/edit/delete. Also
-	// gates the farm↔user links (Farm.Producers), since those are set
-	// through the same create/update endpoints.
+	// organization_admin e proprietario registram fazendas por padrão —
+	// demais roles só visualizam. proprietario aqui é o teto de permissão;
+	// o piso real (só o usuário principal, ManagedByUserID nulo, de fato
+	// cria/vincula) é aplicado no handler via UserService.IsPrincipal, não
+	// nesta matriz. Também gates o vínculo farm↔user (Farm.Producers), já
+	// que passa pelos mesmos endpoints de create/update.
 	entity.ModuleFarms: {
 		entity.SystemRolePlatformOwner:     entity.AccessWrite,
 		entity.SystemRoleOrganizationAdmin: entity.AccessWrite,
-		"proprietario":                     entity.AccessRead,
+		"proprietario":                     entity.AccessWrite,
 		"gerente_agricola":                 entity.AccessRead,
 		"engenheiro_agronomo":              entity.AccessRead,
 		"tecnico_agricola":                 entity.AccessRead,
@@ -98,12 +100,14 @@ var defaultMatrix = map[entity.ModuleKey]map[string]entity.AccessLevel{
 	// Users covers the org-scoped team roster (POST/GET/PUT/DELETE
 	// /{organization_id}/users) — distinct from the cross-tenant
 	// /admin/users screen, which stays platform_owner-only regardless.
-	// Only organization_admin registers new users by default; proprietario
-	// can still view the roster but not create/edit/delete.
+	// organization_admin and proprietario register new users by default;
+	// proprietario here is the ceiling — the actual floor (only a
+	// principal user, ManagedByUserID nil, creates sub-users) is enforced
+	// in UserHandler.CreateForOrg via UserService.IsPrincipal.
 	entity.ModuleUsers: {
 		entity.SystemRolePlatformOwner:     entity.AccessWrite,
 		entity.SystemRoleOrganizationAdmin: entity.AccessWrite,
-		"proprietario":                     entity.AccessRead,
+		"proprietario":                     entity.AccessWrite,
 		"gerente_agricola":                 entity.AccessNone,
 		"engenheiro_agronomo":              entity.AccessNone,
 		"tecnico_agricola":                 entity.AccessNone,

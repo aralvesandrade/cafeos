@@ -5402,6 +5402,86 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/{organization_id}/users/{id}/plan": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Vincula um Plan ao usuário — só permitido para o próprio usuário principal ou platform_owner",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users (Usuários)"
+                ],
+                "summary": "Atribuir plano ao usuário principal",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da Organização",
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do Usuário",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Plano a atribuir",
+                        "name": "plan",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.assignPlanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "Autentica com e-mail e senha",
@@ -5962,12 +6042,6 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "plan": {
-                    "type": "string"
-                },
-                "plan_id": {
-                    "type": "string"
-                },
                 "primary_color": {
                     "type": "string"
                 },
@@ -6409,10 +6483,20 @@ const docTemplate = `{
                 "is_active": {
                     "type": "boolean"
                 },
+                "managed_by_user_id": {
+                    "description": "ManagedByUserID nulo marca o usuário como \"principal\": dono de um\ngrupo de fazendas, responsável pelo próprio Plan, e o único que pode\ncriar sub-usuários (que recebem este campo apontando para ele).\nSub-usuário nunca cria outro usuário nem tem PlanID próprio.",
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
                 "organization_id": {
+                    "type": "string"
+                },
+                "plan": {
+                    "$ref": "#/definitions/entity.Plan"
+                },
+                "plan_id": {
                     "type": "string"
                 },
                 "role": {
@@ -6992,6 +7076,14 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.assignPlanRequest": {
+            "type": "object",
+            "properties": {
+                "plan_id": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.createAllocationRequest": {
             "type": "object",
             "properties": {
@@ -7306,12 +7398,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
-                },
-                "plan": {
-                    "type": "string"
-                },
-                "plan_id": {
                     "type": "string"
                 }
             }
@@ -7811,12 +7897,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
-                },
-                "plan": {
-                    "type": "string"
-                },
-                "plan_id": {
                     "type": "string"
                 },
                 "status": {
