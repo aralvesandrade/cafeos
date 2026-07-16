@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Field } from '@/components/ui/field'
 import { RequiredLegend } from '@/components/ui/required-legend'
+import { Tabs } from '@/components/ui/tabs'
 import { Checkbox } from '@cafeos/shared/components/ui/checkbox.tsx'
 
 export interface PlotData {
@@ -82,14 +83,11 @@ interface PlotFormProps {
   loading?: boolean
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-primary border-b border-border pb-1">{title}</h3>
-      {children}
-    </div>
-  )
-}
+const plotTabs = [
+  { key: 'talhao', label: 'Talhão' },
+  { key: 'atividade', label: 'Atividade' },
+  { key: 'area', label: 'Divisão de Área' },
+]
 
 export function PlotForm({ initial, farms, onSave, onCancel, loading }: PlotFormProps) {
   const [form, setForm] = useState<PlotData>(emptyPlot)
@@ -107,125 +105,131 @@ export function PlotForm({ initial, farms, onSave, onCancel, loading }: PlotForm
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <Section title="Informações do talhão">
-        <div className="grid grid-cols-2 gap-4">
-          <Checkbox
-            checked={form.leased}
-            onChange={(e) => set('leased', e.target.checked)}
-            label="Arrendado?"
-            className="col-span-2 text-foreground"
-          />
-          <Field label="Nome do talhão" required>
-            <Input value={form.name} onChange={(e) => set('name', e.target.value)} required />
-          </Field>
-          <Field label="Fazenda" required>
-            <Select value={form.farm_id} onChange={(e) => set('farm_id', e.target.value)} required>
-              <option value="">Selecione...</option>
-              {farms.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
-            </Select>
-          </Field>
-          <Field label="Área (ha)" required>
-            <Input type="number" step="0.01" value={form.area} onChange={(e) => set('area', e.target.value)} required />
-          </Field>
-          <Field label="Estágio">
-            <Select value={form.stage} onChange={(e) => set('stage', e.target.value)}>
-              <option value="formacao">Formação</option>
-              <option value="producao">Produção</option>
-            </Select>
-          </Field>
-          <Field label="Irrigação">
-            <Input value={form.irrigation} onChange={(e) => set('irrigation', e.target.value)} placeholder="Ex: Não irrigado" />
-          </Field>
-          <Field label="Data Ativação">
-            <Input type="date" value={form.activation_date} onChange={(e) => set('activation_date', e.target.value)} />
-          </Field>
-          <Field label="Data de Plantio">
-            <Input type="date" value={form.planting_date} onChange={(e) => set('planting_date', e.target.value)} />
-          </Field>
-          <Field label="Data Desativação">
-            <Input type="date" value={form.deactivation_date} onChange={(e) => set('deactivation_date', e.target.value)} />
-          </Field>
-          <Checkbox
-            checked={form.intercropped}
-            onChange={(e) => set('intercropped', e.target.checked)}
-            label="Consorciada"
-            className="text-foreground"
-          />
-          <Field label="Cultura Secundária">
-            <Input value={form.secondary_crop} onChange={(e) => set('secondary_crop', e.target.value)} />
-          </Field>
-          <Field label="Ano Plantio">
-            <Input type="number" value={form.planting_year} onChange={(e) => set('planting_year', e.target.value)} />
-          </Field>
-          <Field label="Altitude (m)">
-            <Input type="number" value={form.altitude} onChange={(e) => set('altitude', e.target.value)} />
-          </Field>
-          <Field label="Tipo de Solo">
-            <Select value={form.soil_type} onChange={(e) => set('soil_type', e.target.value)}>
-              <option value="">Selecione...</option>
-              <option value="argiloso">Argiloso</option>
-              <option value="arenoso">Arenoso</option>
-              <option value="siltoso">Siltoso</option>
-              <option value="organico">Orgânico</option>
-            </Select>
-          </Field>
-          <div className="col-span-2">
-            <Field label="Observações">
-              <Input value={form.notes} onChange={(e) => set('notes', e.target.value)} />
-            </Field>
-          </div>
-        </div>
-      </Section>
+      <Tabs tabs={plotTabs}>
+        {(activeTab) => (
+          <>
+            {activeTab === 'talhao' && (
+              <div className="grid grid-cols-2 gap-4">
+                <Checkbox
+                  checked={form.leased}
+                  onChange={(e) => set('leased', e.target.checked)}
+                  label="Arrendado?"
+                  className="col-span-2 text-foreground"
+                />
+                <Field label="Nome do talhão" required>
+                  <Input value={form.name} onChange={(e) => set('name', e.target.value)} required />
+                </Field>
+                <Field label="Fazenda" required>
+                  <Select value={form.farm_id} onChange={(e) => set('farm_id', e.target.value)} required>
+                    <option value="">Selecione...</option>
+                    {farms.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
+                  </Select>
+                </Field>
+                <Field label="Área (ha)" required>
+                  <Input type="number" step="0.01" value={form.area} onChange={(e) => set('area', e.target.value)} required />
+                </Field>
+                <Field label="Estágio">
+                  <Select value={form.stage} onChange={(e) => set('stage', e.target.value)}>
+                    <option value="formacao">Formação</option>
+                    <option value="producao">Produção</option>
+                  </Select>
+                </Field>
+                <Field label="Irrigação">
+                  <Input value={form.irrigation} onChange={(e) => set('irrigation', e.target.value)} placeholder="Ex: Não irrigado" />
+                </Field>
+                <Field label="Data Ativação">
+                  <Input type="date" value={form.activation_date} onChange={(e) => set('activation_date', e.target.value)} />
+                </Field>
+                <Field label="Data de Plantio">
+                  <Input type="date" value={form.planting_date} onChange={(e) => set('planting_date', e.target.value)} />
+                </Field>
+                <Field label="Data Desativação">
+                  <Input type="date" value={form.deactivation_date} onChange={(e) => set('deactivation_date', e.target.value)} />
+                </Field>
+                <Checkbox
+                  checked={form.intercropped}
+                  onChange={(e) => set('intercropped', e.target.checked)}
+                  label="Consorciada"
+                  className="text-foreground"
+                />
+                <Field label="Cultura Secundária">
+                  <Input value={form.secondary_crop} onChange={(e) => set('secondary_crop', e.target.value)} />
+                </Field>
+                <Field label="Ano Plantio">
+                  <Input type="number" value={form.planting_year} onChange={(e) => set('planting_year', e.target.value)} />
+                </Field>
+                <Field label="Altitude (m)">
+                  <Input type="number" value={form.altitude} onChange={(e) => set('altitude', e.target.value)} />
+                </Field>
+                <Field label="Tipo de Solo">
+                  <Select value={form.soil_type} onChange={(e) => set('soil_type', e.target.value)}>
+                    <option value="">Selecione...</option>
+                    <option value="argiloso">Argiloso</option>
+                    <option value="arenoso">Arenoso</option>
+                    <option value="siltoso">Siltoso</option>
+                    <option value="organico">Orgânico</option>
+                  </Select>
+                </Field>
+                <div className="col-span-2">
+                  <Field label="Observações">
+                    <Input value={form.notes} onChange={(e) => set('notes', e.target.value)} />
+                  </Field>
+                </div>
+              </div>
+            )}
 
-      <Section title="Informações da atividade">
-        <div className="grid grid-cols-3 gap-4">
-          <Field label="Tipo">
-            <Select value={form.crop_type} onChange={(e) => set('crop_type', e.target.value)}>
-              <option value="">Selecione...</option>
-              <option value="arabica">Arábica</option>
-              <option value="robusta">Robusta</option>
-            </Select>
-          </Field>
-          <Field label="Variedade / Clone">
-            <Input value={form.cultivar} onChange={(e) => set('cultivar', e.target.value)} />
-          </Field>
-          <Field label="Vida útil (anos)">
-            <Input type="number" value={form.useful_life_years} onChange={(e) => set('useful_life_years', e.target.value)} />
-          </Field>
-          <Field label="Custo de formação/ha (R$)">
-            <Input type="number" step="0.01" value={form.formation_cost_per_ha} onChange={(e) => set('formation_cost_per_ha', e.target.value)} />
-          </Field>
-          <Field label="Espaçamento Linha (m)">
-            <Input type="number" step="0.01" value={form.row_spacing_m} onChange={(e) => set('row_spacing_m', e.target.value)} />
-          </Field>
-          <Field label="Espaçamento Planta (m)">
-            <Input type="number" step="0.01" value={form.plant_spacing_m} onChange={(e) => set('plant_spacing_m', e.target.value)} />
-          </Field>
-          <Field label="Nº de plantas">
-            <Input type="number" value={form.plant_count} onChange={(e) => set('plant_count', e.target.value)} />
-          </Field>
-        </div>
-      </Section>
+            {activeTab === 'atividade' && (
+              <div className="grid grid-cols-3 gap-4">
+                <Field label="Tipo">
+                  <Select value={form.crop_type} onChange={(e) => set('crop_type', e.target.value)}>
+                    <option value="">Selecione...</option>
+                    <option value="arabica">Arábica</option>
+                    <option value="robusta">Robusta</option>
+                  </Select>
+                </Field>
+                <Field label="Variedade / Clone">
+                  <Input value={form.cultivar} onChange={(e) => set('cultivar', e.target.value)} />
+                </Field>
+                <Field label="Vida útil (anos)">
+                  <Input type="number" value={form.useful_life_years} onChange={(e) => set('useful_life_years', e.target.value)} />
+                </Field>
+                <Field label="Custo de formação/ha (R$)">
+                  <Input type="number" step="0.01" value={form.formation_cost_per_ha} onChange={(e) => set('formation_cost_per_ha', e.target.value)} />
+                </Field>
+                <Field label="Espaçamento Linha (m)">
+                  <Input type="number" step="0.01" value={form.row_spacing_m} onChange={(e) => set('row_spacing_m', e.target.value)} />
+                </Field>
+                <Field label="Espaçamento Planta (m)">
+                  <Input type="number" step="0.01" value={form.plant_spacing_m} onChange={(e) => set('plant_spacing_m', e.target.value)} />
+                </Field>
+                <Field label="Nº de plantas">
+                  <Input type="number" value={form.plant_count} onChange={(e) => set('plant_count', e.target.value)} />
+                </Field>
+              </div>
+            )}
 
-      <Section title="Divisão de área do talhão">
-        <div className="grid grid-cols-3 gap-4">
-          <Field label="Açude ou Represa (ha)">
-            <Input type="number" step="0.01" value={form.dam_area} onChange={(e) => set('dam_area', e.target.value)} />
-          </Field>
-          <Field label="Benfeitorias (ha)">
-            <Input type="number" step="0.01" value={form.improvements_area} onChange={(e) => set('improvements_area', e.target.value)} />
-          </Field>
-          <Field label="Estradas (ha)">
-            <Input type="number" step="0.01" value={form.roads_area} onChange={(e) => set('roads_area', e.target.value)} />
-          </Field>
-          <Field label="APP (ha)">
-            <Input type="number" step="0.01" value={form.app_area} onChange={(e) => set('app_area', e.target.value)} />
-          </Field>
-          <Field label="Reserva legal (ha)">
-            <Input type="number" step="0.01" value={form.legal_reserve_area} onChange={(e) => set('legal_reserve_area', e.target.value)} />
-          </Field>
-        </div>
-      </Section>
+            {activeTab === 'area' && (
+              <div className="grid grid-cols-3 gap-4">
+                <Field label="Açude ou Represa (ha)">
+                  <Input type="number" step="0.01" value={form.dam_area} onChange={(e) => set('dam_area', e.target.value)} />
+                </Field>
+                <Field label="Benfeitorias (ha)">
+                  <Input type="number" step="0.01" value={form.improvements_area} onChange={(e) => set('improvements_area', e.target.value)} />
+                </Field>
+                <Field label="Estradas (ha)">
+                  <Input type="number" step="0.01" value={form.roads_area} onChange={(e) => set('roads_area', e.target.value)} />
+                </Field>
+                <Field label="APP (ha)">
+                  <Input type="number" step="0.01" value={form.app_area} onChange={(e) => set('app_area', e.target.value)} />
+                </Field>
+                <Field label="Reserva legal (ha)">
+                  <Input type="number" step="0.01" value={form.legal_reserve_area} onChange={(e) => set('legal_reserve_area', e.target.value)} />
+                </Field>
+              </div>
+            )}
+          </>
+        )}
+      </Tabs>
 
       <div className="flex items-center justify-between gap-3 pt-2 sticky bottom-0 bg-background pb-2">
         <RequiredLegend />
