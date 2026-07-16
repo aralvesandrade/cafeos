@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
-import { cn } from '@/lib/utils'
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
+import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Grid3X3,
@@ -17,60 +17,74 @@ import {
   Shield,
   CreditCard,
   Puzzle,
-} from 'lucide-react'
-import { useAuth } from '@/lib/auth'
-import { useTheme } from '@/lib/theme'
-import { usePermissions, type Module } from '@/lib/permissions'
+} from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { useTheme } from "@/lib/theme";
+import { usePermissions, type Module } from "@/lib/permissions";
 
-const navItems: { to: string; icon: typeof LayoutDashboard; label: string; module: Module }[] = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard', module: 'dashboard' },
-  { to: '/farms', icon: MapPin, label: 'Fazendas', module: 'farms' },
-  { to: '/plots', icon: Grid3X3, label: 'Talhões', module: 'farms' },
-]
+const navItems: {
+  to: string;
+  icon: typeof LayoutDashboard;
+  label: string;
+  module: Module;
+}[] = [
+  { to: "/", icon: LayoutDashboard, label: "Dashboard", module: "dashboard" },
+  { to: "/farms", icon: MapPin, label: "Fazendas", module: "farms" },
+  { to: "/plots", icon: Grid3X3, label: "Talhões", module: "farms" },
+];
 
-const phase2Items: { to: string; icon: typeof LayoutDashboard; label: string; module: Module }[] = [
-  { to: '/team', icon: Users, label: 'Usuários', module: 'users' },
-]
+const phase2Items: {
+  to: string;
+  icon: typeof LayoutDashboard;
+  label: string;
+  module: Module;
+}[] = [{ to: "/team", icon: Users, label: "Usuários", module: "users" }];
 
 const adminItems = [
-  { to: '/organizations', icon: Building2, label: 'Organizações' },
-  { to: '/plans', icon: CreditCard, label: 'Planos' },
-  { to: '/modules', icon: Puzzle, label: 'Módulos' },
-]
+  { to: "/plans", icon: CreditCard, label: "Planos" },
+  { to: "/organizations", icon: Building2, label: "Organizações" },
+  { to: "/modules", icon: Puzzle, label: "Módulos" },
+];
 
 interface SidebarProps {
-  open: boolean
-  onClose: () => void
+  open: boolean;
+  onClose: () => void;
 }
 
-const COLLAPSED_KEY = 'cafeos-sidebar-collapsed'
+const COLLAPSED_KEY = "cafeos-sidebar-collapsed";
 
 export function Sidebar({ open, onClose }: SidebarProps) {
-  const { user } = useAuth()
-  const { theme, toggleTheme } = useTheme()
-  const isAdmin = user?.role === 'platform_owner'
-  const { access } = usePermissions()
-  const [collapsed, setCollapsed] = useState(() => localStorage.getItem(COLLAPSED_KEY) === 'true')
-  const visibleNavItems = navItems.filter((item) => (access?.[item.module] ?? 'none') !== 'none')
-  const visiblePhase2Items = phase2Items.filter((item) => (access?.[item.module] ?? 'none') !== 'none')
-  const canConfigurePermissions = (access?.permissions ?? 'none') !== 'none'
+  const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const isAdmin = user?.role === "platform_owner";
+  const { access } = usePermissions();
+  const [collapsed, setCollapsed] = useState(
+    () => localStorage.getItem(COLLAPSED_KEY) === "true",
+  );
+  const visibleNavItems = navItems.filter(
+    (item) => (access?.[item.module] ?? "none") !== "none",
+  );
+  const visiblePhase2Items = phase2Items.filter(
+    (item) => (access?.[item.module] ?? "none") !== "none",
+  );
+  const canConfigurePermissions = (access?.permissions ?? "none") !== "none";
 
   const toggleCollapsed = () => {
     setCollapsed((prev) => {
-      const next = !prev
-      localStorage.setItem(COLLAPSED_KEY, String(next))
-      return next
-    })
-  }
+      const next = !prev;
+      localStorage.setItem(COLLAPSED_KEY, String(next));
+      return next;
+    });
+  };
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      'flex items-center gap-3 text-sm transition-colors border-l-[3px] -ml-px',
-      collapsed ? 'justify-center px-2 py-2' : 'px-3 py-2',
+      "flex items-center gap-3 text-sm transition-colors border-l-[3px] -ml-px",
+      collapsed ? "justify-center px-2 py-2" : "px-3 py-2",
       isActive
-        ? 'text-sidebar-active-foreground font-semibold border-sidebar-active-foreground'
-        : 'border-transparent text-sidebar-foreground hover:text-sidebar-active-foreground'
-    )
+        ? "text-sidebar-active-foreground font-semibold border-sidebar-active-foreground"
+        : "border-transparent text-sidebar-foreground hover:text-sidebar-active-foreground",
+    );
 
   return (
     <>
@@ -83,19 +97,30 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
       <aside
         className={cn(
-          'fixed top-0 left-0 z-50 h-full w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col transition-all lg:translate-x-0 lg:static lg:z-auto',
-          open ? 'translate-x-0' : '-translate-x-full',
-          collapsed ? 'lg:w-16' : 'lg:w-64'
+          "fixed top-0 left-0 z-50 h-full w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col transition-all lg:translate-x-0 lg:static lg:z-auto",
+          open ? "translate-x-0" : "-translate-x-full",
+          collapsed ? "lg:w-16" : "lg:w-64",
         )}
       >
-        <div className={cn('flex items-center h-16 border-b border-sidebar-border', collapsed ? 'justify-center px-2' : 'justify-between px-4')}>
-          <NavLink to="/" className="flex items-center gap-2 font-display font-semibold text-lg text-sidebar-logo-foreground">
+        <div
+          className={cn(
+            "flex items-center h-16 border-b border-sidebar-border",
+            collapsed ? "justify-center px-2" : "justify-between px-4",
+          )}
+        >
+          <NavLink
+            to="/"
+            className="flex items-center gap-2 font-display font-semibold text-lg text-sidebar-logo-foreground"
+          >
             <span className="w-7 h-7 rounded-md bg-primary text-primary-foreground flex items-center justify-center shrink-0">
               <Sprout className="h-4 w-4" />
             </span>
-            {!collapsed && 'CafeOS'}
+            {!collapsed && "CafeOS"}
           </NavLink>
-          <button onClick={onClose} className="lg:hidden text-sidebar-foreground/60 hover:text-sidebar-foreground">
+          <button
+            onClick={onClose}
+            className="lg:hidden text-sidebar-foreground/60 hover:text-sidebar-foreground"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -105,7 +130,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <NavLink
               key={item.to}
               to={item.to}
-              end={item.to === '/'}
+              end={item.to === "/"}
               onClick={onClose}
               title={collapsed ? item.label : undefined}
               className={linkClass}
@@ -144,38 +169,39 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   Administração
                 </p>
               )}
-              {isAdmin && adminItems.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  onClick={onClose}
-                  title={collapsed ? item.label : undefined}
-                  className={linkClass}
-                >
-                  <item.icon className="h-5 w-5 shrink-0" />
-                  {!collapsed && item.label}
-                </NavLink>
-              ))}
+              {isAdmin &&
+                adminItems.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    onClick={onClose}
+                    title={collapsed ? item.label : undefined}
+                    className={linkClass}
+                  >
+                    <item.icon className="h-5 w-5 shrink-0" />
+                    {!collapsed && item.label}
+                  </NavLink>
+                ))}
               {canConfigurePermissions && (
                 <NavLink
                   to="/roles"
                   onClick={onClose}
-                  title={collapsed ? 'Papéis' : undefined}
+                  title={collapsed ? "Papéis" : undefined}
                   className={linkClass}
                 >
                   <Shield className="h-5 w-5 shrink-0" />
-                  {!collapsed && 'Papéis'}
+                  {!collapsed && "Papéis"}
                 </NavLink>
               )}
               {canConfigurePermissions && (
                 <NavLink
                   to="/permissions"
                   onClick={onClose}
-                  title={collapsed ? 'Permissões' : undefined}
+                  title={collapsed ? "Permissões" : undefined}
                   className={linkClass}
                 >
                   <ShieldCheck className="h-5 w-5 shrink-0" />
-                  {!collapsed && 'Permissões'}
+                  {!collapsed && "Permissões"}
                 </NavLink>
               )}
             </div>
@@ -185,28 +211,42 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         <div className="px-3 py-4 border-t border-sidebar-border space-y-1">
           <button
             onClick={toggleTheme}
-            title={collapsed ? (theme === 'dark' ? 'Modo Claro' : 'Modo Escuro') : undefined}
+            title={
+              collapsed
+                ? theme === "dark"
+                  ? "Modo Claro"
+                  : "Modo Escuro"
+                : undefined
+            }
             className={cn(
-              'flex items-center gap-3 rounded-lg text-sm w-full text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50 transition-colors',
-              collapsed ? 'justify-center px-2 py-2' : 'px-3 py-2'
+              "flex items-center gap-3 rounded-lg text-sm w-full text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50 transition-colors",
+              collapsed ? "justify-center px-2 py-2" : "px-3 py-2",
             )}
           >
-            {theme === 'dark' ? <Sun className="h-5 w-5 shrink-0" /> : <Moon className="h-5 w-5 shrink-0" />}
-            {!collapsed && (theme === 'dark' ? 'Modo Claro' : 'Modo Escuro')}
+            {theme === "dark" ? (
+              <Sun className="h-5 w-5 shrink-0" />
+            ) : (
+              <Moon className="h-5 w-5 shrink-0" />
+            )}
+            {!collapsed && (theme === "dark" ? "Modo Claro" : "Modo Escuro")}
           </button>
           <button
             onClick={toggleCollapsed}
-            title={collapsed ? 'Expandir menu' : undefined}
+            title={collapsed ? "Expandir menu" : undefined}
             className={cn(
-              'hidden lg:flex items-center gap-3 rounded-lg text-sm w-full text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50 transition-colors',
-              collapsed ? 'justify-center px-2 py-2' : 'px-3 py-2'
+              "hidden lg:flex items-center gap-3 rounded-lg text-sm w-full text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-active-bg/50 transition-colors",
+              collapsed ? "justify-center px-2 py-2" : "px-3 py-2",
             )}
           >
-            {collapsed ? <PanelLeftOpen className="h-5 w-5 shrink-0" /> : <PanelLeftClose className="h-5 w-5 shrink-0" />}
-            {!collapsed && 'Recolher menu'}
+            {collapsed ? (
+              <PanelLeftOpen className="h-5 w-5 shrink-0" />
+            ) : (
+              <PanelLeftClose className="h-5 w-5 shrink-0" />
+            )}
+            {!collapsed && "Recolher menu"}
           </button>
         </div>
       </aside>
     </>
-  )
+  );
 }
