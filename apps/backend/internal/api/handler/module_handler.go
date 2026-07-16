@@ -25,6 +25,35 @@ func NewModuleHandler(svc *service.ModuleService) *ModuleHandler {
 // @Success 200 {array} entity.Module
 // @Security BearerAuth
 // @Router /api/v1/{organization_id}/modules [get]
+// Create adiciona um novo modulo ao catalogo.
+// @Summary Criar modulo
+// @Description Cria um novo modulo (somente platform_owner)
+// @Tags modules (Modulos)
+// @Accept json
+// @Produce json
+// @Param module body createModuleRequest true "Dados do modulo"
+// @Success 201 {object} entity.Module
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/admin/modules [post]
+func (h *ModuleHandler) Create(w http.ResponseWriter, r *http.Request) {
+	var req createModuleRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+	if req.Key == "" || req.Name == "" {
+		writeError(w, "key and name are required", http.StatusBadRequest)
+		return
+	}
+	module, err := h.svc.Create(entity.ModuleKey(req.Key), req.Name, req.Order)
+	if err != nil {
+		writeError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	writeJSON(w, module, http.StatusCreated)
+}
+
 func (h *ModuleHandler) List(w http.ResponseWriter, r *http.Request) {
 	modules, err := h.svc.List()
 	if err != nil {
@@ -32,6 +61,12 @@ func (h *ModuleHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, modules, http.StatusOK)
+}
+
+type createModuleRequest struct {
+	Key   string `json:"key"`
+	Name  string `json:"name"`
+	Order int    `json:"order"`
 }
 
 type updateModuleRequest struct {

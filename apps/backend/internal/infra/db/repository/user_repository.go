@@ -23,19 +23,27 @@ func (r *UserRepository) Create(u *entity.User) error {
 
 func (r *UserRepository) GetByID(id string) (*entity.User, error) {
 	var u entity.User
-	err := r.db.Preload("Role").First(&u, "id = ?", id).Error
+	err := r.db.Preload("Role").Preload("Plan").Preload("ManagedByUser").First(&u, "id = ?", id).Error
 	return &u, err
 }
 
 func (r *UserRepository) GetByEmail(email string) (*entity.User, error) {
 	var u entity.User
-	err := r.db.Preload("Role").Where("email = ?", email).First(&u).Error
+	err := r.db.Preload("Role").Preload("Plan").Preload("ManagedByUser").Where("email = ?", email).First(&u).Error
 	return &u, err
 }
 
 func (r *UserRepository) ListByOrganization(organizationID string) ([]*entity.User, error) {
 	var users []*entity.User
-	err := r.db.Preload("Role").Where("organization_id = ?", organizationID).Order("name").Find(&users).Error
+	err := r.db.Preload("Role").Preload("Plan").Preload("ManagedByUser").Where("organization_id = ?", organizationID).Order("name").Find(&users).Error
+	return users, err
+}
+
+func (r *UserRepository) ListByManager(managerID string) ([]*entity.User, error) {
+	var users []*entity.User
+	err := r.db.Preload("Role").Preload("Plan").Preload("ManagedByUser").
+		Where("id = ? OR managed_by_user_id = ?", managerID, managerID).
+		Order("name").Find(&users).Error
 	return users, err
 }
 
@@ -45,7 +53,7 @@ func (r *UserRepository) Update(u *entity.User) error {
 
 func (r *UserRepository) List() ([]*entity.User, error) {
 	var users []*entity.User
-	err := r.db.Preload("Role").Order("name").Find(&users).Error
+	err := r.db.Preload("Role").Preload("Plan").Preload("ManagedByUser").Order("name").Find(&users).Error
 	return users, err
 }
 

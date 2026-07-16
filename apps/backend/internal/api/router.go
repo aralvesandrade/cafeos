@@ -95,7 +95,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	signupH := handler.NewSignupHandler(signupSvc)
 	organizationH := handler.NewOrganizationHandler(organizationRepo, permSvc)
 	planH := handler.NewPlanHandler(planSvc)
-	userH := handler.NewUserHandler(userRepo, roleSvc, userSvc)
+	userH := handler.NewUserHandler(userRepo, roleSvc, userSvc, farmSvc)
 	finH := handler.NewFinancialHandler(finSvc, farmSvc)
 	stockH := handler.NewStockHandler(stockSvc, farmSvc)
 	fleetH := handler.NewFleetHandler(fleetSvc, farmSvc)
@@ -298,6 +298,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	mux.Handle("PUT /api/v1/{organization_id}/users/{id}", mchain(entity.ModuleUsers, write, userH.UpdateForOrg))
 	mux.Handle("DELETE /api/v1/{organization_id}/users/{id}", mchain(entity.ModuleUsers, write, userH.DeleteForOrg))
 	mux.Handle("PATCH /api/v1/{organization_id}/users/{id}/plan", authMw(http.HandlerFunc(userH.AssignPlanForOrg)))
+	mux.Handle("PUT /api/v1/{organization_id}/users/{id}/farms", mchain(entity.ModuleUsers, write, userH.SetUserFarms))
 
 	// Sync — offline mobile (requires RabbitMQ publisher)
 	if publisher != nil {

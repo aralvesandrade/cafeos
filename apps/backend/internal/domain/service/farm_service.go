@@ -176,6 +176,69 @@ func (s *FarmService) SetProducers(farmID string, producers []*entity.Producer) 
 	return producers, nil
 }
 
+// LinkUserToFarms creates Producer records linking userID to each farmID.
+// callerUserID must be the owner of every farm. userName/userEmail populate
+// the Producer legal fields (required by the not-null constraint on Name).
+func (s *FarmService) LinkUserToFarms(orgID, callerUserID, userID, roleID, userName, userEmail string, farmIDs []string) error {
+	for _, farmID := range farmIDs {
+		if !s.IsOwner(farmID, callerUserID) {
+			return errors.New("caller does not own farm " + farmID)
+		}
+	}
+
+	now := time.Now()
+	producers := make([]*entity.Producer, 0, len(farmIDs))
+	for _, farmID := range farmIDs {
+		producers = append(producers, &entity.Producer{
+			ID:             uuid.New().String(),
+			OrganizationID: orgID,
+			FarmID:         farmID,
+			UserID:         userID,
+			RoleID:         roleID,
+			Name:           userName,
+			Email:          userEmail,
+			CreatedAt:      now,
+			UpdatedAt:      now,
+		})
+	}
+	return s.producerRepo.CreateBatch(producers)
+}
+
+// SetUserFarms replaces every farm-link of userID with the given farmIDs.
+// callerUserID must own every farm. Uses CreateBatch + DeleteByUserID in a
+// single transaction for atomicity.
+func (s *FarmService) SetUserFarms(orgID, callerUserID, userID, roleID, userName, userEmail string, farmIDs []string) error {
+	for _, farmID := range farmIDs {
+		if !s.IsOwner(farmID, callerUserID) {
+			return errors.New("caller does not own farm " + farmID)
+		}
+	}
+
+	if err := s.producerRepo.DeleteByUserID(userID); err != nil {
+		return err
+	}
+	if len(farmIDs) == 0 {
+		return nil
+	}
+
+	now := time.Now()
+	producers := make([]*entity.Producer, 0, len(farmIDs))
+	for _, farmID := range farmIDs {
+		producers = append(producers, &entity.Producer{
+			ID:             uuid.New().String(),
+			OrganizationID: orgID,
+			FarmID:         farmID,
+			UserID:         userID,
+			RoleID:         roleID,
+			Name:           userName,
+			Email:          userEmail,
+			CreatedAt:      now,
+			UpdatedAt:      now,
+		})
+	}
+	return s.producerRepo.CreateBatch(producers)
+}
+
 func (s *FarmService) Delete(id string) error {
 	if err := s.producerRepo.DeleteByFarmID(id); err != nil {
 		return err

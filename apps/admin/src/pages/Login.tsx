@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Sprout, LogIn, UserCircle } from 'lucide-react'
+import { Sprout, LogIn, UserCircle, ChevronDown, ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/lib/auth'
@@ -20,6 +20,7 @@ export function Login() {
   const [password, setPassword] = useState('admin123')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showQuickAccess, setShowQuickAccess] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
   const toast = useToast()
@@ -98,32 +99,56 @@ export function Login() {
         </Button>
       </form>
 
-      <div className="bg-card rounded-xl shadow-sm border border-border p-4 mt-4">
-        <p className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-1">
-          <UserCircle className="h-3 w-3" />
-          ACESSO RÁPIDO — SELECIONE UM PERFIL
-        </p>
-        <div className="grid grid-cols-2 gap-2">
-          {profiles.map((p) => (
-            <button
-              key={p.email}
-              type="button"
-              onClick={() => {
-                setEmail(p.email)
-                setPassword(p.password)
-                setError('')
-              }}
-              className={`text-left text-xs px-3 py-2 rounded-lg border transition-colors ${
-                email === p.email
-                  ? 'border-primary bg-primary/10 text-primary font-medium'
-                  : 'border-border text-foreground hover:border-primary/50 hover:bg-muted'
-              }`}
-            >
-              <div className="truncate font-medium">{p.label}</div>
-              <div className="truncate text-[10px] opacity-60">{p.role}</div>
-            </button>
-          ))}
-        </div>
+      <div className="bg-card rounded-xl shadow-sm border border-border mt-4">
+        <button
+          type="button"
+          onClick={() => setShowQuickAccess((v) => !v)}
+          className="w-full flex items-center justify-between px-4 py-3 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <span className="flex items-center gap-1">
+            <UserCircle className="h-3 w-3" />
+            ACESSO RÁPIDO
+          </span>
+          {showQuickAccess ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+        </button>
+        {showQuickAccess && (
+          <div className="px-4 pb-4">
+            <p className="text-[10px] text-muted-foreground mb-2">Selecione um perfil para preenchimento automático</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('')
+                  setPassword('')
+                  setError('')
+                }}
+                className="text-left text-xs px-3 py-2 rounded-lg border border-dashed border-border text-muted-foreground hover:border-primary/50 hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <div className="truncate font-medium">Limpar</div>
+                <div className="truncate text-[10px] opacity-60">—</div>
+              </button>
+              {profiles.map((p) => (
+                <button
+                  key={p.email}
+                  type="button"
+                  onClick={() => {
+                    setEmail(p.email)
+                    setPassword(p.password)
+                    setError('')
+                  }}
+                  className={`text-left text-xs px-3 py-2 rounded-lg border transition-colors ${
+                    email === p.email
+                      ? 'border-primary bg-primary/10 text-primary font-medium'
+                      : 'border-border text-foreground hover:border-primary/50 hover:bg-muted'
+                  }`}
+                >
+                  <div className="truncate font-medium">{p.label}</div>
+                  <div className="truncate text-[10px] opacity-60">{p.role}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

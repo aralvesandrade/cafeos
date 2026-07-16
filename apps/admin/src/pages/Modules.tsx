@@ -4,36 +4,29 @@ import { useToast } from '@/lib/toast'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
 import { Field } from '@/components/ui/field'
 import { RequiredLegend } from '@/components/ui/required-legend'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Pencil, Building2 } from 'lucide-react'
+import { Plus, Pencil, Puzzle } from 'lucide-react'
+import type { ModuleMeta } from '@/lib/permissions'
 
-interface Organization {
-  id: string
-  name: string
-  brand_name: string
-  slug: string
-  status: string
-  created_at: string
-}
+const emptyForm = { key: '', name: '', order: '0' }
 
-
-export function Organizations() {
-  const [organizations, setOrganizations] = useState<Organization[]>([])
+export function Modules() {
+  const [modules, setModules] = useState<ModuleMeta[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editing, setEditing] = useState<Organization | null>(null)
-  const [form, setForm] = useState({ name: '', status: 'active' })
+  const [editing, setEditing] = useState<ModuleMeta | null>(null)
+  const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
   const toast = useToast()
 
   const load = useCallback(async () => {
     try {
-      const organizationData = await apiRequest<Organization[]>('/admin/organizations', { admin: true })
-      setOrganizations(organizationData)
+      const data = await apiRequest<ModuleMeta[]>('/modules')
+      data.sort((a, b) => a.order - b.order)
+      setModules(data)
     } catch (err) {
       console.error(err)
     } finally {
@@ -48,16 +41,16 @@ export function Organizations() {
     setSaving(true)
     try {
       if (editing) {
-        await apiRequest(`/admin/organizations/${editing.id}`, { method: 'PUT', body: form, admin: true })
+        await apiRequest(`/admin/modules/${editing.key}`, { method: 'PUT', body: { name: form.name, order: Number(form.order) }, admin: true })
       } else {
-        await apiRequest('/admin/organizations', { method: 'POST', body: form, admin: true })
+        await apiRequest('/admin/modules', { method: 'POST', body: { key: form.key, name: form.name, order: Number(form.order) }, admin: true })
       }
       setDialogOpen(false); setEditing(null)
       await load()
-      toast.success(editing ? 'Organização atualizada' : 'Organização criada')
+      toast.success(editing ? 'Módulo atualizado' : 'Módulo criado')
     } catch (err) {
       console.error(err)
-      toast.error('Erro ao salvar organização')
+      toast.error('Erro ao salvar módulo')
     } finally {
       setSaving(false)
     }
@@ -69,64 +62,58 @@ export function Organizations() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-foreground">Organizações</h1>
-          <p className="text-sm text-muted-foreground">Gerenciar clientes da plataforma</p>
+          <h1 className="font-display text-2xl font-semibold text-foreground">Módulos</h1>
+          <p className="text-sm text-muted-foreground">Catálogo de módulos do sistema</p>
         </div>
-        <Button onClick={() => { setEditing(null); setForm({ name: '', status: 'active' }); setDialogOpen(true) }}>
-          <Plus className="h-4 w-4" /> Nova Organização
+        <Button onClick={() => { setEditing(null); setForm(emptyForm); setDialogOpen(true) }}>
+          <Plus className="h-4 w-4" /> Novo Módulo
         </Button>
       </div>
 
       <Table>
         <TableHead>
           <TableRow>
+            <TableHeader>Ordem</TableHeader>
+            <TableHeader>Chave</TableHeader>
             <TableHeader>Nome</TableHeader>
-            <TableHeader>Slug</TableHeader>
-            <TableHeader>Status</TableHeader>
             <TableHeader className="text-right">Ações</TableHeader>
           </TableRow>
         </TableHead>
         <TableBody>
-          {organizations.map((o) => (
-            <TableRow key={o.id}>
+          {modules.map((m) => (
+            <TableRow key={m.key}>
+              <TableCell className="text-muted-foreground text-sm">{m.order}</TableCell>
+              <TableCell><Badge variant="default">{m.key}</Badge></TableCell>
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4 text-primary" />
-                  {o.name}
+                  <Puzzle className="h-4 w-4 text-primary" />
+                  {m.name}
                 </div>
               </TableCell>
-              <TableCell className="text-muted-foreground text-sm">{o.slug}</TableCell>
-              <TableCell>
-                <Badge variant={o.status === 'active' ? 'success' : 'default'}>
-                  {o.status === 'active' ? 'Ativo' : 'Inativo'}
-                </Badge>
-              </TableCell>
               <TableCell className="text-right">
-                <Button variant="ghost" size="sm" onClick={() => { setEditing(o); setForm({ name: o.name, status: o.status }); setDialogOpen(true) }}>
+                <Button variant="ghost" size="sm" onClick={() => { setEditing(m); setForm({ key: m.key, name: m.name, order: String(m.order) }); setDialogOpen(true) }}>
                   <Pencil className="h-4 w-4" />
                 </Button>
               </TableCell>
             </TableRow>
           ))}
-          {organizations.length === 0 && (
-            <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma organização cadastrada.</TableCell></TableRow>
+          {modules.length === 0 && (
+            <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhum módulo encontrado.</TableCell></TableRow>
           )}
         </TableBody>
       </Table>
 
-      <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Organização' : 'Nova Organização'}>
+      <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} title={editing ? 'Editar Módulo' : 'Novo Módulo'}>
         <form onSubmit={handleSave} className="space-y-4">
+          <Field label="Chave" required>
+            <Input value={form.key} onChange={(e) => setForm({ ...form, key: e.target.value })} required disabled={!!editing} placeholder="ex: custom_module" />
+          </Field>
           <Field label="Nome" required>
             <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           </Field>
-          {editing && (
-            <Field label="Status">
-              <Select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-                <option value="active">Ativo</option>
-                <option value="inactive">Inativo</option>
-              </Select>
-            </Field>
-          )}
+          <Field label="Ordem">
+            <Input type="number" value={form.order} onChange={(e) => setForm({ ...form, order: e.target.value })} />
+          </Field>
           <div className="flex items-center justify-between gap-3 pt-2">
             <RequiredLegend />
             <div className="flex gap-3">

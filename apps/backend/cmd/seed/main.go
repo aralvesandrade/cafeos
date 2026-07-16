@@ -17,8 +17,9 @@ import (
 )
 
 const (
-	adminEmail = "admin@cafeos.com.br"
-	adminPass  = "admin123"
+	adminEmail  = "admin@cafeos.com.br"
+	adminPass   = "admin123"
+	defaultPass = "123456"
 )
 
 func main() {
@@ -206,13 +207,16 @@ func seed(db *gorm.DB) error {
 		PlanSlug                       string
 	}
 	userDefs := []userDef{
+		//
 		{Name: "Administrador", Email: adminEmail, Password: adminPass, RoleKey: entity.SystemRolePlatformOwner},
-		{Name: "João Silva", Email: "joao@cafeos.com.br", Password: "123456", RoleKey: entity.RoleKeyProprietario, PlanSlug: "pro"},
-		{Name: "Maria Oliveira", Email: "maria@cafeos.com.br", Password: "123456", RoleKey: "gerente_agricola"},
-		{Name: "Carlos Santos", Email: "carlos@cafeos.com.br", Password: "123456", RoleKey: "engenheiro_agronomo"},
-		{Name: "Ana Costa", Email: "ana@cafeos.com.br", Password: "123456", RoleKey: "operador_campo"},
-		{Name: "Fernanda Lima", Email: "fernanda@cafeos.com.br", Password: "123456", RoleKey: entity.SystemRoleOrganizationAdmin},
-		{Name: "Rodrigo Alves", Email: "rodrigo@cafeos.com.br", Password: "123456", RoleKey: "consultor_externo"},
+		{Name: "Fernanda Lima", Email: "fernanda@cafeos.com.br", Password: defaultPass, RoleKey: entity.SystemRoleOrganizationAdmin},
+		//
+		{Name: "João Silva", Email: "joao@cafeos.com.br", Password: defaultPass, RoleKey: entity.RoleKeyProprietario, PlanSlug: "pro"},
+		{Name: "Maria Oliveira", Email: "maria@cafeos.com.br", Password: defaultPass, RoleKey: entity.RoleKeyProprietario, PlanSlug: "essencial"},
+		//
+		{Name: "Carlos Santos", Email: "carlos@cafeos.com.br", Password: defaultPass, RoleKey: "engenheiro_agronomo"},
+		{Name: "Ana Costa", Email: "ana@cafeos.com.br", Password: defaultPass, RoleKey: "operador_campo"},
+		{Name: "Rodrigo Alves", Email: "rodrigo@cafeos.com.br", Password: defaultPass, RoleKey: "consultor_externo"},
 	}
 	userByEmail := make(map[string]*entity.User, len(userDefs))
 	for _, d := range userDefs {
@@ -245,8 +249,8 @@ func seed(db *gorm.DB) error {
 
 	// Managed-by hierarchy
 	type mgmt struct {
-		UserEmail  string
-		ManagerID  string
+		UserEmail string
+		ManagerID string
 	}
 	mgmtChain := []mgmt{
 		{UserEmail: "carlos@cafeos.com.br", ManagerID: joaoUser.ID},
@@ -313,6 +317,7 @@ func seed(db *gorm.DB) error {
 		producers := []entity.Producer{
 			{OrganizationID: organization.ID, FarmID: farms[0].ID, UserID: joaoUser.ID, RoleID: roleIDByKey[entity.RoleKeyProprietario], CPF: "123.456.789-00", Name: "João Silva", Phone: "(35) 99999-0001", Email: "joao@cafeos.com.br"},
 			{OrganizationID: organization.ID, FarmID: farms[0].ID, UserID: anaUser.ID, RoleID: roleIDByKey["operador_campo"], Name: "Ana Costa", Phone: "(35) 99999-0004", Email: "ana@cafeos.com.br"},
+			{OrganizationID: organization.ID, FarmID: farms[1].ID, UserID: anaUser.ID, RoleID: roleIDByKey["operador_campo"], Name: "Ana Costa", Phone: "(35) 99999-0004", Email: "ana@cafeos.com.br"},
 			{OrganizationID: organization.ID, FarmID: farms[1].ID, UserID: joaoUser.ID, RoleID: roleIDByKey[entity.RoleKeyProprietario], CPF: "123.456.789-00", Name: "João Silva", Phone: "(35) 99999-0001", Email: "joao@cafeos.com.br"},
 			{OrganizationID: organization.ID, FarmID: farms[2].ID, UserID: mariaUser.ID, RoleID: roleIDByKey[entity.RoleKeyProprietario], CPF: "987.654.321-00", Name: "Maria Oliveira", Phone: "(35) 99999-0002", Email: "maria@cafeos.com.br"},
 		}
@@ -446,11 +451,11 @@ func seed(db *gorm.DB) error {
 				status = entity.HarvestEmAndamento
 			}
 			h = entity.Harvest{
-				OrganizationID:     organization.ID,
-				Year:               y,
-				Description:        fmt.Sprintf("Safra %d", y),
+				OrganizationID:      organization.ID,
+				Year:                y,
+				Description:         fmt.Sprintf("Safra %d", y),
 				EstimatedProduction: 3000 + float64(y-2024)*500,
-				Status:             status,
+				Status:              status,
 			}
 			if err := db.Create(&h).Error; err != nil {
 				return fmt.Errorf("create harvest %d: %w", y, err)

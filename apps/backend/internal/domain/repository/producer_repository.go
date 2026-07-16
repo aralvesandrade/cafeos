@@ -12,4 +12,6 @@ type ProducerRepository interface {
 	ExistsByFarmAndUser(farmID, userID string) (bool, error)
 	Update(producer *entity.Producer) error
 	DeleteByFarmID(farmID string) error
+	CreateBatch(producers []*entity.Producer) error
+	DeleteByUserID(userID string) error
 }

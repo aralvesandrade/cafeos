@@ -43,6 +43,17 @@ func (r *ProducerRepository) Update(p *entity.Producer) error {
 	return r.db.Save(p).Error
 }
 
+func (r *ProducerRepository) CreateBatch(producers []*entity.Producer) error {
+	if len(producers) == 0 {
+		return nil
+	}
+	return r.db.Create(producers).Error
+}
+
+func (r *ProducerRepository) DeleteByUserID(userID string) error {
+	return r.db.Where("user_id = ?", userID).Delete(&entity.Producer{}).Error
+}
+
 func (r *ProducerRepository) DeleteByFarmID(farmID string) error {
 	return r.db.Where("farm_id = ?", farmID).Delete(&entity.Producer{}).Error
 }

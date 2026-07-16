@@ -6,7 +6,7 @@ import { Forbidden } from '@/pages/Forbidden'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 
-const platformOnlyRoutes = ['/organizations', '/users']
+const platformOnlyRoutes = ['/organizations']
 
 export function AdminLayout() {
   const { isAuthenticated, user } = useAuth()

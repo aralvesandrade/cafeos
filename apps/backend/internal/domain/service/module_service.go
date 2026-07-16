@@ -49,6 +49,21 @@ func (s *ModuleService) List() ([]*entity.Module, error) {
 
 // UpdateMeta renames/reorders a module. The key itself is fixed — it is
 // wired directly into route declarations in router.go.
+// Create registers a new module. Only platform_owner can do this.
+func (s *ModuleService) Create(key entity.ModuleKey, name string, order int) (*entity.Module, error) {
+	module := &entity.Module{
+		Key:       key,
+		Name:      name,
+		Order:     order,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	if err := s.repo.Upsert(module); err != nil {
+		return nil, err
+	}
+	return module, nil
+}
+
 func (s *ModuleService) UpdateMeta(key entity.ModuleKey, name string, order int) (*entity.Module, error) {
 	module, err := s.repo.GetByKey(key)
 	if err != nil {

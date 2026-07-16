@@ -3,22 +3,12 @@ import { NavLink } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import {
   LayoutDashboard,
-  Tractor,
   Grid3X3,
   MapPin,
-  Calendar,
   Building2,
   Users,
   Sprout,
   X,
-  DollarSign,
-  Package,
-  Truck,
-  UserCog,
-  CircleDollarSign,
-  Tags,
-  Wallet,
-  SplitSquareHorizontal,
   Sun,
   Moon,
   PanelLeftClose,
@@ -26,6 +16,7 @@ import {
   ShieldCheck,
   Shield,
   CreditCard,
+  Puzzle,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { useTheme } from '@/lib/theme'
@@ -35,26 +26,16 @@ const navItems: { to: string; icon: typeof LayoutDashboard; label: string; modul
   { to: '/', icon: LayoutDashboard, label: 'Dashboard', module: 'dashboard' },
   { to: '/farms', icon: MapPin, label: 'Fazendas', module: 'farms' },
   { to: '/plots', icon: Grid3X3, label: 'Talhões', module: 'farms' },
-  { to: '/operations', icon: Tractor, label: 'Operações', module: 'operations' },
-  { to: '/operation-types', icon: Tags, label: 'Tipos de Operação', module: 'farms' },
-  { to: '/harvests', icon: Calendar, label: 'Safras', module: 'harvests' },
 ]
 
 const phase2Items: { to: string; icon: typeof LayoutDashboard; label: string; module: Module }[] = [
-  { to: '/financial', icon: DollarSign, label: 'Financeiro', module: 'financial' },
-  { to: '/cost-centers', icon: CircleDollarSign, label: 'Centros de Custo', module: 'financial' },
-  { to: '/budgets', icon: Wallet, label: 'Orçamento', module: 'financial' },
-  { to: '/cost-allocations', icon: SplitSquareHorizontal, label: 'Rateio de Custo', module: 'financial' },
-  { to: '/stock', icon: Package, label: 'Estoque', module: 'resources' },
-  { to: '/fleet', icon: Truck, label: 'Frota', module: 'resources' },
-  { to: '/labor', icon: UserCog, label: 'Equipes', module: 'resources' },
-  { to: '/team', icon: Users, label: 'Minha Equipe', module: 'users' },
+  { to: '/team', icon: Users, label: 'Usuários', module: 'users' },
 ]
 
 const adminItems = [
   { to: '/organizations', icon: Building2, label: 'Organizações' },
   { to: '/plans', icon: CreditCard, label: 'Planos' },
-  { to: '/users', icon: Users, label: 'Usuários' },
+  { to: '/modules', icon: Puzzle, label: 'Módulos' },
 ]
 
 interface SidebarProps {
@@ -177,17 +158,6 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               ))}
               {canConfigurePermissions && (
                 <NavLink
-                  to="/permissions"
-                  onClick={onClose}
-                  title={collapsed ? 'Permissões' : undefined}
-                  className={linkClass}
-                >
-                  <ShieldCheck className="h-5 w-5 shrink-0" />
-                  {!collapsed && 'Permissões'}
-                </NavLink>
-              )}
-              {canConfigurePermissions && (
-                <NavLink
                   to="/roles"
                   onClick={onClose}
                   title={collapsed ? 'Papéis' : undefined}
@@ -195,6 +165,17 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 >
                   <Shield className="h-5 w-5 shrink-0" />
                   {!collapsed && 'Papéis'}
+                </NavLink>
+              )}
+              {canConfigurePermissions && (
+                <NavLink
+                  to="/permissions"
+                  onClick={onClose}
+                  title={collapsed ? 'Permissões' : undefined}
+                  className={linkClass}
+                >
+                  <ShieldCheck className="h-5 w-5 shrink-0" />
+                  {!collapsed && 'Permissões'}
                 </NavLink>
               )}
             </div>

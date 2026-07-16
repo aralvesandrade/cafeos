@@ -17,10 +17,11 @@ type UserHandler struct {
 	repo    repository.UserRepository
 	roleSvc *service.RoleService
 	userSvc *service.UserService
+	farmSvc *service.FarmService
 }
 
-func NewUserHandler(repo repository.UserRepository, roleSvc *service.RoleService, userSvc *service.UserService) *UserHandler {
-	return &UserHandler{repo: repo, roleSvc: roleSvc, userSvc: userSvc}
+func NewUserHandler(repo repository.UserRepository, roleSvc *service.RoleService, userSvc *service.UserService, farmSvc *service.FarmService) *UserHandler {
+	return &UserHandler{repo: repo, roleSvc: roleSvc, userSvc: userSvc, farmSvc: farmSvc}
 }
 
 type createUserRequest struct {
@@ -30,8 +31,9 @@ type createUserRequest struct {
 	Password       string `json:"password"`
 	// RoleID is preferred; Role (a role key, e.g. "operador_campo") is
 	// accepted for backward compatibility and resolved via RoleService.
-	RoleID string `json:"role_id"`
-	Role   string `json:"role"`
+	RoleID  string   `json:"role_id"`
+	Role    string   `json:"role"`
+	FarmIDs []string `json:"farm_ids,omitempty"`
 }
 
 type updateUserRequest struct {
@@ -246,14 +248,20 @@ type userResponse struct {
 	IsActive        bool    `json:"is_active"`
 	Status          string  `json:"status"`
 	ManagedByUserID *string `json:"managed_by_user_id"`
+	ManagedByName   *string `json:"managed_by_name,omitempty"`
 	IsPrincipal     bool    `json:"is_principal"`
 	PlanID          *string `json:"plan_id,omitempty"`
+	PlanName        *string `json:"plan_name,omitempty"`
 }
 
 func toUserResponse(u *entity.User) userResponse {
 	status := "active"
 	if !u.IsActive {
 		status = "inactive"
+	}
+	var planName *string
+	if u.PlanID != nil {
+		planName = &u.Plan.Name
 	}
 	return userResponse{
 		ID:              u.ID,
@@ -265,8 +273,10 @@ func toUserResponse(u *entity.User) userResponse {
 		IsActive:        u.IsActive,
 		Status:          status,
 		ManagedByUserID: u.ManagedByUserID,
+		ManagedByName:   managedByName(u.ManagedByUser, u.ManagedByUserID),
 		IsPrincipal:     u.ManagedByUserID == nil,
 		PlanID:          u.PlanID,
+		PlanName:        planName,
 	}
 }
 
@@ -281,7 +291,25 @@ func toUserResponse(u *entity.User) userResponse {
 // @Router /api/v1/{organization_id}/users [get]
 func (h *UserHandler) ListForOrg(w http.ResponseWriter, r *http.Request) {
 	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
-	users, err := h.repo.ListByOrganization(organizationID)
+	callerRole, _ := r.Context().Value(middleware.RoleKey).(string)
+	callerUserID, _ := r.Context().Value(middleware.UserIDKey).(string)
+
+	var users []*entity.User
+	var err error
+	if callerRole == entity.SystemRoleOrganizationAdmin || callerRole == entity.SystemRolePlatformOwner {
+		users, err = h.repo.ListByOrganization(organizationID)
+	} else {
+		isPrincipal, _ := h.userSvc.IsPrincipal(callerUserID)
+		if isPrincipal {
+			users, err = h.repo.ListByManager(callerUserID)
+		} else {
+			var u *entity.User
+			u, err = h.repo.GetByID(callerUserID)
+			if err == nil {
+				users = []*entity.User{u}
+			}
+		}
+	}
 	if err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -375,6 +403,19 @@ func (h *UserHandler) CreateForOrg(w http.ResponseWriter, r *http.Request) {
 	if err := h.repo.Create(user); err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
+	}
+
+	// Vincula fazendas ao novo usuário, se fornecidas
+	if len(req.FarmIDs) > 0 {
+		role, err := h.roleSvc.FindByKey(entity.RoleKeyProprietario)
+		if err != nil {
+			writeError(w, "failed to resolve default farm role", http.StatusInternalServerError)
+			return
+		}
+		if err := h.farmSvc.LinkUserToFarms(organizationID, callerUserID, user.ID, role.ID, user.Name, user.Email, req.FarmIDs); err != nil {
+			writeError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 	}
 
 	writeJSON(w, toUserResponse(user), http.StatusCreated)
@@ -530,4 +571,78 @@ func (h *UserHandler) AssignPlanForOrg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, toUserResponse(updated), http.StatusOK)
+}
+
+type setUserFarmsRequest struct {
+	FarmIDs []string `json:"farm_ids"`
+}
+
+// SetUserFarms substitui as fazendas vinculadas a um sub-usuário.
+// @Summary Vincular fazendas ao usuário
+// @Description Substitui todas as fazendas vinculadas ao usuário pelas fornecidas
+// @Tags users (Usuários)
+// @Accept json
+// @Produce json
+// @Param organization_id path string true "ID da Organização"
+// @Param id path string true "ID do Usuário"
+// @Param farms body setUserFarmsRequest true "Lista de IDs de fazendas"
+// @Success 200 {object} entity.User
+// @Failure 400 {object} map[string]string
+// @Failure 403 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /api/v1/{organization_id}/users/{id}/farms [put]
+func (h *UserHandler) SetUserFarms(w http.ResponseWriter, r *http.Request) {
+	organizationID, _ := r.Context().Value(middleware.OrganizationIDKey).(string)
+	callerUserID, _ := r.Context().Value(middleware.UserIDKey).(string)
+	callerRole, _ := r.Context().Value(middleware.RoleKey).(string)
+	targetID := r.PathValue("id")
+
+	existing, err := h.repo.GetByID(targetID)
+	if err != nil || existing.OrganizationID != organizationID {
+		writeError(w, "user not found", http.StatusNotFound)
+		return
+	}
+
+	// Apenas organization_admin, platform_owner, ou principal que gerencia o alvo
+	if callerRole != entity.SystemRoleOrganizationAdmin && callerRole != entity.SystemRolePlatformOwner {
+		if err := h.userSvc.EnsureManages(callerUserID, targetID); err != nil {
+			writeError(w, "only the managing principal or organization admin can set farms", http.StatusForbidden)
+			return
+		}
+	}
+
+	var req setUserFarmsRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	role, err := h.roleSvc.FindByKey(entity.RoleKeyProprietario)
+	if err != nil {
+		writeError(w, "failed to resolve default farm role", http.StatusInternalServerError)
+		return
+	}
+
+	if err := h.farmSvc.SetUserFarms(organizationID, callerUserID, targetID, role.ID, existing.Name, existing.Email, req.FarmIDs); err != nil {
+		writeError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	updated, err := h.repo.GetByID(targetID)
+	if err != nil {
+		writeError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	writeJSON(w, toUserResponse(updated), http.StatusOK)
+}
+
+func managedByName(m *entity.User, id *string) *string {
+	if m != nil && m.Name != "" {
+		return &m.Name
+	}
+	if id != nil {
+		return id
+	}
+	return nil
 }
