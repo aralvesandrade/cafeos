@@ -64,8 +64,8 @@ func seed(db *gorm.DB) error {
 	// mesma ordem em que era exibido antes.
 	plans := []entity.Plan{
 		{
-			Name: "Grátis", Slug: "free", Description: "Para pequenos produtores que estão começando",
-			PriceCents: 0, BillingInterval: "monthly", MaxFarms: 1, MaxUsers: 2,
+			Name: "Essencial", Slug: "essencial", Description: "Para pequenos produtores que estão começando",
+			PriceCents: 2900, BillingInterval: "monthly", MaxFarms: 1, MaxUsers: 2,
 			Features: entity.PlanFeatureList{
 				{Label: "1 fazenda", Included: true},
 				{Label: "5 talhões", Included: true},
@@ -135,7 +135,7 @@ func seed(db *gorm.DB) error {
 		}
 		planIDBySlug[plans[i].Slug] = plans[i].ID
 	}
-	fmt.Println("  ✓ Plans: free, pro, cooperativa, consultoria")
+	fmt.Println("  ✓ Plans: essencial, pro, cooperativa, consultoria")
 
 	// Organization (tenant/whitelabel — plano não é mais campo da organização,
 	// e sim de cada usuário principal dentro dela).
@@ -187,11 +187,11 @@ func seed(db *gorm.DB) error {
 	// sub-usuário de Maria. Fernanda é admin do tenant (organization_admin),
 	// sem farms/plano próprio.
 	proPlanID := planIDBySlug["pro"]
-	freePlanID := planIDBySlug["free"]
+	essencialPlanID := planIDBySlug["essencial"]
 	users := []entity.User{
 		{OrganizationID: organization.ID, Name: "Administrador", Email: adminEmail, PasswordHash: hash(adminPass), RoleID: roleIDByKey[entity.SystemRolePlatformOwner], IsActive: true},
 		{OrganizationID: organization.ID, Name: "João Silva", Email: "joao@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.RoleKeyProprietario], IsActive: true, PlanID: &proPlanID},
-		{OrganizationID: organization.ID, Name: "Maria Oliveira", Email: "maria@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.RoleKeyProprietario], IsActive: true, PlanID: &freePlanID},
+		{OrganizationID: organization.ID, Name: "Maria Oliveira", Email: "maria@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.RoleKeyProprietario], IsActive: true, PlanID: &essencialPlanID},
 		{OrganizationID: organization.ID, Name: "Carlos Santos", Email: "carlos@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey["engenheiro_agronomo"], IsActive: true},
 		{OrganizationID: organization.ID, Name: "Ana Costa", Email: "ana@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey["operador_campo"], IsActive: true},
 		{OrganizationID: organization.ID, Name: "Fernanda Lima", Email: "fernanda@cafeos.com.br", PasswordHash: hash("123456"), RoleID: roleIDByKey[entity.SystemRoleOrganizationAdmin], IsActive: true},

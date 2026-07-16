@@ -85,7 +85,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	}
 
 	userSvc := domainSvc.NewUserService(userRepo, planRepo)
-	signupSvc := domainSvc.NewSignupService(transactor, organizationRepo, roleSvc, signupOrgSlug)
+	signupSvc := domainSvc.NewSignupService(transactor, organizationRepo, planRepo, roleSvc, signupOrgSlug)
 	farmH := handler.NewFarmHandler(farmSvc, userSvc, roleSvc)
 	plotH := handler.NewPlotHandler(plotSvc, farmSvc)
 	opH := handler.NewOperationHandler(opSvc, plotSvc, farmSvc)

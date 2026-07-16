@@ -7863,6 +7863,9 @@ const docTemplate = `{
                 "phone": {
                     "type": "string"
                 },
+                "plan_slug": {
+                    "type": "string"
+                },
                 "state": {
                     "type": "string"
                 },

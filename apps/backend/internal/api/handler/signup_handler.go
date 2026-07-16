@@ -25,6 +25,7 @@ type registerRequest struct {
 	City        string  `json:"city"`
 	MainCrop    string  `json:"main_crop"`
 	TotalAreaHA float64 `json:"total_area_ha"`
+	PlanSlug    string  `json:"plan_slug"`
 }
 
 type registerResponse struct {
@@ -59,6 +60,7 @@ func (h *SignupHandler) Register(w http.ResponseWriter, r *http.Request) {
 		City:        req.City,
 		MainCrop:    req.MainCrop,
 		TotalAreaHA: req.TotalAreaHA,
+		PlanSlug:    req.PlanSlug,
 	})
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)

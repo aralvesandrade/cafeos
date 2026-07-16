@@ -85,7 +85,7 @@ export function Plans() {
                 <Button
                   variant={plan.featured ? 'secondary' : 'outline'}
                   className="w-full"
-                  onClick={() => navigate('/signup')}
+                  onClick={() => navigate(`/signup?plano=${plan.slug}`)}
                 >
                   Assinar
                 </Button>

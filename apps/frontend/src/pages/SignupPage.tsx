@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Sprout, CheckCircle, ArrowRight } from 'lucide-react'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -7,7 +7,11 @@ import { Select } from '@/components/ui/select'
 import { Tabs } from '@/components/ui/tabs'
 import { RequiredLegend } from '@/components/ui/required-legend'
 import { Button } from '@/components/ui/button'
-import { registerSignup } from '@/lib/api'
+import { registerSignup, fetchPlans, type Plan } from '@/lib/api'
+
+function formatPrice(cents: number) {
+  return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: cents % 100 === 0 ? 0 : 2 })
+}
 
 const ESTADOS = [
   'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',
@@ -21,6 +25,9 @@ const steps = [
 ]
 
 export function SignupPage() {
+  const [searchParams] = useSearchParams()
+  const planSlug = searchParams.get('plano') || ''
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
   const [activeTab, setActiveTab] = useState('dono')
   const [form, setForm] = useState({
     name: '',
@@ -36,6 +43,13 @@ export function SignupPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
+
+  useEffect(() => {
+    if (!planSlug) return
+    fetchPlans()
+      .then((plans) => setSelectedPlan(plans.find((p) => p.slug === planSlug) ?? null))
+      .catch(() => setSelectedPlan(null))
+  }, [planSlug])
 
   const set = (field: keyof typeof form) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -67,6 +81,7 @@ export function SignupPage() {
         city: form.city,
         main_crop: form.main_crop,
         total_area_ha: form.total_area_ha ? Number(form.total_area_ha) : 0,
+        plan_slug: planSlug || undefined,
       })
       setDone(true)
     } catch (err) {
@@ -111,6 +126,19 @@ export function SignupPage() {
               <p className="text-sm text-card-foreground/60 mb-6">
                 Leva menos de dois minutos — conte pra gente sobre você e sua fazenda.
               </p>
+
+              {selectedPlan && (
+                <div className="flex items-center justify-between rounded-sm border border-primary/40 bg-primary/10 px-4 py-3 mb-6">
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide">Plano selecionado</p>
+                    <p className="text-sm font-medium text-card-foreground">{selectedPlan.name}</p>
+                  </div>
+                  <p className="font-mono text-gold font-medium">
+                    {formatPrice(selectedPlan.price_cents)}
+                    <span className="text-xs text-muted-foreground">/{selectedPlan.billing_interval === 'yearly' ? 'ano' : 'mês'}</span>
+                  </p>
+                </div>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <Tabs tabs={steps} activeTab={activeTab}>

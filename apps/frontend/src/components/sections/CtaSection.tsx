@@ -1,11 +1,9 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Mail } from 'lucide-react'
 import { LeadModal } from '@/components/ui/LeadModal'
 
 export function CtaSection() {
-  const navigate = useNavigate()
   const [showContact, setShowContact] = useState(false)
 
   return (
@@ -15,20 +13,17 @@ export function CtaSection() {
           Pronto para transformar sua cafeicultura?
         </h2>
         <p className="text-lg text-foreground/85 max-w-2xl mx-auto mb-8">
-          Comece grátis hoje e descubra como o CafeOS pode ajudar você a
+          Comece hoje mesmo e descubra como o CafeOS pode ajudar você a
           aumentar a produtividade, reduzir custos e tomar decisões melhores.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button
-            variant="secondary"
-            size="lg"
-            className="gap-2"
-            onClick={() => navigate('/signup')}
-          >
-            Assinar Grátis
-            <ArrowRight className="h-5 w-5" />
-          </Button>
+          <a href="#plans">
+            <Button variant="secondary" size="lg" className="gap-2">
+              Assinar agora
+              <ArrowRight className="h-5 w-5" />
+            </Button>
+          </a>
           <Button
             variant="outline"
             size="lg"

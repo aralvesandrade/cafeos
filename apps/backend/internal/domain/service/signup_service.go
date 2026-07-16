@@ -18,14 +18,16 @@ import (
 type SignupService struct {
 	transactor       repository.Transactor
 	organizationRepo repository.OrganizationRepository
+	planRepo         repository.PlanRepository
 	roleSvc          *RoleService
 	defaultOrgSlug   string
 }
 
-func NewSignupService(transactor repository.Transactor, organizationRepo repository.OrganizationRepository, roleSvc *RoleService, defaultOrgSlug string) *SignupService {
+func NewSignupService(transactor repository.Transactor, organizationRepo repository.OrganizationRepository, planRepo repository.PlanRepository, roleSvc *RoleService, defaultOrgSlug string) *SignupService {
 	return &SignupService{
 		transactor:       transactor,
 		organizationRepo: organizationRepo,
+		planRepo:         planRepo,
 		roleSvc:          roleSvc,
 		defaultOrgSlug:   defaultOrgSlug,
 	}
@@ -41,6 +43,7 @@ type RegisterPrincipalInput struct {
 	City        string
 	MainCrop    string
 	TotalAreaHA float64
+	PlanSlug    string
 }
 
 // RegisterPrincipal creates the user and farm every public signup produces.
@@ -67,6 +70,15 @@ func (s *SignupService) RegisterPrincipal(input RegisterPrincipalInput) (*entity
 		return nil, nil, errors.New("proprietario role not found")
 	}
 
+	var planID *string
+	if input.PlanSlug != "" {
+		plan, err := s.planRepo.GetBySlug(input.PlanSlug)
+		if err != nil {
+			return nil, nil, errors.New("plan not found")
+		}
+		planID = &plan.ID
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, nil, errors.New("failed to hash password")
@@ -80,6 +92,7 @@ func (s *SignupService) RegisterPrincipal(input RegisterPrincipalInput) (*entity
 		Email:          input.Email,
 		PasswordHash:   string(hash),
 		RoleID:         role.ID,
+		PlanID:         planID,
 		IsActive:       true,
 		CreatedAt:      now,
 		UpdatedAt:      now,

@@ -37,6 +37,7 @@ export interface RegisterPayload {
   city: string
   main_crop: string
   total_area_ha: number
+  plan_slug?: string
 }
 
 export interface RegisterResponse {

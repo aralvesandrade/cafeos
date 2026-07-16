@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Sprout, Leaf, BarChart3, Wallet, Bell, Tractor, SplitSquareHorizontal } from 'lucide-react'
 
@@ -19,8 +18,6 @@ const manifest = [
 ]
 
 export function Hero() {
-  const navigate = useNavigate()
-
   return (
     <section className="relative min-h-screen flex items-center bg-background pt-16 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(circle, var(--color-foreground) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
@@ -45,10 +42,12 @@ export function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <Button variant="primary" size="lg" onClick={() => navigate('/signup')}>
-                Assinar Grátis
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              <a href="#plans">
+                <Button variant="primary" size="lg">
+                  Assinar agora
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </a>
               <a href="#features">
                 <Button variant="outline" size="lg">
                   Ver Funcionalidades
