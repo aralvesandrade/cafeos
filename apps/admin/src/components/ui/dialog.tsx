@@ -26,7 +26,7 @@ export function Dialog({ open, onClose, title, children, className }: DialogProp
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose()
       }}
@@ -39,9 +39,9 @@ export function Dialog({ open, onClose, title, children, className }: DialogProp
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+          className="absolute top-4 right-4 inline-flex items-center justify-center w-[30px] h-[30px] rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
         >
-          <X className="h-5 w-5" />
+          <X className="h-[17px] w-[17px]" />
         </button>
         <h2 className="text-lg font-semibold text-foreground mb-4">{title}</h2>
         {children}

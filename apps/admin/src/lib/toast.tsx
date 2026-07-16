@@ -47,7 +47,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             {t.kind === 'success' ? (
               <CircleCheck className="h-[18px] w-[18px] mt-0.5 shrink-0 text-success-foreground" />
             ) : (
-              <CircleAlert className="h-[18px] w-[18px] mt-0.5 shrink-0 text-destructive" />
+              <CircleAlert className="h-[18px] w-[18px] mt-0.5 shrink-0 text-danger-foreground" />
             )}
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold">{t.title}</div>
