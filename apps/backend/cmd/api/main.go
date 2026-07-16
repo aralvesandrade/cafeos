@@ -67,7 +67,7 @@ func main() {
 		}
 	}
 
-	router := api.NewRouter(db, eventBus, pub, cfg.JWTSecret, log)
+	router := api.NewRouter(db, eventBus, pub, cfg.JWTSecret, cfg.SignupOrganizationSlug, log)
 
 	port := cfg.ServerPort
 	if p := os.Getenv("PORT"); p != "" {

@@ -18,7 +18,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
-func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, jwtSecret string, log *slog.Logger) http.Handler {
+func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, jwtSecret string, signupOrgSlug string, log *slog.Logger) http.Handler {
 	mux := http.NewServeMux()
 
 	farmRepo := infraRepo.NewFarmRepository(db)
@@ -85,12 +85,14 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 	}
 
 	userSvc := domainSvc.NewUserService(userRepo, planRepo)
+	signupSvc := domainSvc.NewSignupService(transactor, organizationRepo, roleSvc, signupOrgSlug)
 	farmH := handler.NewFarmHandler(farmSvc, userSvc, roleSvc)
 	plotH := handler.NewPlotHandler(plotSvc, farmSvc)
 	opH := handler.NewOperationHandler(opSvc, plotSvc, farmSvc)
 	harvestH := handler.NewHarvestHandler(harvestSvc, plotSvc, farmSvc, indicatorRepo)
 	dashboardH := handler.NewDashboardHandler(harvestRepo, indicatorRepo, opRepo, plotRepo, farmRepo, hpRepo, farmSvc)
 	authH := handler.NewAuthHandler(userRepo, organizationRepo, jwtSecret)
+	signupH := handler.NewSignupHandler(signupSvc)
 	organizationH := handler.NewOrganizationHandler(organizationRepo, permSvc)
 	planH := handler.NewPlanHandler(planSvc)
 	userH := handler.NewUserHandler(userRepo, roleSvc, userSvc)
@@ -114,6 +116,7 @@ func NewRouter(db *gorm.DB, eventBus event.Bus, publisher *messaging.Publisher, 
 
 	// Auth (public)
 	mux.HandleFunc("POST /auth/login", authH.Login)
+	mux.HandleFunc("POST /auth/register", signupH.Register)
 
 	// Health
 	mux.HandleFunc("GET /health", handler.HealthCheck)
