@@ -5527,7 +5527,7 @@ const docTemplate = `{
         },
         "/auth/register": {
             "post": {
-                "description": "Cria um usuário principal (proprietario) e sua fazenda na organização padrão da plataforma — não exige autenticação",
+                "description": "Cria um usuário principal (proprietario) na organização padrão da plataforma — não exige autenticação. A fazenda é cadastrada depois, já autenticado.",
                 "consumes": [
                     "application/json"
                 ],
@@ -5540,7 +5540,7 @@ const docTemplate = `{
                 "summary": "Cadastro público de proprietário",
                 "parameters": [
                     {
-                        "description": "Dados do proprietário e da fazenda",
+                        "description": "Dados do proprietário",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -7842,16 +7842,7 @@ const docTemplate = `{
         "handler.registerRequest": {
             "type": "object",
             "properties": {
-                "city": {
-                    "type": "string"
-                },
                 "email": {
-                    "type": "string"
-                },
-                "farm_name": {
-                    "type": "string"
-                },
-                "main_crop": {
                     "type": "string"
                 },
                 "name": {
@@ -7860,26 +7851,14 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
-                "phone": {
-                    "type": "string"
-                },
                 "plan_slug": {
                     "type": "string"
-                },
-                "state": {
-                    "type": "string"
-                },
-                "total_area_ha": {
-                    "type": "number"
                 }
             }
         },
         "handler.registerResponse": {
             "type": "object",
             "properties": {
-                "farm_id": {
-                    "type": "string"
-                },
                 "user_id": {
                     "type": "string"
                 }

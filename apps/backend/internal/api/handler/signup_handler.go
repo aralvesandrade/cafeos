@@ -16,30 +16,23 @@ func NewSignupHandler(svc *service.SignupService) *SignupHandler {
 }
 
 type registerRequest struct {
-	Name        string  `json:"name"`
-	Email       string  `json:"email"`
-	Password    string  `json:"password"`
-	Phone       string  `json:"phone"`
-	FarmName    string  `json:"farm_name"`
-	State       string  `json:"state"`
-	City        string  `json:"city"`
-	MainCrop    string  `json:"main_crop"`
-	TotalAreaHA float64 `json:"total_area_ha"`
-	PlanSlug    string  `json:"plan_slug"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	PlanSlug string `json:"plan_slug"`
 }
 
 type registerResponse struct {
 	UserID string `json:"user_id"`
-	FarmID string `json:"farm_id"`
 }
 
-// Register realiza o cadastro público de um novo proprietário + sua fazenda
+// Register realiza o cadastro público de um novo proprietário
 // @Summary Cadastro público de proprietário
-// @Description Cria um usuário principal (proprietario) e sua fazenda na organização padrão da plataforma — não exige autenticação
+// @Description Cria um usuário principal (proprietario) na organização padrão da plataforma — não exige autenticação. A fazenda é cadastrada depois, já autenticado.
 // @Tags auth (Autenticação)
 // @Accept json
 // @Produce json
-// @Param body body registerRequest true "Dados do proprietário e da fazenda"
+// @Param body body registerRequest true "Dados do proprietário"
 // @Success 201 {object} registerResponse
 // @Failure 400 {object} map[string]string
 // @Router /auth/register [post]
@@ -50,22 +43,16 @@ func (h *SignupHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, farm, err := h.svc.RegisterPrincipal(service.RegisterPrincipalInput{
-		Name:        req.Name,
-		Email:       req.Email,
-		Password:    req.Password,
-		Phone:       req.Phone,
-		FarmName:    req.FarmName,
-		State:       req.State,
-		City:        req.City,
-		MainCrop:    req.MainCrop,
-		TotalAreaHA: req.TotalAreaHA,
-		PlanSlug:    req.PlanSlug,
+	user, err := h.svc.RegisterPrincipal(service.RegisterPrincipalInput{
+		Name:     req.Name,
+		Email:    req.Email,
+		Password: req.Password,
+		PlanSlug: req.PlanSlug,
 	})
 	if err != nil {
 		writeError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	writeJSON(w, registerResponse{UserID: user.ID, FarmID: farm.ID}, http.StatusCreated)
+	writeJSON(w, registerResponse{UserID: user.ID}, http.StatusCreated)
 }

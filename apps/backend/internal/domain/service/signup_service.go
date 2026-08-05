@@ -11,21 +11,21 @@ import (
 )
 
 // SignupService handles the public, unauthenticated self-service
-// registration flow: a new "usuário principal" (proprietario) plus their
-// first Farm, both created under a single fixed platform organization
-// (defaultOrgSlug) — the request never carries an organization_id, so a
-// public caller can never target an arbitrary tenant.
+// registration flow: a new "usuário principal" (proprietario) created under
+// a single fixed platform organization (defaultOrgSlug) — the request never
+// carries an organization_id, so a public caller can never target an
+// arbitrary tenant. Farm registration happens later, once authenticated.
 type SignupService struct {
-	transactor       repository.Transactor
+	userRepo         repository.UserRepository
 	organizationRepo repository.OrganizationRepository
 	planRepo         repository.PlanRepository
 	roleSvc          *RoleService
 	defaultOrgSlug   string
 }
 
-func NewSignupService(transactor repository.Transactor, organizationRepo repository.OrganizationRepository, planRepo repository.PlanRepository, roleSvc *RoleService, defaultOrgSlug string) *SignupService {
+func NewSignupService(userRepo repository.UserRepository, organizationRepo repository.OrganizationRepository, planRepo repository.PlanRepository, roleSvc *RoleService, defaultOrgSlug string) *SignupService {
 	return &SignupService{
-		transactor:       transactor,
+		userRepo:         userRepo,
 		organizationRepo: organizationRepo,
 		planRepo:         planRepo,
 		roleSvc:          roleSvc,
@@ -34,54 +34,46 @@ func NewSignupService(transactor repository.Transactor, organizationRepo reposit
 }
 
 type RegisterPrincipalInput struct {
-	Name        string
-	Email       string
-	Password    string
-	Phone       string
-	FarmName    string
-	State       string
-	City        string
-	MainCrop    string
-	TotalAreaHA float64
-	PlanSlug    string
+	Name     string
+	Email    string
+	Password string
+	PlanSlug string
 }
 
-// RegisterPrincipal creates the user and farm every public signup produces.
-// The new user is always an independent principal (ManagedByUserID nil,
-// role "proprietario") — unlike UserHandler.CreateForOrg, there is no
-// "first user of the org becomes admin, rest become sub-users" rule here,
-// since every public signup is meant to be its own independent owner
-// sharing the same default platform organization.
-func (s *SignupService) RegisterPrincipal(input RegisterPrincipalInput) (*entity.User, *entity.Farm, error) {
+// RegisterPrincipal creates the user every public signup produces. The new
+// user is always an independent principal (ManagedByUserID nil, role
+// "proprietario") — unlike UserHandler.CreateForOrg, there is no "first user
+// of the org becomes admin, rest become sub-users" rule here, since every
+// public signup is meant to be its own independent owner sharing the same
+// default platform organization. Farm registration is a separate,
+// authenticated step (POST /api/v1/{organization_id}/farms).
+func (s *SignupService) RegisterPrincipal(input RegisterPrincipalInput) (*entity.User, error) {
 	if input.Name == "" || input.Email == "" || input.Password == "" {
-		return nil, nil, errors.New("name, email and password are required")
-	}
-	if input.FarmName == "" {
-		return nil, nil, errors.New("farm name is required")
+		return nil, errors.New("name, email and password are required")
 	}
 
 	org, err := s.organizationRepo.GetBySlug(s.defaultOrgSlug)
 	if err != nil {
-		return nil, nil, errors.New("default organization not configured")
+		return nil, errors.New("default organization not configured")
 	}
 
 	role, err := s.roleSvc.FindByKey(entity.RoleKeyProprietario)
 	if err != nil {
-		return nil, nil, errors.New("proprietario role not found")
+		return nil, errors.New("proprietario role not found")
 	}
 
 	var planID *string
 	if input.PlanSlug != "" {
 		plan, err := s.planRepo.GetBySlug(input.PlanSlug)
 		if err != nil {
-			return nil, nil, errors.New("plan not found")
+			return nil, errors.New("plan not found")
 		}
 		planID = &plan.ID
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, nil, errors.New("failed to hash password")
+		return nil, errors.New("failed to hash password")
 	}
 
 	now := time.Now()
@@ -98,44 +90,9 @@ func (s *SignupService) RegisterPrincipal(input RegisterPrincipalInput) (*entity
 		UpdatedAt:      now,
 	}
 
-	farm := &entity.Farm{
-		ID:             uuid.New().String(),
-		OrganizationID: org.ID,
-		Name:           input.FarmName,
-		Phone:          input.Phone,
-		State:          input.State,
-		City:           input.City,
-		MainCrop:       input.MainCrop,
-		TotalAreaHA:    input.TotalAreaHA,
-		CreatedAt:      now,
-		UpdatedAt:      now,
+	if err := s.userRepo.Create(user); err != nil {
+		return nil, err
 	}
 
-	producer := &entity.Producer{
-		ID:             uuid.New().String(),
-		OrganizationID: org.ID,
-		UserID:         user.ID,
-		RoleID:         role.ID,
-		Name:           input.Name,
-		Phone:          input.Phone,
-		Email:          input.Email,
-		CreatedAt:      now,
-		UpdatedAt:      now,
-	}
-
-	err = s.transactor.RunInTx(func(repos repository.TransactionProvider) error {
-		if err := repos.User().Create(user); err != nil {
-			return err
-		}
-		if err := repos.Farm().Create(farm); err != nil {
-			return err
-		}
-		producer.FarmID = farm.ID
-		return repos.Producer().Create(producer)
-	})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return user, farm, nil
+	return user, nil
 }

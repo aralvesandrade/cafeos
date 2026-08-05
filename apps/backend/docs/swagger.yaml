@@ -1512,31 +1512,17 @@ definitions:
     type: object
   handler.registerRequest:
     properties:
-      city:
-        type: string
       email:
-        type: string
-      farm_name:
-        type: string
-      main_crop:
         type: string
       name:
         type: string
       password:
         type: string
-      phone:
-        type: string
       plan_slug:
         type: string
-      state:
-        type: string
-      total_area_ha:
-        type: number
     type: object
   handler.registerResponse:
     properties:
-      farm_id:
-        type: string
       user_id:
         type: string
     type: object
@@ -5229,10 +5215,11 @@ paths:
     post:
       consumes:
       - application/json
-      description: Cria um usuário principal (proprietario) e sua fazenda na organização
-        padrão da plataforma — não exige autenticação
+      description: Cria um usuário principal (proprietario) na organização padrão
+        da plataforma — não exige autenticação. A fazenda é cadastrada depois, já
+        autenticado.
       parameters:
-      - description: Dados do proprietário e da fazenda
+      - description: Dados do proprietário
         in: body
         name: body
         required: true
