@@ -7,17 +7,24 @@ import { useAuth } from '@/lib/auth'
 import { apiRequest } from '@/lib/api'
 import { useToast } from '@/lib/toast'
 
-const profiles = [
-  { label: 'Admin Plataforma', email: 'admin@cafeos.com.br', password: 'admin123', role: 'platform_owner' },
-  { label: 'Admin Organização', email: 'fernanda@cafeos.com.br', password: '123456', role: 'organization_admin' },
-  { label: 'Consultor', email: 'rodrigo@cafeos.com.br', password: '123456', role: 'consultor_externo' },
-  { label: 'Proprietário (2 fazendas)', email: 'joao@cafeos.com.br', password: '123456', role: 'proprietario' },
-  { label: 'Proprietário (1 fazenda)', email: 'maria@cafeos.com.br', password: '123456', role: 'proprietario' },
-]
+const isDev = import.meta.env.VITE_APP_ENV === 'development'
+
+// Guarded by the isDev ternary (not just the isDev check in the JSX below) so
+// that Vite's minifier constant-folds this away and the seed passwords never
+// end up in the production bundle.
+const profiles = isDev
+  ? [
+      { label: 'Admin Plataforma', email: 'admin@cafeos.com.br', password: 'admin123', role: 'platform_owner' },
+      { label: 'Admin Organização', email: 'fernanda@cafeos.com.br', password: '123456', role: 'organization_admin' },
+      { label: 'Consultor', email: 'rodrigo@cafeos.com.br', password: '123456', role: 'consultor_externo' },
+      { label: 'Proprietário (2 fazendas)', email: 'joao@cafeos.com.br', password: '123456', role: 'proprietario' },
+      { label: 'Proprietário (1 fazenda)', email: 'maria@cafeos.com.br', password: '123456', role: 'proprietario' },
+    ]
+  : []
 
 export function Login() {
-  const [email, setEmail] = useState('admin@cafeos.com.br')
-  const [password, setPassword] = useState('admin123')
+  const [email, setEmail] = useState(isDev ? 'admin@cafeos.com.br' : '')
+  const [password, setPassword] = useState(isDev ? 'admin123' : '')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showQuickAccess, setShowQuickAccess] = useState(false)
@@ -99,57 +106,59 @@ export function Login() {
         </Button>
       </form>
 
-      <div className="bg-card rounded-xl shadow-sm border border-border mt-4">
-        <button
-          type="button"
-          onClick={() => setShowQuickAccess((v) => !v)}
-          className="w-full flex items-center justify-between px-4 py-3 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <span className="flex items-center gap-1">
-            <UserCircle className="h-3 w-3" />
-            ACESSO RÁPIDO
-          </span>
-          {showQuickAccess ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-        </button>
-        {showQuickAccess && (
-          <div className="px-4 pb-4">
-            <p className="text-[10px] text-muted-foreground mb-2">Selecione um perfil para preenchimento automático</p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail('')
-                  setPassword('')
-                  setError('')
-                }}
-                className="text-left text-xs px-3 py-2 rounded-lg border border-dashed border-border text-muted-foreground hover:border-primary/50 hover:text-foreground hover:bg-muted transition-colors"
-              >
-                <div className="truncate font-medium">Limpar</div>
-                <div className="truncate text-[10px] opacity-60">—</div>
-              </button>
-              {profiles.map((p) => (
+      {isDev && (
+        <div className="bg-card rounded-xl shadow-sm border border-border mt-4">
+          <button
+            type="button"
+            onClick={() => setShowQuickAccess((v) => !v)}
+            className="w-full flex items-center justify-between px-4 py-3 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <span className="flex items-center gap-1">
+              <UserCircle className="h-3 w-3" />
+              ACESSO RÁPIDO
+            </span>
+            {showQuickAccess ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+          </button>
+          {showQuickAccess && (
+            <div className="px-4 pb-4">
+              <p className="text-[10px] text-muted-foreground mb-2">Selecione um perfil para preenchimento automático</p>
+              <div className="grid grid-cols-2 gap-2">
                 <button
-                  key={p.email}
                   type="button"
                   onClick={() => {
-                    setEmail(p.email)
-                    setPassword(p.password)
+                    setEmail('')
+                    setPassword('')
                     setError('')
                   }}
-                  className={`text-left text-xs px-3 py-2 rounded-lg border transition-colors ${
-                    email === p.email
-                      ? 'border-primary bg-primary/10 text-primary font-medium'
-                      : 'border-border text-foreground hover:border-primary/50 hover:bg-muted'
-                  }`}
+                  className="text-left text-xs px-3 py-2 rounded-lg border border-dashed border-border text-muted-foreground hover:border-primary/50 hover:text-foreground hover:bg-muted transition-colors"
                 >
-                  <div className="truncate font-medium">{p.label}</div>
-                  <div className="truncate text-[10px] opacity-60">{p.role}</div>
+                  <div className="truncate font-medium">Limpar</div>
+                  <div className="truncate text-[10px] opacity-60">—</div>
                 </button>
-              ))}
+                {profiles.map((p) => (
+                  <button
+                    key={p.email}
+                    type="button"
+                    onClick={() => {
+                      setEmail(p.email)
+                      setPassword(p.password)
+                      setError('')
+                    }}
+                    className={`text-left text-xs px-3 py-2 rounded-lg border transition-colors ${
+                      email === p.email
+                        ? 'border-primary bg-primary/10 text-primary font-medium'
+                        : 'border-border text-foreground hover:border-primary/50 hover:bg-muted'
+                    }`}
+                  >
+                    <div className="truncate font-medium">{p.label}</div>
+                    <div className="truncate text-[10px] opacity-60">{p.role}</div>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
