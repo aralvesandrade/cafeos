@@ -31,18 +31,11 @@ export interface RegisterPayload {
   name: string
   email: string
   password: string
-  phone: string
-  farm_name: string
-  state: string
-  city: string
-  main_crop: string
-  total_area_ha: number
   plan_slug?: string
 }
 
 export interface RegisterResponse {
   user_id: string
-  farm_id: string
 }
 
 export async function registerSignup(payload: RegisterPayload): Promise<RegisterResponse> {
