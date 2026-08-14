@@ -345,6 +345,24 @@ docker run --name cafeos-api -p 5001:5001 \
   -d --network my-network aralvesandrade/cafeos-api
 ```
 
+Redeploy após publicar nova imagem:
+
+```bash
+docker pull aralvesandrade/cafeos-api
+docker stop cafeos-api && docker rm cafeos-api
+docker run --name cafeos-api -p 5001:5001 \
+  -e SERVER_PORT=5001 \
+  -e LOG_LEVEL=DEBUG \
+  -e LOG_FORMAT=json \
+  -e JWT_SECRET=dev-secret-change-in-production \
+  -e TZ=America/Sao_Paulo \
+  -e DATABASE_URL=postgres://cafeos:cafeos@postgres:5432/cafeos?sslmode=disable \
+  -e REDIS_URL=redis://redis:6379 \
+  -e RABBITMQ_URL=amqp://cafeos:cafeos@rabbitmq:5672/ \
+  -e SIGNUP_ORGANIZATION_SLUG=cafeos \
+  -d --network my-network aralvesandrade/cafeos-api
+```
+
 ### Frontend
 
 `VITE_API_URL` e `VITE_ADMIN_URL` são lidos em build-time pelo Vite — passe via `--build-arg` apontando para as URLs públicas de API e Admin (sem isso, o build cai nos fallbacks `http://localhost:5001` e `http://localhost:5174`, usados no link "Entrar" do Header/Footer).
