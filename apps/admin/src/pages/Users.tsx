@@ -18,7 +18,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, User, CreditCard } from "lucide-react";
+import { Plus, Pencil, Trash2, User } from "lucide-react";
 import { useRoles, roleLabel } from "@/lib/roles";
 
 interface OrgUser {

@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
 import { Select } from '@/components/ui/select'
 import { Plus, Pencil, Trash2, Package, ArrowUpDown } from 'lucide-react'
 import { useModuleAccess } from '@/lib/permissions'
@@ -40,7 +39,6 @@ export function Stock() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [movDialogOpen, setMovDialogOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<string>('')
   const [editing, setEditing] = useState<StockItem | null>(null)
   const [form, setForm] = useState({ product_id: '', farm_id: '', quantity: '', unit: '', batch: '', expiry_date: '', min_stock: '', location: '', notes: '' })
   const [movForm, setMovForm] = useState({ item_id: '', type: 'in', quantity: '', date: '', reference: '', notes: '' })

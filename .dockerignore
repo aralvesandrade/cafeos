@@ -1,0 +1,9 @@
+**/node_modules
+**/dist
+apps/mobile
+apps/backend/tmp
+.git
+.specify
+plans
+docs
+*.md

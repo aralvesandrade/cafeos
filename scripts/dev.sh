@@ -75,6 +75,18 @@ case "${1:-help}" in
     cd "$ROOT_DIR/apps/backend"
     go test ./... -v
     ;;
+  docker:build)
+    echo "Building API Docker image..."
+    docker buildx build -t aralvesandrade/cafeos-api "$ROOT_DIR/apps/backend"
+    ;;
+  docker:build:frontend)
+    echo "Building frontend Docker image..."
+    docker buildx build -f "$ROOT_DIR/apps/frontend/Dockerfile" -t aralvesandrade/cafeos-frontend "$ROOT_DIR"
+    ;;
+  docker:build:admin)
+    echo "Building admin Docker image..."
+    docker buildx build -f "$ROOT_DIR/apps/admin/Dockerfile" -t aralvesandrade/cafeos-admin "$ROOT_DIR"
+    ;;
   *)
     echo "Usage: $0 {command}"
     echo ""
@@ -88,5 +100,8 @@ case "${1:-help}" in
     echo "  db:reset    Reset database and re-run migrations"
     echo "  db:seed     Run seed data"
     echo "  test        Run backend tests"
+    echo "  docker:build           Build API Docker image"
+    echo "  docker:build:frontend  Build frontend Docker image"
+    echo "  docker:build:admin     Build admin Docker image"
     ;;
 esac
