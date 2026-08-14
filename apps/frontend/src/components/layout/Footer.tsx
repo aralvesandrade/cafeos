@@ -1,4 +1,5 @@
 import { Sprout, Mail, ArrowUpRight } from 'lucide-react'
+import { ADMIN_URL } from '@/lib/api'
 
 const productLinks = [
   { label: 'Funcionalidades', href: '#features' },
@@ -9,7 +10,7 @@ const productLinks = [
 
 const companyLinks = [
   { label: 'Por que o CafeOS?', href: '#about' },
-  { label: 'Acessar plataforma', href: 'http://localhost:5174', external: true },
+  { label: 'Acessar plataforma', href: ADMIN_URL, external: true },
 ]
 
 export function Footer() {

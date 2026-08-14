@@ -347,8 +347,13 @@ docker run --name cafeos-api -p 5001:5001 \
 
 ### Frontend
 
+`VITE_API_URL` e `VITE_ADMIN_URL` são lidos em build-time pelo Vite — passe via `--build-arg` apontando para as URLs públicas de API e Admin (sem isso, o build cai nos fallbacks `http://localhost:5001` e `http://localhost:5174`, usados no link "Entrar" do Header/Footer).
+
 ```bash
-docker buildx build -f apps/frontend/Dockerfile -t aralvesandrade/cafeos-frontend .
+docker buildx build \
+  --build-arg VITE_API_URL=https://cafeos-api.aralvesandrade.com.br \
+  --build-arg VITE_ADMIN_URL=https://cafeos-admin.aralvesandrade.com.br \
+  -f apps/frontend/Dockerfile -t aralvesandrade/cafeos-frontend .
 docker push aralvesandrade/cafeos-frontend
 ```
 
@@ -365,13 +370,22 @@ docker run --name cafeos-frontend -p 8080:80 \
   -d --network my-network aralvesandrade/cafeos-frontend
 ```
 
+Redeploy após publicar nova imagem:
+
+```bash
+docker pull aralvesandrade/cafeos-frontend
+docker stop cafeos-frontend && docker rm cafeos-frontend
+docker run --name cafeos-frontend -p 8080:80 \
+  -d --network my-network aralvesandrade/cafeos-frontend
+```
+
 ### Admin
 
 `VITE_API_URL` é lido em build-time pelo Vite — passe via `--build-arg` apontando para a URL pública da API.
 
 ```bash
 docker buildx build \
-  --build-arg VITE_API_URL=https://api.cafeos.com.br \
+  --build-arg VITE_API_URL=https://cafeos-api.aralvesandrade.com.br \
   -f apps/admin/Dockerfile -t aralvesandrade/cafeos-admin .
 docker push aralvesandrade/cafeos-admin
 ```
@@ -388,6 +402,27 @@ Executar o container (Nginx servindo o build estático na porta 80):
 docker run --name cafeos-admin -p 5174:80 \
   -d --network my-network aralvesandrade/cafeos-admin
 ```
+
+Redeploy após publicar nova imagem:
+
+```bash
+docker pull aralvesandrade/cafeos-admin
+docker stop cafeos-admin && docker rm cafeos-admin
+docker run --name cafeos-admin -p 5174:80 \
+  -d --network my-network aralvesandrade/cafeos-admin
+```
+
+### Seed (dados iniciais)
+
+A imagem `aralvesandrade/cafeos-api` inclui também o binário `./seed`. Rode-o pontualmente contra o Postgres do ambiente (mesma rede do container), sobrescrevendo o entrypoint:
+
+```bash
+docker run --rm --network my-network \
+  -e DATABASE_URL=postgres://cafeos:cafeos@postgres:5432/cafeos?sslmode=disable \
+  --entrypoint ./seed aralvesandrade/cafeos-api
+```
+
+> ⚠️ O seed cria usuários com senhas fixas (`admin123`, `123456` — ver `apps/backend/cmd/seed/main.go`). Rodar em produção expõe credenciais conhecidas publicamente — confirme antes de aplicar fora do ambiente local.
 
 ## Desenvolvimento Local
 

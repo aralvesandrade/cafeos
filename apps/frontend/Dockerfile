@@ -9,6 +9,10 @@ RUN npm ci --workspace=apps/frontend --include-workspace-root
 
 COPY packages/shared packages/shared
 COPY apps/frontend apps/frontend
+ARG VITE_API_URL=http://localhost:5001
+ARG VITE_ADMIN_URL=http://localhost:5174
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_ADMIN_URL=$VITE_ADMIN_URL
 RUN npm run build --workspace=apps/frontend
 
 FROM nginx:1.27-alpine

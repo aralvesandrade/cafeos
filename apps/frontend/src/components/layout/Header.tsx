@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Sprout, Menu, X } from 'lucide-react'
 import { useState } from 'react'
+import { ADMIN_URL } from '@/lib/api'
 
 const navLinks = [
   { label: 'Por que o CafeOS?', href: '#about' },
@@ -35,7 +36,7 @@ export function Header() {
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
-            <a href="http://localhost:5174" target="_blank" rel="noopener noreferrer">
+            <a href={ADMIN_URL} target="_blank" rel="noopener noreferrer">
               <Button variant="ghost" size="sm">Entrar</Button>
             </a>
           </div>
@@ -62,7 +63,7 @@ export function Header() {
               </a>
             ))}
             <div className="flex gap-3 pt-2">
-              <a href="http://localhost:5174" target="_blank" rel="noopener noreferrer">
+              <a href={ADMIN_URL} target="_blank" rel="noopener noreferrer">
                 <Button variant="ghost" size="sm">Entrar</Button>
               </a>
             </div>
